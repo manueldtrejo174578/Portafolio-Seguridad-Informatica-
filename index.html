@@ -7,28 +7,25 @@
 <meta name="description" content="Portafolio digital de Manuel Darío Trejo Salazar (MDTS) — CNO IV Seguridad Informática.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Importando fuentes tecnológicas desde Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Paleta Dark Mode con tema Xbox */
-    --bg-color: #111411;          /* Fondo casi negro con un levísimo tinte verde */
-    --box-bg: #1a1f1a;            /* Cajas un poco más claras */
-    --text-color: #a3cfa8;        /* Texto general en verde muy pálido (no cansa la vista) */
-    --accent: #107C10;            /* Verde Xbox Oficial (para fondos y bordes gruesos) */
-    --accent-bright: #5DC21E;     /* Verde Xbox Brillante (para textos, links y resaltados) */
-    --border-color: #2b402c;      /* Bordes sutiles verdosos */
-    --shadow-color: #080a08;      /* Sombra súper oscura */
+
+    --bg-color: #181818;      
+    --box-bg: #242424;        
+    --text-color: #cccccc;    
+    --accent: #4ade80;        
+    --border-color: #404040; 
+    --shadow-color: #0a0a0a;  
   }
 
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Share Tech Mono', monospace; 
+    font-family: 'Courier New', Courier, monospace; 
     line-height: 1.6;
     margin: 0;
     padding: 20px;
-    font-size: 1.1rem;
   }
 
   .container {
@@ -36,24 +33,23 @@
     margin: 0 auto;
   }
 
-  h1, h2, h3, .tech-title {
-    font-family: 'Orbitron', sans-serif;
-    color: #e0f2e3; /* Títulos casi blancos pero con tinte verde */
+  h1, h2, h3, .handwritten {
+    font-family: 'Caveat', cursive, sans-serif;
+    color: #eeeeee;
     margin-top: 0;
-    letter-spacing: 1px;
   }
 
-  h1 { font-size: 2.5rem; margin-bottom: 5px; line-height: 1.2; }
-  h2 { font-size: 1.8rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase;}
+  h1 { font-size: 3rem; margin-bottom: 5px; line-height: 1.1; }
+  h2 { font-size: 2.2rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px;}
 
   a {
-    color: var(--accent-bright);
+    color: var(--accent);
     text-decoration: none;
     font-weight: bold;
   }
   a:hover {
     text-decoration: underline;
-    background-color: var(--accent);
+    background-color: #2a3d30; 
     color: #ffffff;
   }
 
@@ -63,7 +59,7 @@
     box-shadow: 6px 6px 0px var(--shadow-color);
     padding: 25px;
     margin-bottom: 40px;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
   header {
@@ -72,10 +68,10 @@
   .id-card {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     flex-wrap: wrap;
     border-bottom: 2px dashed var(--border-color);
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     margin-bottom: 20px;
   }
 
@@ -91,17 +87,14 @@
     padding: 5px 10px;
     background: var(--bg-color);
     box-shadow: 3px 3px 0px var(--shadow-color);
-    color: var(--accent-bright);
-    text-transform: uppercase;
-    font-size: 0.9rem;
+    color: var(--text-color);
   }
   nav a:hover {
     background: var(--accent);
-    color: #ffffff;
+    color: #111;
     text-decoration: none;
     transform: translate(-2px, -2px);
     box-shadow: 5px 5px 0px var(--shadow-color);
-    border-color: var(--accent);
   }
 
   .tag-container {
@@ -109,34 +102,31 @@
   }
   .tag {
     display: inline-block;
-    border: 1px solid var(--accent-bright);
-    background-color: var(--bg-color);
-    color: var(--accent-bright);
-    padding: 3px 10px;
-    font-size: 0.85rem;
+    border: 2px solid var(--border-color);
+    background-color: #1e1e1e;
+    color: #aaaaaa;
+    padding: 2px 8px;
+    font-size: 0.9rem;
     font-weight: bold;
     margin-right: 5px;
     margin-bottom: 5px;
-    text-transform: uppercase;
-    border-radius: 2px;
   }
 
   button.btn {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
     font-size: 1rem;
     background: var(--bg-color);
-    color: var(--accent-bright);
+    color: var(--accent);
     border: 3px solid var(--border-color);
     padding: 10px 20px;
     cursor: pointer;
     box-shadow: 4px 4px 0px var(--shadow-color);
     transition: all 0.1s;
-    letter-spacing: 1px;
   }
   button.btn:hover {
     background: var(--accent);
-    color: #ffffff;
+    color: #111;
     border-color: var(--accent);
   }
   button.btn:active {
@@ -145,21 +135,20 @@
   }
 
   .form-group { margin-bottom: 15px; }
-  label { font-weight: bold; display: block; margin-bottom: 5px; color: #e0f2e3; }
+  label { font-weight: bold; display: block; margin-bottom: 5px; color: #eeeeee; }
   input, textarea {
     width: 100%;
     padding: 10px;
     border: 2px solid var(--border-color);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
+    font-family: inherit;
     box-sizing: border-box;
-    background: #0d100d;
-    color: var(--accent-bright);
+    background: #121212;
+    color: var(--text-color);
   }
   input:focus, textarea:focus {
     outline: none;
-    background: #111411;
-    border-color: var(--accent-bright);
+    background: #181818;
+    border-color: var(--accent);
   }
 
   .tech-grid {
@@ -172,7 +161,7 @@
     padding: 15px;
     background: var(--bg-color);
   }
-  .tech-card ul { padding-left: 20px; margin-top: 10px; }
+  .tech-card ul { padding-left: 20px; }
 
   footer {
     text-align: center;
@@ -180,14 +169,7 @@
     padding-top: 20px;
     border-top: 3px solid var(--border-color);
     font-size: 0.9rem;
-    color: #68856b;
-  }
-  
-  .sys-log {
-    color: #68856b;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-top: 10px;
+    color: #888888;
   }
 </style>
 </head>
@@ -198,82 +180,78 @@
   <header class="box">
     <div class="id-card">
       <div>
-        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.4rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
-        <div class="sys-log">
-          >_ INSTITUCIÓN: Universidad Politécnica de San Luis Potosí (UPSLP)<br>
-          >_ ASIGNATURA: CNO IV — Seguridad Informática<br>
-          >_ PERIODO: 7.º Semestre (Agosto - Diciembre 2026)
-        </div>
+        <strong style="color: #eeeeee;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        CNO IV · Seguridad Informática · 7.º semestre
       </div>
-      <div style="font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: bold; color: var(--accent-bright); margin-left: 20px;">MT</div>
+      <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">MT</div>
     </div>
     <nav>
       <ul>
-        <li><a href="#inicio">/inicio</a></li>
-        <li><a href="#presentacion">/presentación</a></li>
-        <li><a href="#perfil">/perfil</a></li>
-        <li><a href="#contacto">/contacto</a></li>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#presentacion">Presentación</a></li>
+        <li><a href="#perfil">Perfil</a></li>
+        <li><a href="#contacto">Contacto</a></li>
       </ul>
     </nav>
   </header>
 
   <main id="inicio">
     <section class="box">
-      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ PORTAFOLIO DE EVIDENCIAS ]</span>
+      <span class="handwritten" style="font-size: 1.5rem; color: var(--accent);">Cuaderno de campo — parcial 1</span>
       <h1>Hola, soy Manuel Darío.</h1>
-      <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Alias: MDTS — rumbo a SOC & Pentesting ]</p>
+      <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">[ alias MDTS — rumbo a SOC & Pentesting ]</p>
       <p>
         Este sitio reúne, poco a poco, la evidencia de mi paso por la asignatura
         CNO IV — Seguridad Informática: prácticas, análisis y proyectos anotados
-        como en un cuaderno de laboratorio.
+        como en un cuaderno de laboratorio[cite: 1].
       </p>
-      <div style="margin-top: 20px; color: #68856b;">
-        <p><em>SOC -> Pentesting -> Forense Digital</em></p>
+      <div style="margin-top: 20px; color: #888;">
+        <p><em>Ruta: SOC -> Pentesting -> Forense Digital</em></p>
       </div>
     </section>
 
     <section id="presentacion" class="box">
-      <h2>01_Presentación</h2>
+      <h2>01. Presentación del portafolio</h2>
       <p>
         Este portafolio digital tiene como propósito reunir, organizar y documentar de manera ordenada
         la evidencia de aprendizaje generada durante el curso de <strong>Seguridad Informática (CNO IV)</strong>.
-        Funciona como un registro técnico y progresivo del trabajo realizado a lo largo del semestre.
+        Funciona como un registro técnico y progresivo del trabajo realizado a lo largo del semestre[cite: 1].
       </p>
       <p>
         El curso está enfocado en el estudio de la seguridad informática desde una perspectiva
         práctica: pruebas de penetración (pentesting), análisis de vulnerabilidades, hardening de sistemas y
-        buenas prácticas de defensa.
+        buenas prácticas de defensa[cite: 1].
       </p>
       <div class="tag-container">
-        <span class="tag">SEGURIDAD INFORMÁTICA</span>
-        <span class="tag">PENTESTING</span>
-        <span class="tag">DOC. TÉCNICA</span>
+        <span class="tag">Seguridad Informática</span>
+        <span class="tag">Pentesting</span>
+        <span class="tag">Doc. Técnica</span>
       </div>
     </section>
 
     <section id="perfil" class="box">
-      <h2>02_Perfil</h2>
+      <h2>02. Perfil del estudiante</h2>
       <p>
         Estudiante de 7.º semestre en la <strong>Universidad Politécnica de San Luis Potosí</strong>,
-        actualmente cursando la asignatura de Seguridad Informática.
+        actualmente cursando la asignatura de Seguridad Informática[cite: 1].
       </p>
       <p>
         Entusiasta interesado en aprender las técnicas propias de un <strong>SOC (Security Operations Center)</strong>
         y en el <strong>pentesting</strong>, con especial curiosidad por entender cómo se detectan, explotan y
-        mitigan vulnerabilidades en entornos reales.
+        mitigan vulnerabilidades en entornos reales[cite: 1].
       </p>
       <div class="tag-container">
-        <span class="tag">SOC / BLUE TEAM</span>
-        <span class="tag">CIBERSEGURIDAD</span>
-        <span class="tag">INVESTIGACIÓN</span>
+        <span class="tag">SOC / Blue Team</span>
+        <span class="tag">Ciberseguridad</span>
+        <span class="tag">Investigación</span>
       </div>
     </section>
 
     <section id="tecnico" class="box">
-      <h2>03_Info_Técnica</h2>
+      <h2>03. Info Técnica del Sitio</h2>
       <div class="tech-grid">
         <div class="tech-card">
-          <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif;">Tecnologías</strong>
+          <strong style="color: #eeeeee;">Tecnologías</strong>
           <ul>
             <li>HTML5 semántico</li>
             <li>CSS3 nativo</li>
@@ -281,7 +259,7 @@
           </ul>
         </div>
         <div class="tech-card">
-          <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif;">Infraestructura</strong>
+          <strong style="color: #eeeeee;">Infraestructura</strong>
           <ul>
             <li>GitHub Pages</li>
             <li>Git / Control de versiones</li>
@@ -292,8 +270,8 @@
     </section>
 
     <section id="contacto" class="box">
-      <h2>04_Contacto</h2>
-      <p>Escríbeme si quieres comentar algo sobre este portafolio o el curso.</p>
+      <h2>04. Contacto</h2>
+      <p>Escríbeme si quieres comentar algo sobre este portafolio o el curso[cite: 1].</p>
       
       <form id="contactForm">
         <div class="form-group">
@@ -308,7 +286,7 @@
           <label for="message">Mensaje (log):</label>
           <textarea id="message" name="message" rows="4" required></textarea>
         </div>
-        <button type="submit" class="btn">EJECUTAR_ENVÍO</button>
+        <button type="submit" class="btn">EJECUTAR / ENVIAR</button>
         <p id="formStatus" style="font-weight: bold; margin-top: 15px;"></p>
       </form>
     </section>
@@ -316,7 +294,7 @@
 
   <footer>
     <p>© <span id="year"></span> Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
-    <p>Hecho con HTML, CSS y modo oscuro.</p>
+    <p>Hecho con HTML, CSS y modo oscuro para cuidar los ojos.</p>
   </footer>
 
 </div>
@@ -324,17 +302,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  const EMAILJS_PUBLIC_KEY  = "TU_PUBLIC_KEY";
-  const EMAILJS_SERVICE_ID  = "TU_SERVICE_ID";
-  const EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID_AUTORESPUESTA";
+  
+  const WORKER_URL = 'https://telegram-portafolio-bot.tuusuario.workers.dev'; 
 
   const form = document.getElementById('contactForm');
   const statusEl = document.getElementById('formStatus');
-
-  if (window.emailjs && EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY") {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-  }
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -351,27 +323,40 @@
       return;
     }
 
-    if (EMAILJS_PUBLIC_KEY === "TU_PUBLIC_KEY") {
-      statusEl.textContent = '> WARNING: Configura las credenciales de EmailJS en el código.';
+    if (WORKER_URL === 'https://telegram-portafolio-bot.tuusuario.workers.dev') {
+      statusEl.textContent = '> WARNING: Configura la URL de tu Cloudflare Worker.';
       statusEl.style.color = '#feca57';
       return;
     }
 
-    statusEl.textContent = '> INICIANDO CONEXIÓN...';
+    statusEl.textContent = '> INICIANDO CONEXIÓN SEGURA...';
 
-    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      name: name,
-      email: email,
-      message: message,
-      time: new Date().toLocaleString('es-MX')
-    }).then(function(){
-      statusEl.textContent = '> ÉXITO: Paquete enviado correctamente. Recibirás un ACK en tu correo.';
-      statusEl.style.color = 'var(--accent-bright)';
-      form.reset();
-    }).catch(function(err){
-      statusEl.textContent = '> ERROR FATAL: Falló el envío (Timeout/Rechazado).';
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        message: message
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.success) {
+        statusEl.textContent = '> ÉXITO: Payload entregado y ofuscado correctamente.';
+        statusEl.style.color = 'var(--accent-bright)';
+        form.reset();
+      } else {
+        statusEl.textContent = '> ERROR: Fallo en el gateway de seguridad.';
+        statusEl.style.color = '#ff6b6b';
+      }
+    })
+    .catch(error => {
+      statusEl.textContent = '> ERROR FATAL: Conexión rechazada por el Worker.';
       statusEl.style.color = '#ff6b6b';
-      console.error(err);
+      console.error(error);
     });
   });
 </script>
