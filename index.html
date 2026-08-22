@@ -7,25 +7,26 @@
 <meta name="description" content="Portafolio digital de Manuel Darío Trejo Salazar (MDTS) — CNO IV Seguridad Informática.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-
-    --bg-color: #181818;      
-    --box-bg: #242424;        
-    --text-color: #cccccc;    
-    --accent: #4ade80;        
-    --border-color: #404040; 
-    --shadow-color: #0a0a0a;  
+    --bg-color: #111411;          
+    --box-bg: #1a1f1a;           
+    --text-color: #a3cfa8;      
+    --accent: #107C10;            
+    --accent-bright: #5DC21E;     
+    --border-color: #2b402c;     
+    --shadow-color: #080a08;      
   }
 
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Courier New', Courier, monospace; 
+    font-family: 'Share Tech Mono', monospace; 
     line-height: 1.6;
     margin: 0;
     padding: 20px;
+    font-size: 1.1rem;
   }
 
   .container {
@@ -33,23 +34,24 @@
     margin: 0 auto;
   }
 
-  h1, h2, h3, .handwritten {
-    font-family: 'Caveat', cursive, sans-serif;
-    color: #eeeeee;
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3; 
     margin-top: 0;
+    letter-spacing: 1px;
   }
 
-  h1 { font-size: 3rem; margin-bottom: 5px; line-height: 1.1; }
-  h2 { font-size: 2.2rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px;}
+  h1 { font-size: 2.5rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.8rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase;}
 
   a {
-    color: var(--accent);
+    color: var(--accent-bright);
     text-decoration: none;
     font-weight: bold;
   }
   a:hover {
     text-decoration: underline;
-    background-color: #2a3d30; 
+    background-color: var(--accent);
     color: #ffffff;
   }
 
@@ -59,7 +61,7 @@
     box-shadow: 6px 6px 0px var(--shadow-color);
     padding: 25px;
     margin-bottom: 40px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   header {
@@ -87,14 +89,17 @@
     padding: 5px 10px;
     background: var(--bg-color);
     box-shadow: 3px 3px 0px var(--shadow-color);
-    color: var(--text-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
   }
   nav a:hover {
     background: var(--accent);
-    color: #111;
+    color: #ffffff;
     text-decoration: none;
     transform: translate(-2px, -2px);
     box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
   }
 
   .tag-container {
@@ -102,31 +107,34 @@
   }
   .tag {
     display: inline-block;
-    border: 2px solid var(--border-color);
-    background-color: #1e1e1e;
-    color: #aaaaaa;
-    padding: 2px 8px;
-    font-size: 0.9rem;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
     font-weight: bold;
     margin-right: 5px;
     margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
   }
 
   button.btn {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Orbitron', sans-serif;
     font-weight: bold;
     font-size: 1rem;
     background: var(--bg-color);
-    color: var(--accent);
+    color: var(--accent-bright);
     border: 3px solid var(--border-color);
     padding: 10px 20px;
     cursor: pointer;
     box-shadow: 4px 4px 0px var(--shadow-color);
     transition: all 0.1s;
+    letter-spacing: 1px;
   }
   button.btn:hover {
     background: var(--accent);
-    color: #111;
+    color: #ffffff;
     border-color: var(--accent);
   }
   button.btn:active {
@@ -135,20 +143,21 @@
   }
 
   .form-group { margin-bottom: 15px; }
-  label { font-weight: bold; display: block; margin-bottom: 5px; color: #eeeeee; }
+  label { font-weight: bold; display: block; margin-bottom: 5px; color: #e0f2e3; }
   input, textarea {
     width: 100%;
     padding: 10px;
     border: 2px solid var(--border-color);
-    font-family: inherit;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
     box-sizing: border-box;
-    background: #121212;
-    color: var(--text-color);
+    background: #0d100d;
+    color: var(--accent-bright);
   }
   input:focus, textarea:focus {
     outline: none;
-    background: #181818;
-    border-color: var(--accent);
+    background: #111411;
+    border-color: var(--accent-bright);
   }
 
   .tech-grid {
@@ -161,7 +170,7 @@
     padding: 15px;
     background: var(--bg-color);
   }
-  .tech-card ul { padding-left: 20px; }
+  .tech-card ul { padding-left: 20px; margin-top: 10px; }
 
   footer {
     text-align: center;
@@ -169,7 +178,12 @@
     padding-top: 20px;
     border-top: 3px solid var(--border-color);
     font-size: 0.9rem;
-    color: #888888;
+    color: #68856b;
+  }
+  
+  .sys-log {
+    color: #68856b;
+    font-size: 0.85rem;
   }
 </style>
 </head>
@@ -180,98 +194,98 @@
   <header class="box">
     <div class="id-card">
       <div>
-        <strong style="color: #eeeeee;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
-        CNO IV · Seguridad Informática · 7.º semestre
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Institución: Univ. Politécnica de San Luis Potosí (UPSLP) | Asignatura: CNO IV Seguridad Informática | Periodo: 7.º Semestre</span>
       </div>
-      <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">MT</div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
     </div>
     <nav>
       <ul>
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#presentacion">Presentación</a></li>
-        <li><a href="#perfil">Perfil</a></li>
-        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="#inicio">/inicio</a></li>
+        <li><a href="#presentacion">/presentación</a></li>
+        <li><a href="#perfil">/perfil</a></li>
+        <li><a href="#contacto">/contacto</a></li>
       </ul>
     </nav>
   </header>
 
   <main id="inicio">
     <section class="box">
-      <span class="handwritten" style="font-size: 1.5rem; color: var(--accent);">Cuaderno de campo — parcial 1</span>
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ PORTAFOLIO DE EVIDENCIAS ]</span>
       <h1>Hola, soy Manuel Darío.</h1>
-      <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">[ alias MDTS — rumbo a SOC & Pentesting ]</p>
+      <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Alias: MDTS — rumbo a SOC & Pentesting ]</p>
       <p>
         Este sitio reúne, poco a poco, la evidencia de mi paso por la asignatura
         CNO IV — Seguridad Informática: prácticas, análisis y proyectos anotados
-        como en un cuaderno de laboratorio[cite: 1].
+        como en un cuaderno de laboratorio.
       </p>
-      <div style="margin-top: 20px; color: #888;">
-        <p><em>Ruta: SOC -> Pentesting -> Forense Digital</em></p>
+      <div style="margin-top: 20px; color: #68856b;">
+        <p><em>SOC -> Pentesting -> Forense Digital</em></p>
       </div>
     </section>
 
     <section id="presentacion" class="box">
-      <h2>01. Presentación del portafolio</h2>
+      <h2>01_Presentación</h2>
       <p>
         Este portafolio digital tiene como propósito reunir, organizar y documentar de manera ordenada
         la evidencia de aprendizaje generada durante el curso de <strong>Seguridad Informática (CNO IV)</strong>.
-        Funciona como un registro técnico y progresivo del trabajo realizado a lo largo del semestre[cite: 1].
+        Funciona como un registro técnico y progresivo del trabajo realizado a lo largo del semestre.
       </p>
       <p>
         El curso está enfocado en el estudio de la seguridad informática desde una perspectiva
         práctica: pruebas de penetración (pentesting), análisis de vulnerabilidades, hardening de sistemas y
-        buenas prácticas de defensa[cite: 1].
+        buenas prácticas de defensa.
       </p>
       <div class="tag-container">
-        <span class="tag">Seguridad Informática</span>
-        <span class="tag">Pentesting</span>
-        <span class="tag">Doc. Técnica</span>
+        <span class="tag">SEGURIDAD INFORMÁTICA</span>
+        <span class="tag">PENTESTING</span>
+        <span class="tag">DOC. TÉCNICA</span>
       </div>
     </section>
 
     <section id="perfil" class="box">
-      <h2>02. Perfil del estudiante</h2>
+      <h2>02_Perfil</h2>
       <p>
         Estudiante de 7.º semestre en la <strong>Universidad Politécnica de San Luis Potosí</strong>,
-        actualmente cursando la asignatura de Seguridad Informática[cite: 1].
+        actualmente cursando la asignatura de Seguridad Informática.
       </p>
       <p>
         Entusiasta interesado en aprender las técnicas propias de un <strong>SOC (Security Operations Center)</strong>
         y en el <strong>pentesting</strong>, con especial curiosidad por entender cómo se detectan, explotan y
-        mitigan vulnerabilidades en entornos reales[cite: 1].
+        mitigan vulnerabilidades en entornos reales.
       </p>
       <div class="tag-container">
-        <span class="tag">SOC / Blue Team</span>
-        <span class="tag">Ciberseguridad</span>
-        <span class="tag">Investigación</span>
+        <span class="tag">SOC / BLUE TEAM</span>
+        <span class="tag">CIBERSEGURIDAD</span>
+        <span class="tag">INVESTIGACIÓN</span>
       </div>
     </section>
 
     <section id="tecnico" class="box">
-      <h2>03. Info Técnica del Sitio</h2>
+      <h2>03_Info_Técnica</h2>
       <div class="tech-grid">
         <div class="tech-card">
-          <strong style="color: #eeeeee;">Tecnologías</strong>
+          <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif;">Tecnologías</strong>
           <ul>
             <li>HTML5 semántico</li>
             <li>CSS3 nativo</li>
-            <li>JavaScript vanilla</li>
+            <li>JavaScript vanilla (Fetch API)</li>
           </ul>
         </div>
         <div class="tech-card">
-          <strong style="color: #eeeeee;">Infraestructura</strong>
+          <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif;">Infraestructura</strong>
           <ul>
             <li>GitHub Pages</li>
             <li>Git / Control de versiones</li>
-            <li>Dominio *.github.io</li>
+            <li>Cloudflare Workers (Backend)</li>
           </ul>
         </div>
       </div>
     </section>
 
     <section id="contacto" class="box">
-      <h2>04. Contacto</h2>
-      <p>Escríbeme si quieres comentar algo sobre este portafolio o el curso[cite: 1].</p>
+      <h2>04_Contacto</h2>
+      <p>Escríbeme si quieres comentar algo sobre este portafolio o el curso.</p>
       
       <form id="contactForm">
         <div class="form-group">
@@ -286,7 +300,7 @@
           <label for="message">Mensaje (log):</label>
           <textarea id="message" name="message" rows="4" required></textarea>
         </div>
-        <button type="submit" class="btn">EJECUTAR / ENVIAR</button>
+        <button type="submit" class="btn">EJECUTAR_ENVÍO</button>
         <p id="formStatus" style="font-weight: bold; margin-top: 15px;"></p>
       </form>
     </section>
@@ -294,15 +308,13 @@
 
   <footer>
     <p>© <span id="year"></span> Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
-    <p>Hecho con HTML, CSS y modo oscuro para cuidar los ojos.</p>
+    <p>Hecho con HTML, CSS y modo oscuro.</p>
   </footer>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
-  
   const WORKER_URL = 'https://telegram-portafolio-bot.tuusuario.workers.dev'; 
 
   const form = document.getElementById('contactForm');
