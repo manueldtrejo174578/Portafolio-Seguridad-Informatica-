@@ -7,7 +7,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
    ----------------------------------------------------------- */
 
 // Cloudflare Worker: reenvía el mensaje a tu bot de Telegram (ver README)
-const WORKER_URL = 'https://telegrambot.174578.workers.dev/';
+const WORKER_URL = 'https://telegrambot.174578.workers.dev';
 
 // EmailJS: envía la confirmación automática al remitente (ver README)
 const EMAILJS_PUBLIC_KEY  = '0g-l-qTxh5xUitFsd';
