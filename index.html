@@ -185,6 +185,11 @@
     color: #68856b;
     font-size: 0.85rem;
   }
+
+  button.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -300,7 +305,7 @@
           <label for="message">Mensaje (log):</label>
           <textarea id="message" name="message" rows="4" required></textarea>
         </div>
-        <button type="submit" class="btn">EJECUTAR_ENVÍO</button>
+        <button type="submit" class="btn" id="submitBtn">EJECUTAR_ENVÍO</button>
         <p id="formStatus" style="font-weight: bold; margin-top: 15px;"></p>
       </form>
     </section>
@@ -313,64 +318,6 @@
 
 </div>
 
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-  const WORKER_URL = 'https://telegrambot.174578.workers.dev/'; 
-
-  const form = document.getElementById('contactForm');
-  const statusEl = document.getElementById('formStatus');
-
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    statusEl.textContent = '';
-    statusEl.style.color = 'inherit';
-
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-
-    if(!name || !email || !message){
-      statusEl.textContent = '> ERROR: Faltan parámetros en la solicitud.';
-      statusEl.style.color = '#ff6b6b';
-      return;
-    }
-
-    if (WORKER_URL === 'https://telegram-portafolio-bot.tuusuario.workers.dev') {
-      statusEl.textContent = '> WARNING: Configura la URL de tu Cloudflare Worker.';
-      statusEl.style.color = '#feca57';
-      return;
-    }
-
-    statusEl.textContent = '> INICIANDO CONEXIÓN SEGURA...';
-
-    fetch(WORKER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        message: message
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if(data.success) {
-        statusEl.textContent = '> ÉXITO: Payload entregado y ofuscado correctamente.';
-        statusEl.style.color = 'var(--accent-bright)';
-        form.reset();
-      } else {
-        statusEl.textContent = '> ERROR: Fallo en el gateway de seguridad.';
-        statusEl.style.color = '#ff6b6b';
-      }
-    })
-    .catch(error => {
-      statusEl.textContent = '> ERROR FATAL: Conexión rechazada por el Worker.';
-      statusEl.style.color = '#ff6b6b';
-      console.error(error);
-    });
-  });
-</script>
+<script src="script.js"></script>
 </body>
 </html>
