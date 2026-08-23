@@ -1,149 +1,111 @@
-const TELEGRAM_PROXY_URL = "https://contactobot.175329.workers.dev";
+document.addEventListener('DOMContentLoaded', function () {
 
-const EMAILJS_PUBLIC_KEY         = "Kr6139fnMFe5NwZN7";
-const EMAILJS_SERVICE_ID         = "service_4cqjacs";
-const EMAILJS_TEMPLATE_AUTOREPLY = "template_5i9pggd"; 
+document.getElementById('year').textContent = new Date().getFullYear();
 
-const telegramReady = TELEGRAM_PROXY_URL !== "https://TU-WORKER.workers.dev";
+/* -----------------------------------------------------------
+   CONFIGURACIÓN
+   ----------------------------------------------------------- */
 
+// Cloudflare Worker: reenvía el mensaje a tu bot de Telegram (ver README)
+const WORKER_URL = 'https://telegrambot.174578.workers.dev/';
+
+// EmailJS: envía la confirmación automática al remitente (ver README)
+const EMAILJS_PUBLIC_KEY  = '0g-l-qTxh5xUitFsd';
+const EMAILJS_SERVICE_ID  = 'service_41hb0e5';
+const EMAILJS_TEMPLATE_ID = 'template_27s7ezq';
+
+const workerReady = WORKER_URL && WORKER_URL !== 'https://TU-WORKER.workers.dev';
 const emailjsReady =
-  typeof emailjs !== "undefined" &&
-  EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY";
+  typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY';
 
 if (emailjsReady) {
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 }
 
-/* =========================================================
-   AÑO EN EL FOOTER
-   ========================================================= */
-document.getElementById("year").textContent = new Date().getFullYear();
+const form = document.getElementById('contactForm');
+const statusEl = document.getElementById('formStatus');
+const submitBtn = document.getElementById('submitBtn');
 
-/* =========================================================
-   TIMESTAMP "EN VIVO" DEL EVENT CARD
-   ========================================================= */
-function updateLiveTimestamp() {
-  const el = document.getElementById("liveTimestamp");
-  if (!el) return;
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  el.textContent = `Fecha: ${stamp}`;
+if (!form) {
+  console.error('No se encontró el formulario (#contactForm). Revisa que el id en el HTML coincida.');
+  return;
 }
-updateLiveTimestamp();
-setInterval(updateLiveTimestamp, 1000);
 
-/* =========================================================
-   MENÚ MÓVIL
-   ========================================================= */
-const navToggle = document.getElementById("navToggle");
-const primaryNav = document.getElementById("primaryNav");
+function sendToTelegram(name, email, message) {
+  return fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, message })
+  })
+    .then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data.success) throw new Error(data.error || 'telegram_failed');
+      return data;
+    });
+}
 
-navToggle.addEventListener("click", () => {
-  const isOpen = primaryNav.classList.toggle("is-open");
-  navToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-primaryNav.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    primaryNav.classList.remove("is-open");
-    navToggle.setAttribute("aria-expanded", "false");
+function sendAutoReply(name, email, message) {
+  if (!emailjsReady) return Promise.resolve({ skipped: true });
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    name: name,
+    email: email,
+    message: message,
+    time: new Date().toLocaleString('es-MX')
   });
-});
-
-/* Enlaces de apartados aún no publicados: no navegan */
-document.querySelectorAll(".is-pending").forEach((link) => {
-  link.addEventListener("click", (e) => e.preventDefault());
-});
-
-/* =========================================================
-   REVEAL AL HACER SCROLL
-   ========================================================= */
-const revealEls = document.querySelectorAll(".reveal");
-if ("IntersectionObserver" in window) {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.15 }
-  );
-  revealEls.forEach((el) => observer.observe(el));
-} else {
-  revealEls.forEach((el) => el.classList.add("is-visible"));
 }
 
-/* =========================================================
-   FORMULARIO DE CONTACTO
-   ========================================================= */
-const contactForm = document.getElementById("contactForm");
-const submitBtn = document.getElementById("submitBtn");
-const formStatus = document.getElementById("formStatus");
-
-contactForm.addEventListener("submit", async (e) => {
+form.addEventListener('submit', function (e) {
   e.preventDefault();
+  statusEl.textContent = '';
+  statusEl.style.color = 'inherit';
 
-  const data = {
-    name: document.getElementById("name").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    subject: document.getElementById("subject").value.trim(),
-    message: document.getElementById("message").value.trim(),
-  };
+  const name = form.name.value.trim();
+  const email = form.email.value.trim();
+  const message = form.message.value.trim();
 
-  if (!data.name || !data.email || !data.subject || !data.message) {
-    setStatus("Completa todos los campos antes de enviar.", "err");
+  if (!name || !email || !message) {
+    statusEl.textContent = '> ERROR: Faltan parámetros en la solicitud.';
+    statusEl.style.color = '#ff6b6b';
     return;
   }
 
-  if (!telegramReady && !emailjsReady) {
-    setStatus(
-      "El envío automático aún no está configurado (faltan las claves en script.js).",
-      "err"
-    );
+  if (!workerReady) {
+    statusEl.textContent = '> WARNING: Configura la URL de tu Cloudflare Worker en script.js.';
+    statusEl.style.color = '#feca57';
     return;
   }
 
   submitBtn.disabled = true;
-  setStatus("Enviando…", "");
+  statusEl.textContent = '> INICIANDO CONEXIÓN SEGURA...';
+  statusEl.style.color = 'inherit';
 
-  try {
-    const tasks = [];
+  Promise.allSettled([
+    sendToTelegram(name, email, message),
+    sendAutoReply(name, email, message)
+  ])
+    .then(function (results) {
+      const telegramOk = results[0].status === 'fulfilled';
 
-    // 1) Aviso instantáneo para ti vía Telegram (a través del Worker)
-    if (telegramReady) {
-      tasks.push(
-        fetch(TELEGRAM_PROXY_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }).then((res) => {
-          if (!res.ok) throw new Error("Telegram proxy error");
-        })
-      );
-    }
+      if (telegramOk) {
+        statusEl.textContent = '> ÉXITO: Payload entregado y ofuscado correctamente.';
+        statusEl.style.color = 'var(--accent-bright)';
+        form.reset();
+      } else {
+        statusEl.textContent = '> ERROR: Fallo en el gateway de seguridad.';
+        statusEl.style.color = '#ff6b6b';
+        console.error(results[0].reason);
+      }
 
-    // 2) Autorespuesta para quien llenó el formulario
-    if (emailjsReady) {
-      tasks.push(emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, data));
-    }
-
-    await Promise.all(tasks);
-
-    setStatus("Reporte enviado. Te llegará una confirmación por correo en breve.", "ok");
-    contactForm.reset();
-  } catch (err) {
-    console.error(err);
-    setStatus("No se pudo enviar el mensaje. Intenta de nuevo más tarde.", "err");
-  } finally {
-    submitBtn.disabled = false;
-  }
+      if (results[1].status === 'rejected') {
+        console.error('EmailJS error:', results[1].reason);
+      }
+    })
+    .finally(function () {
+      submitBtn.disabled = false;
+    });
 });
 
-function setStatus(text, type) {
-  formStatus.textContent = text;
-  formStatus.className = "form-status" + (type ? " " + type : "");
-}
+}); // fin DOMContentLoaded
