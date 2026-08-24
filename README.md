@@ -1,6 +1,6 @@
 # Portafolio — MDTS · CNO IV Seguridad Informática
 
-Sitio estático (HTML/CSS/JS) para el portafolio digital de la asignatura CNO IV.
+Sitio estático (HTML/JS) para el portafolio digital de la asignatura CNO IV.
 
 ## Publicación
 
@@ -8,7 +8,7 @@ Sitio estático (HTML/CSS/JS) para el portafolio digital de la asignatura CNO IV
 2. Activa GitHub Pages: *Settings → Pages → Deploy from branch → main*.
 3. Marca *Enforce HTTPS*. Listo.
 
-URL: `https://TU_USUARIO.github.io/NOMBRE_REPO/`
+URL: `https://manueldtrejo174578.github.io/Portafolio-Seguridad-Informatica-/`
 
 ## Formulario de contacto
 
@@ -17,23 +17,12 @@ URL: `https://TU_USUARIO.github.io/NOMBRE_REPO/`
 
 > Mientras no configures las claves, el formulario valida campos pero no envía correos. El sitio sigue funcionando.
 
-## Estructura
-
-| Parcial | Archivo | Estado |
-|---------|---------|--------|
-| 1 — Inicio | `index.html` | ✅ |
-| 2 — Sobre mí | `sobre-mi.html` | 🔒 Próximo |
-| 3 — Proyectos | `proyectos.html` | 🔒 Próximo |
-| 4 — Certificaciones | `certificaciones.html` | 🔒 Próximo |
-
 Para activar un enlace futuro, reemplaza `onclick="return false;"` por el `href` correspondiente.
 
 ## Pendiente
 
-- [ ] Actualizar el enlace del repo en `index.html`.
+- [ ] Incluir mi direccion de correo en `index.html`.
 - [ ] Configurar Worker de Cloudflare y EmailJS.
 - [ ] Verificar en móvil y confirmar el candado 🔒 en la URL.
-
----
 
 *Manuel Darío Trejo Salazar (MDTS) — UPSLP · 7.º Semestre*
