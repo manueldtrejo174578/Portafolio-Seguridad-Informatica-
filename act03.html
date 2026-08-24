@@ -320,6 +320,7 @@
   }
 </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -568,9 +569,9 @@
 
     <h3>Prueba 1: Captura Local</h3>
     <p>Se ejecutó el programa y se tecleó la frase "Hola Mundo":</p>
-    <div class="screenshot-placeholder">
-      📷 [Captura de pantalla: Terminal mostrando eventos capturados]<br>
-      <em>Incluir captura de la terminal con los eventos registrados</em>
+    <div style="text-align: center; margin: 20px 0;">
+      <img src="img/holamundo.png" alt="Captura de terminal Windows - Captura local de eventos Hola Mundo" style="max-width: 100%; border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--shadow-color);">
+      <p class="sys-log" style="margin-top: 10px;">Figura 3: Terminal Windows — Captura local de la frase "Hola Mundo"</p>
     </div>
 
     <h3>Prueba 2: Verificación de Persistencia</h3>
@@ -608,16 +609,16 @@ FECHA_HORA          | TIPO   | ID         | TECLA
     <div class="two-col">
       <div>
         <h4>Emisor (Máquina Windows/Ubuntu)</h4>
-        <div class="screenshot-placeholder">
-          📷 [Captura: Terminal del emisor]<br>
-          <em>Mostrando conexión establecida y eventos enviados</em>
+        <div style="text-align: center; margin: 15px 0;">
+          <img src="img/visual_terminal.png" alt="Terminal Visual Studio Code - Emisor de telemetría" style="max-width: 100%; border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--shadow-color);">
+          <p class="sys-log" style="margin-top: 8px;">Figura 4: Emisor — Terminal VS Code mostrando envío de eventos</p>
         </div>
       </div>
       <div>
         <h4>Receptor (Kali Linux)</h4>
-        <div class="screenshot-placeholder">
-          📷 [Captura: Terminal de Kali]<br>
-          <em>Mostrando recepción de paquetes y eventos</em>
+        <div style="text-align: center; margin: 15px 0;">
+          <img src="img/kali_terminal.png" alt="Terminal Kali Linux - Receptor de telemetría" style="max-width: 100%; border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--shadow-color);">
+          <p class="sys-log" style="margin-top: 8px;">Figura 5: Receptor — Terminal Kali Linux recibiendo paquetes JSON</p>
         </div>
       </div>
     </div>
