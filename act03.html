@@ -321,6 +321,7 @@
 </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -447,15 +448,16 @@
     listener.join()          <span class="code-comment"># ← Bloquea hasta que termine</span></pre>
 
     <div class="warning-box">
-      <h4>⚠️ Contexto de Amenazas — MITRE ATT&CK T1056.001</h4>
-      <p>Los adversarios utilizan keylogging para interceptar credenciales cuando otros métodos de volcado no son efectivos. Permiten:</p>
+      <h4>🛡️ Marco de Amenazas — MITRE ATT&CK T1056.001</h4>
+      <p>La técnica <strong>T1056.001</strong> forma parte del framework MITRE ATT&CK bajo la táctica de <em>Collection</em> (Recolección). Describe el registro de pulsaciones de teclado como vector de obtención de información sensible, sin requerir privilegios elevados en el sistema comprometido.</p>
+      <p style="margin-top: 10px;">En operaciones reales, los actores de amenazas emplean esta técnica para:</p>
       <ul style="margin-left: 20px; margin-top: 10px;">
-        <li>Robo de credenciales de acceso (usuarios y contraseñas)</li>
-        <li>Captura de información financiera (números de tarjeta, PINs)</li>
-        <li>Monitoreo de comunicaciones confidenciales</li>
-        <li>Recopilación de datos personales para ingeniería social</li>
+        <li>Extraer credenciales de acceso durante sesiones de autenticación interactiva.</li>
+        <li>Registrar datos financieros, claves API o tokens de sesión introducidos por el usuario.</li>
+        <li>Documentar patrones de comportamiento y hábitos de navegación para campañas de spear-phishing.</li>
+        <li>Evadir controles de seguridad que dependen únicamente de contraseñas estáticas.</li>
       </ul>
-      <p style="margin-top: 15px;"><strong>Defensa:</strong> Uso de teclados virtuales, autenticación multifactor (MFA), software anti-keylogger y monitoreo de procesos sospechosos.</p>
+      <p style="margin-top: 15px;"><strong>Contramedidas:</strong> Implementar autenticación multifactor (MFA), restringir la instalación de software no firmado, monitorear hooks de bajo nivel (WH_KEYBOARD_LL, evdev) y utilizar teclados virtuales para entradas sensibles.</p>
     </div>
   </section>
 
@@ -678,8 +680,9 @@ FECHA_HORA          | TIPO   | ID         | TECLA
       <a href="KALI_receptor.py" class="btn" download>📥 KALI_receptor.py</a>
     </div>
     <div class="danger-box" style="margin-top: 20px;">
-      <h4>⚠️ Aviso Legal y Ético</h4>
-      <p>Este código está diseñado exclusivamente para <strong>fines educativos en un entorno de laboratorio controlado</strong>. Su propósito es comprender las técnicas de los adversarios para poder defenderse de ellas. El uso no autorizado de keyloggers constituye un delito informático.</p>
+      <h4>⚠️ Declaración de Uso Responsable</h4>
+      <p>El material presentado en esta actividad tiene como <strong>único propósito la formación académica</strong> en ciberseguridad. Su ejecución debe limitarse a <strong>entornos virtuales aislados</strong>, bajo supervisión docente y con el consentimiento explícito de todas las partes involucradas.</p>
+      <p style="margin-top: 10px;">La implementación de software de captura de entrada sin autorización expresa vulnera legislaciones de protección de datos, privacidad informática y acceso indebido a sistemas. El estudiante asume la responsabilidad de emplear estos conocimientos de manera ética, profesional y conforme a la normativa vigente.</p>
     </div>
   </section>
 
