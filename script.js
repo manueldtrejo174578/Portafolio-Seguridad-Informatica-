@@ -1,15 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
 document.getElementById('year').textContent = new Date().getFullYear();
-
-/* -----------------------------------------------------------
-   CONFIGURACIÓN
-   ----------------------------------------------------------- */
-
-// Cloudflare Worker: reenvía el mensaje a tu bot de Telegram (ver README)
 const WORKER_URL = 'https://telegrambot.174578.workers.dev';
-
-// EmailJS: envía la confirmación automática al remitente (ver README)
 const EMAILJS_PUBLIC_KEY  = '0g-l-qTxh5xUitFsd';
 const EMAILJS_SERVICE_ID  = 'service_41hb0e5';
 const EMAILJS_TEMPLATE_ID = 'template_27s7ezq';
