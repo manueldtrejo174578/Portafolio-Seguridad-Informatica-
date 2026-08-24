@@ -1,19 +1,3 @@
-/**
- * Cloudflare Worker — proxy seguro entre el formulario del portafolio
- * y la API de Telegram.
- *
- * Por qué existe: el sitio (GitHub Pages) es estático, así que todo su
- * JS es público. Si el token del bot viviera en ese JS, cualquiera que
- * abriera el código fuente podría usarlo. Este Worker guarda el token
- * como variable secreta del lado del servidor; el navegador nunca lo ve.
- *
- * Variables/secretos que debes configurar en Cloudflare (Settings > Variables):
- *   TELEGRAM_BOT_TOKEN   (secret)  -> token que te da @BotFather
- *   TELEGRAM_CHAT_ID     (secret)  -> tu chat_id numérico
- *   ALLOWED_ORIGIN        (var)    -> ej. https://tu-usuario.github.io
- *
- * Instrucciones completas de despliegue: ver README.md.
- */
 
 export default {
   async fetch(request, env) {
