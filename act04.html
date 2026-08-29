@@ -407,7 +407,7 @@ python -m pip install --upgrade pip
 python -m pip install -e .</pre>
 
     <div class="screenshot">
-      <img src="img/act04_01_set_instalacion.png" alt="Instalación de SET en Kali Linux">
+      <img src="img/act04_1.png" alt="Instalación de SET en Kali Linux">
       <div class="screenshot-caption">Figura 1: Clonado del repositorio e instalación de dependencias en entorno virtual</div>
     </div>
 
@@ -416,7 +416,7 @@ python -m pip install -e .</pre>
     <pre>sudo setoolkit</pre>
 
     <div class="screenshot">
-      <img src="img/act04_02_set_menu.png" alt="Menú principal de SET">
+      <img src="img/act04_2.png" alt="Menú principal de SET">
       <div class="screenshot-caption">Figura 2: Interfaz de Social-Engineer Toolkit v8.1.3 (Codename: Maverick)</div>
     </div>
 
@@ -425,17 +425,17 @@ python -m pip install -e .</pre>
 
     <div class="two-col">
       <div class="screenshot">
-        <img src="img/act04_03_tailscale_kali.png" alt="Tailscale status en Kali">
+        <img src="img/act04_3.png" alt="Tailscale status en Kali">
         <div class="screenshot-caption">Figura 3: Kali Linux — tailscale status y systemctl status tailscaled</div>
       </div>
       <div class="screenshot">
-        <img src="img/act04_04_tailscale_windows_ping.png" alt="Tailscale status y ping en Windows">
+        <img src="img/act04_4.png" alt="Tailscale status y ping en Windows">
         <div class="screenshot-caption">Figura 4: Windows 10 — tailscale status y ping exitoso a Kali</div>
       </div>
     </div>
 
     <div class="screenshot">
-      <img src="img/act04_05_tailscale_dashboard.png" alt="Dashboard de Tailscale">
+      <img src="img/act04_5.png" alt="Dashboard de Tailscale">
       <div class="screenshot-caption">Figura 5: Dashboard web de Tailscale — ambos nodos Connected</div>
     </div>
 
@@ -443,12 +443,12 @@ python -m pip install -e .</pre>
     <p>Se creó una carpeta dedicada y el archivo <code>index.html</code> con un formulario de autenticación genérico. El atributo <code>action</code> del formulario apunta a la IP Tailscale de Kali para que SET capture los datos vía POST.</p>
 
     <div class="screenshot">
-      <img src="img/act04_06_mkdir_nano.png" alt="Creación de carpeta y archivo HTML">
+      <img src="img/act04_6.png" alt="Creación de carpeta y archivo HTML">
       <div class="screenshot-caption">Figura 6: Creación de directorio carpetaindex y edición con nano</div>
     </div>
 
     <div class="screenshot">
-      <img src="img/act04_07_codigo_html.png" alt="Código fuente del login ficticio">
+      <img src="img/act04_7.png" alt="Código fuente del login ficticio">
       <div class="screenshot-caption">Figura 7: Código HTML del portal ficticio con formulario POST a 100.70.51.71</div>
     </div>
 
@@ -460,22 +460,22 @@ python -m pip install -e .</pre>
 3) Custom Import</pre>
 
     <div class="screenshot">
-      <img src="img/act04_08_set_menu1.png" alt="Menú Social-Engineering Attacks">
+      <img src="img/act04_8.png" alt="Menú Social-Engineering Attacks">
       <div class="screenshot-caption">Figura 8: Selección de Social-Engineering Attacks (Opción 1)</div>
     </div>
 
     <div class="screenshot">
-      <img src="img/act04_09_set_webattack.png" alt="Website Attack Vectors">
+      <img src="img/act04_9.png" alt="Website Attack Vectors">
       <div class="screenshot-caption">Figura 9: Selección de Website Attack Vectors (Opción 2)</div>
     </div>
 
     <div class="screenshot">
-      <img src="img/act04_10_set_harvester_desc.png" alt="Descripción de Credential Harvester">
+      <img src="img/act04_10.png" alt="Descripción de Credential Harvester">
       <div class="screenshot-caption">Figura 10: Selección de Credential Harvester Attack Method (Opción 3)</div>
     </div>
 
     <div class="screenshot">
-      <img src="img/act04_11_set_customimport.png" alt="Custom Import en SET">
+      <img src="img/act04_11.png" alt="Custom Import en SET">
       <div class="screenshot-caption">Figura 11: Selección de Custom Import (Opción 3) para cargar página propia</div>
     </div>
 
@@ -488,7 +488,7 @@ python -m pip install -e .</pre>
     </table>
 
     <div class="screenshot">
-      <img src="img/act04_12_set_running.png" alt="SET corriendo en puerto 80">
+      <img src="img/act04_12.png" alt="SET corriendo en puerto 80">
       <div class="screenshot-caption">Figura 12: SET levanta el servidor — Credential Harvester running on port 80</div>
     </div>
   </section>
@@ -500,7 +500,7 @@ python -m pip install -e .</pre>
     <p>Se accedió desde el navegador Firefox a la IP Tailscale del servidor atacante. La víctima visualiza un portal institucional con mensaje de sesión expirada e ingresa credenciales de prueba.</p>
 
     <div class="screenshot">
-      <img src="img/act04_13_victima_login.png" alt="Página de login en Windows 10">
+      <img src="img/act04_13.png" alt="Página de login en Windows 10">
       <div class="screenshot-caption">Figura 13: Windows 10 — La víctima accede a http://100.70.51.71 e ingresa usuario2 / contraseña2</div>
     </div>
 
@@ -508,7 +508,7 @@ python -m pip install -e .</pre>
     <p>SET intercepta la petición POST y extrae los campos del formulario en tiempo real:</p>
 
     <div class="screenshot">
-      <img src="img/act04_14_set_captura.png" alt="Captura de credenciales en SET">
+      <img src="img/act04_14.png" alt="Captura de credenciales en SET">
       <div class="screenshot-caption">Figura 14: Kali Linux — SET muestra WE GOT A HIT! con username=usuario2 y password=contraseña2</div>
     </div>
 
@@ -516,7 +516,7 @@ python -m pip install -e .</pre>
     <p>Se configuró el redireccionamiento del harvester hacia Wikipedia para simular el comportamiento de un ataque real que oculta sus huellas.</p>
 
     <div class="screenshot">
-      <img src="img/act04_15_victima_wikipedia.png" alt="Redirección a Wikipedia">
+      <img src="img/act04_15.png" alt="Redirección a Wikipedia">
       <div class="screenshot-caption">Figura 15: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
     </div>
   </section>
