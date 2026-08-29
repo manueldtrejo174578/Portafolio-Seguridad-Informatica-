@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Act04 — Una página demasiado convincente | MDTS Portafolio</title>
+<meta name="description" content="Actividad 04: Simulación de phishing con Social-Engineer Toolkit (SET) y Tailscale - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --danger: #c94a4a;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-danger { border-color: var(--danger); color: var(--danger); }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  pre {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+    padding: 18px;
+    overflow-x: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent-bright);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .warning-box {
+    background: rgba(201, 162, 39, 0.1);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warning-box h4 { color: var(--warning); margin-top: 0; }
+
+  .success-box {
+    background: rgba(93, 194, 30, 0.1);
+    border: 2px solid var(--accent-bright);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .success-box h4 { color: var(--accent-bright); margin-top: 0; }
+
+  .danger-box {
+    background: rgba(201, 74, 74, 0.1);
+    border: 2px solid var(--danger);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .danger-box h4 { color: var(--danger); margin-top: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .objectives {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .objective-card {
+    background: var(--code-bg);
+    padding: 20px;
+    border-radius: 2px;
+    border-left: 4px solid var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .objective-card h4 { color: var(--accent-bright); margin-bottom: 10px; margin-top: 0; }
+
+  .screenshot {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+    padding: 0;
+    margin: 15px 0;
+    overflow: hidden;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .screenshot img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-caption {
+    padding: 10px;
+    text-align: center;
+    color: #68856b;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial1.html">/primer_parcial</a></li>
+        <li><a href="#info">/info</a></li>
+        <li><a href="#laboratorio">/lab</a></li>
+        <li><a href="#evidencias">/evidencias</a></li>
+        <li><a href="#flujo">/flujo</a></li>
+        <li><a href="#controles">/controles</a></li>
+        <li><a href="#conclusiones">/conclusiones</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ACTIVIDAD 04 — LABORATORIO DE CIBERSEGURIDAD ]</span>
+    <h1>Una página demasiado convincente</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Credential Harvester Attack Method ]</p>
+    <p>
+      Implementación y análisis, en un entorno de laboratorio controlado, de una simulación de ingeniería social
+      mediante <strong>Social-Engineer Toolkit (SET)</strong>, utilizando una página web ficticia para comprender el funcionamiento
+      de una técnica de captura de información y reconocer los elementos que permiten identificar un intento de phishing.
+    </p>
+    <div class="tag-container">
+      <span class="tag">KALI LINUX</span>
+      <span class="tag">SET</span>
+      <span class="tag">TAILSCALE</span>
+      <span class="tag">PHISHING</span>
+      <span class="tag tag-danger">CREDENTIAL HARVESTER</span>
+    </div>
+  </section>
+
+  <section class="box" id="info">
+    <h2>00_Info General</h2>
+    <table>
+      <tr><th>Campo</th><th>Detalle</th></tr>
+      <tr><td><strong>Alumno</strong></td><td>Manuel Darío Trejo Salazar (MDTS)</td></tr>
+      <tr><td><strong>Asignatura</strong></td><td>CNO IV — Seguridad Informática</td></tr>
+      <tr><td><strong>Instructor</strong></td><td>Servando López Contreras</td></tr>
+      <tr><td><strong>Fecha</strong></td><td>28 de agosto de 2026</td></tr>
+      <tr><td><strong>Duración</strong></td><td>4 horas</td></tr>
+      <tr><td><strong>Entorno</strong></td><td>Laboratorio controlado — 2 VMs (Kali Linux + Windows 10) conectadas vía Tailscale</td></tr>
+      <tr><td><strong>Objetivo</strong></td><td>Configurar SET Credential Harvester para capturar credenciales de una página ficticia</td></tr>
+    </table>
+  </section>
+
+  <section class="box">
+    <h2>01_Objetivos</h2>
+    <p>Al finalizar la actividad, el alumno deberá ser capaz de:</p>
+    <div class="objectives">
+      <div class="objective-card">
+        <h4>⚙️ Configurar SET</h4>
+        <p>Configurar un escenario básico de ingeniería social utilizando Social-Engineer Toolkit (SET).</p>
+      </div>
+      <div class="objective-card">
+        <h4>🌐 Implementar Página Ficticia</h4>
+        <p>Implementar una página web ficticia mediante el módulo Credential Harvester.</p>
+      </div>
+      <div class="objective-card">
+        <h4>📡 Analizar Flujo</h4>
+        <p>Analizar el proceso mediante el cual la información del formulario es transmitida y registrada por el servidor.</p>
+      </div>
+      <div class="objective-card">
+        <h4>🔍 Identificar IoC</h4>
+        <p>Identificar indicadores técnicos y visuales que permitan reconocer una página potencialmente fraudulenta.</p>
+      </div>
+      <div class="objective-card">
+        <h4>🛡️ Proponer Controles</h4>
+        <p>Proponer controles de seguridad orientados a prevenir o reducir el impacto de ataques de phishing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>02_Descripción del Escenario</h2>
+    <p>
+      El área de seguridad informática de una organización ha recibido reportes de empleados que aseguran haber recibido
+      un mensaje relacionado con una supuesta actualización de credenciales. El mensaje contiene un enlace que dirige a un
+      portal aparentemente institucional.
+    </p>
+    <p>
+      La página incluye logotipo, campos de usuario y contraseña, y un mensaje indicando:
+      <em>"Su sesión ha expirado. Inicie sesión nuevamente para continuar."</em>
+    </p>
+    <p>
+      A primera vista, nada parece fuera de lo común. Sin embargo, el portal <strong>no pertenece a la organización</strong>.
+      Se trata de una página de phishing diseñada para capturar credenciales de acceso.
+    </p>
+    <div class="warning-box">
+      <h4>⚠️ Alcance del Laboratorio</h4>
+      <p>Esta actividad se realiza exclusivamente en un entorno de laboratorio controlado. Queda prohibido utilizar páginas de servicios reales, clonar portales institucionales, utilizar credenciales personales, solicitar datos a terceros, publicar el servidor hacia Internet, usar dominios externos, implementar suplantación DNS, instalar payloads o ejecutar código malicioso.</p>
+    </div>
+  </section>
+
+  <section class="box" id="laboratorio">
+    <h2>03_Configuración del Laboratorio</h2>
+
+    <h3>Infraestructura</h3>
+    <table>
+      <tr><th>Componente</th><th>Especificación</th></tr>
+      <tr><td>Sistema Operativo (Ataque)</td><td>Kali Linux (última versión estable)</td></tr>
+      <tr><td>Herramienta</td><td>Social-Engineer Toolkit (SET) v8.1.3</td></tr>
+      <tr><td>Sistema Operativo (Víctima)</td><td>Windows 10 Pro</td></tr>
+      <tr><td>Conectividad entre VMs</td><td>Tailscale VPN (WireGuard)</td></tr>
+      <tr><td>IP Kali (Tailscale)</td><td>100.70.51.71</td></tr>
+      <tr><td>IP Windows (Tailscale)</td><td>100.126.55.113</td></tr>
+      <tr><td>Sitio Web Ficticio</td><td>index.html (login institucional genérico)</td></tr>
+    </table>
+
+    <h3>Paso 1: Instalación de SET</h3>
+    <p>Desde Kali Linux, se clonó el repositorio oficial de TrustedSec y se instaló en un entorno virtual de Python:</p>
+    <pre>git clone https://github.com/trustedsec/social-engineer-toolkit/ setoolkit/
+cd setoolkit
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .</pre>
+
+    <div class="screenshot">
+      <img src="img/act04_01_set_instalacion.png" alt="Instalación de SET en Kali Linux">
+      <div class="screenshot-caption">Figura 1: Clonado del repositorio e instalación de dependencias en entorno virtual</div>
+    </div>
+
+    <h3>Paso 2: Inicio de SET</h3>
+    <p>Se ejecutó la herramienta con privilegios de root:</p>
+    <pre>sudo setoolkit</pre>
+
+    <div class="screenshot">
+      <img src="img/act04_02_set_menu.png" alt="Menú principal de SET">
+      <div class="screenshot-caption">Figura 2: Interfaz de Social-Engineer Toolkit v8.1.3 (Codename: Maverick)</div>
+    </div>
+
+    <h3>Paso 3: Conectividad Tailscale</h3>
+    <p>Se verificó el estado de la VPN mesh entre ambas máquinas virtuales. Tailscale asigna IPs privadas fijas del rango CGNAT (100.64.0.0/10) y establece túneles directos cifrados vía WireGuard.</p>
+
+    <div class="two-col">
+      <div class="screenshot">
+        <img src="img/act04_03_tailscale_kali.png" alt="Tailscale status en Kali">
+        <div class="screenshot-caption">Figura 3: Kali Linux — tailscale status y systemctl status tailscaled</div>
+      </div>
+      <div class="screenshot">
+        <img src="img/act04_04_tailscale_windows_ping.png" alt="Tailscale status y ping en Windows">
+        <div class="screenshot-caption">Figura 4: Windows 10 — tailscale status y ping exitoso a Kali</div>
+      </div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/act04_05_tailscale_dashboard.png" alt="Dashboard de Tailscale">
+      <div class="screenshot-caption">Figura 5: Dashboard web de Tailscale — ambos nodos Connected</div>
+    </div>
+
+    <h3>Paso 4: Creación del sitio web ficticio</h3>
+    <p>Se creó una carpeta dedicada y el archivo <code>index.html</code> con un formulario de autenticación genérico. El atributo <code>action</code> del formulario apunta a la IP Tailscale de Kali para que SET capture los datos vía POST.</p>
+
+    <div class="screenshot">
+      <img src="img/act04_06_mkdir_nano.png" alt="Creación de carpeta y archivo HTML">
+      <div class="screenshot-caption">Figura 6: Creación de directorio carpetaindex y edición con nano</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/act04_07_codigo_html.png" alt="Código fuente del login ficticio">
+      <div class="screenshot-caption">Figura 7: Código HTML del portal ficticio con formulario POST a 100.70.51.71</div>
+    </div>
+
+    <h3>Paso 5: Configuración del ataque en SET</h3>
+    <p>Secuencia de menús seleccionada:</p>
+    <pre>1) Social-Engineering Attacks
+2) Website Attack Vectors
+3) Credential Harvester Attack Method
+3) Custom Import</pre>
+
+    <div class="screenshot">
+      <img src="img/act04_08_set_menu1.png" alt="Menú Social-Engineering Attacks">
+      <div class="screenshot-caption">Figura 8: Selección de Social-Engineering Attacks (Opción 1)</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/act04_09_set_webattack.png" alt="Website Attack Vectors">
+      <div class="screenshot-caption">Figura 9: Selección de Website Attack Vectors (Opción 2)</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/act04_10_set_harvester_desc.png" alt="Descripción de Credential Harvester">
+      <div class="screenshot-caption">Figura 10: Selección de Credential Harvester Attack Method (Opción 3)</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/act04_11_set_customimport.png" alt="Custom Import en SET">
+      <div class="screenshot-caption">Figura 11: Selección de Custom Import (Opción 3) para cargar página propia</div>
+    </div>
+
+    <p>Configuración final:</p>
+    <table>
+      <tr><th>Parámetro</th><th>Valor</th></tr>
+      <tr><td>IP Address for POST back</td><td>100.70.51.71</td></tr>
+      <tr><td>Path to website</td><td>/home/papajohn/Documentos/carpetaindex/</td></tr>
+      <tr><td>URL de referencia</td><td>http://www.ingreso.com (genérica)</td></tr>
+    </table>
+
+    <div class="screenshot">
+      <img src="img/act04_12_set_running.png" alt="SET corriendo en puerto 80">
+      <div class="screenshot-caption">Figura 12: SET levanta el servidor — Credential Harvester running on port 80</div>
+    </div>
+  </section>
+
+  <section class="box" id="evidencias">
+    <h2>04_Evidencias del Ataque Simulado</h2>
+
+    <h3>Desde la máquina víctima (Windows 10)</h3>
+    <p>Se accedió desde el navegador Firefox a la IP Tailscale del servidor atacante. La víctima visualiza un portal institucional con mensaje de sesión expirada e ingresa credenciales de prueba.</p>
+
+    <div class="screenshot">
+      <img src="img/act04_13_victima_login.png" alt="Página de login en Windows 10">
+      <div class="screenshot-caption">Figura 13: Windows 10 — La víctima accede a http://100.70.51.71 e ingresa usuario2 / contraseña2</div>
+    </div>
+
+    <h3>Captura de credenciales en Kali</h3>
+    <p>SET intercepta la petición POST y extrae los campos del formulario en tiempo real:</p>
+
+    <div class="screenshot">
+      <img src="img/act04_14_set_captura.png" alt="Captura de credenciales en SET">
+      <div class="screenshot-caption">Figura 14: Kali Linux — SET muestra WE GOT A HIT! con username=usuario2 y password=contraseña2</div>
+    </div>
+
+    <h3>Redirección post-captura</h3>
+    <p>Se configuró el redireccionamiento del harvester hacia Wikipedia para simular el comportamiento de un ataque real que oculta sus huellas.</p>
+
+    <div class="screenshot">
+      <img src="img/act04_15_victima_wikipedia.png" alt="Redirección a Wikipedia">
+      <div class="screenshot-caption">Figura 15: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
+    </div>
+  </section>
+
+  <section class="box" id="flujo">
+    <h2>05_Explicación del Flujo de Captura</h2>
+
+    <h3>¿Qué es un Credential Harvester?</h3>
+    <p>
+      Un <strong>Credential Harvester</strong> (cosechador de credenciales) es un componente de SET diseñado para capturar información de autenticación introducida por una víctima en un formulario web controlado por el atacante. Su función dentro de una campaña de phishing es:
+    </p>
+    <ul style="margin-left: 20px;">
+      <li>Servir una página de autenticación que simula un portal legítimo.</li>
+      <li>Interceptar los datos enviados por el formulario mediante el método HTTP POST.</li>
+      <li>Registrar y exfiltrar la información hacia el servidor controlado por el atacante.</li>
+      <li>Redirigir a la víctima (opcionalmente) hacia un sitio legítimo para evitar sospechas.</li>
+    </ul>
+
+    <h3>Diagrama de flujo</h3>
+    <div class="screenshot">
+      <img src="img/act04_esquema.jpg" alt="Diagrama de flujo del ataque">
+      <div class="screenshot-caption">Figura 16: Diagrama del flujo completo — Víctima → Servidor SET → Archivo Log</div>
+    </div>
+
+    <h3>Secuencia técnica</h3>
+    <table>
+      <tr><th>Etapa</th><th>Descripción</th></tr>
+      <tr><td>1. Solicitud GET</td><td>El navegador de la víctima solicita la página al servidor SET.</td></tr>
+      <tr><td>2. Respuesta HTML</td><td>SET sirve <code>index.html</code> con el formulario de login.</td></tr>
+      <tr><td>3. Envío de credenciales</td><td>La víctima completa el formulario y envía POST a <code>/post.php</code>.</td></tr>
+      <tr><td>4. Procesamiento</td><td>SET intercepta la petición POST y extrae los parámetros <code>username</code> y <code>password</code>.</td></tr>
+      <tr><td>5. Almacenamiento</td><td>Los datos se muestran en terminal y se guardan en <code>harvester_*.txt</code>.</td></tr>
+      <tr><td>6. Redirección</td><td>SET redirige al usuario al sitio configurado (Wikipedia).</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="controles">
+    <h2>06_Controles de Seguridad Propuestos</h2>
+    <table>
+      <tr><th>Control</th><th>Descripción</th></tr>
+      <tr><td><strong>Autenticación Multifactor (MFA)</strong></td><td>Requiere un segundo factor (token, biometría, app) además de la contraseña.</td></tr>
+      <tr><td><strong>Filtrado de URLs (Proxy/Web Gateway)</strong></td><td>Bloquea dominios sospechosos o no categorizados.</td></tr>
+      <tr><td><strong>DNS Seguro (DNSSEC/DoH)</strong></td><td>Previene envenenamiento de DNS y redirecciones maliciosas.</td></tr>
+      <tr><td><strong>Certificados SSL/TLS válidos</strong></td><td>Los sitios legítimos utilizan HTTPS con certificados válidos.</td></tr>
+      <tr><td><strong>Análisis de correo (SEG)</strong></td><td>Filtra correos con enlaces sospechosos o dominios similares (typosquatting).</td></tr>
+      <tr><td><strong>Honeypots de credenciales</strong></td><td>Detecta uso de credenciales "señuelo" en sistemas reales.</td></tr>
+    </table>
+
+    <h3>Indicadores de compromiso (IoC) visuales</h3>
+    <ul style="margin-left: 20px;">
+      <li>URL con dirección IP directa en lugar de dominio reconocible.</li>
+      <li>Conexión HTTP sin candado de seguridad (ausencia de HTTPS).</li>
+      <li>Mensajes de urgencia excesiva ("Su sesión ha expirado", "Acción inmediata requerida").</li>
+      <li>Errores ortográficos o diseño visual inconsistente con el portal original.</li>
+      <li>Solicitud de credenciales en contextos inusuales o no solicitados.</li>
+    </ul>
+  </section>
+
+  <section class="box" id="conclusiones">
+    <h2>07_Conclusión</h2>
+    <p>
+      La actividad demostró que el módulo Credential Harvester de SET permite capturar credenciales en tiempo real al servir una página web ficticia que explota la confianza del usuario, confirmando que la prevención efectiva contra el phishing requiere combinar capacitación, autenticación multifactor y verificación técnica de URLs y certificados.
+    </p>
+  </section>
+
+  <section class="box">
+    <h2>08_Referencias</h2>
+    <ul style="margin-left: 20px;">
+      <li>Kennedy, D. (s. f.). <em>The Social-Engineer Toolkit (SET)</em> [Software]. TrustedSec. https://github.com/trustedsec/social-engineer-toolkit</li>
+      <li>National Institute of Standards and Technology. (2021). <em>Phishing</em>. NIST. https://www.nist.gov/itl/smallbusinesscyber/guidance-topic/phishing</li>
+      <li>National Institute of Standards and Technology. (2024). <em>Cybersecurity Framework 2.0</em>. NIST. https://www.nist.gov/cyberframework</li>
+      <li>Offensive Security. (2026). <em>set | Kali Linux Tools</em>. Kali Linux. https://www.kali.org/tools/set/</li>
+      <li>TechTarget. (2024). <em>How to use Social-Engineer Toolkit</em>. SearchSecurity. https://www.techtarget.com/cybersecurity/tutorial/How-to-use-Social-Engineer-Toolkit</li>
+    </ul>
+  </section>
+
+  <section class="box">
+    <h2>09_Documentación Completa</h2>
+    <p>Descarga el informe completo de la actividad en formato PDF:</p>
+    <div style="margin-top: 20px;">
+      <a href="DOCUMENTACION.pdf" class="btn" download>📥 Descargar PDF</a>
+    </div>
+    <div class="danger-box" style="margin-top: 20px;">
+      <h4>⚠️ Declaración de Uso Responsable</h4>
+      <p>El material presentado tiene como <strong>único propósito la formación académica</strong> en ciberseguridad. Su ejecución debe limitarse a <strong>entornos virtuales aislados</strong>, bajo supervisión docente y con el consentimiento explícito de todas las partes involucradas.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y JavaScript</p>
+  </footer>
+
+</div>
+</body>
+</html>
