@@ -512,12 +512,20 @@ python -m pip install -e .</pre>
       <div class="screenshot-caption">Figura 14: Kali Linux — SET muestra WE GOT A HIT! con username=usuario2 y password=contraseña2</div>
     </div>
 
-    <h3>Redirección post-captura</h3>
-    <p>Se configuró el redireccionamiento del harvester hacia Wikipedia para simular el comportamiento de un ataque real que oculta sus huellas.</p>
+    <h3>Configuración del redireccionamiento</h3>
+    <p>Se configuró el parámetro <code>HARVESTER_REDIRECT</code> en SET para redirigir a la víctima hacia un sitio legítimo tras la captura:</p>
 
     <div class="screenshot">
-      <img src="img/act04_15.png" alt="Redirección a Wikipedia">
-      <div class="screenshot-caption">Figura 15: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
+      <img src="img/act04_15.png" alt="Configuración del redireccionamiento">
+      <div class="screenshot-caption">Figura 15: Configuración HARVESTER_REDIRECT=ON y HARVESTER_URL=https://www.wikipedia.org</div>
+    </div>
+
+    <h3>Redirección post-captura</h3>
+    <p>El navegador de la víctima es redirigido a Wikipedia, simulando el comportamiento de un ataque real que oculta sus huellas:</p>
+
+    <div class="screenshot">
+      <img src="img/act04_16.png" alt="Redirección a Wikipedia">
+      <div class="screenshot-caption">Figura 16: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
     </div>
   </section>
 
@@ -538,7 +546,7 @@ python -m pip install -e .</pre>
     <h3>Diagrama de flujo</h3>
     <div class="screenshot">
       <img src="img/act04_esquema.jpg" alt="Diagrama de flujo del ataque">
-      <div class="screenshot-caption">Figura 16: Diagrama del flujo completo — Víctima → Servidor SET → Archivo Log</div>
+      <div class="screenshot-caption">Figura 17: Diagrama del flujo completo — Víctima → Servidor SET → Archivo Log</div>
     </div>
 
     <h3>Secuencia técnica</h3>
