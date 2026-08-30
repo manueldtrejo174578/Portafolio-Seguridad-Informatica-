@@ -512,20 +512,28 @@ python -m pip install -e .</pre>
       <div class="screenshot-caption">Figura 14: Kali Linux — SET muestra WE GOT A HIT! con username=usuario2 y password=contraseña2</div>
     </div>
 
+    <h3>Evidencia del Credential Harvester</h3>
+    <p>Visualización adicional del módulo Credential Harvester registrando las credenciales interceptadas:</p>
+
+    <div class="screenshot">
+      <img src="img/act04_15.png" alt="Evidencia del Credential Harvester">
+      <div class="screenshot-caption">Figura 15: Kali Linux — SET Credential Harvester mostrando los datos interceptados en tiempo real</div>
+    </div>
+
     <h3>Configuración del redireccionamiento</h3>
     <p>Se configuró el parámetro <code>HARVESTER_REDIRECT</code> en SET para redirigir a la víctima hacia un sitio legítimo tras la captura:</p>
 
     <div class="screenshot">
-      <img src="img/act04_15.png" alt="Configuración del redireccionamiento">
-      <div class="screenshot-caption">Figura 15: Configuración HARVESTER_REDIRECT=ON y HARVESTER_URL=https://www.wikipedia.org</div>
+      <img src="img/act04_16.png" alt="Configuración del redireccionamiento">
+      <div class="screenshot-caption">Figura 16: Configuración HARVESTER_REDIRECT=ON y HARVESTER_URL=https://www.wikipedia.org</div>
     </div>
 
     <h3>Redirección post-captura</h3>
     <p>El navegador de la víctima es redirigido a Wikipedia, simulando el comportamiento de un ataque real que oculta sus huellas:</p>
 
     <div class="screenshot">
-      <img src="img/act04_16.png" alt="Redirección a Wikipedia">
-      <div class="screenshot-caption">Figura 16: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
+      <img src="img/act04_17.png" alt="Redirección a Wikipedia">
+      <div class="screenshot-caption">Figura 17: Windows 10 — Tras enviar credenciales, el navegador redirige a wikipedia.org</div>
     </div>
   </section>
 
@@ -546,7 +554,7 @@ python -m pip install -e .</pre>
     <h3>Diagrama de flujo</h3>
     <div class="screenshot">
       <img src="img/act04_esquema.jpg" alt="Diagrama de flujo del ataque">
-      <div class="screenshot-caption">Figura 17: Diagrama del flujo completo — Víctima → Servidor SET → Archivo Log</div>
+      <div class="screenshot-caption">Figura 18: Diagrama del flujo completo — Víctima → Servidor SET → Archivo Log</div>
     </div>
 
     <h3>Secuencia técnica</h3>
