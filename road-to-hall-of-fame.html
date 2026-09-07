@@ -3,91 +3,574 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab 01 — Simple Case | MDTS</title>
+<title>MDTS — ROAD TO HALL OF FAME | CNO IV</title>
+<meta name="description" content="Road to Hall of Fame — Laboratorios de Seguridad Informática.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-color: #111411; --box-bg: #1a1f1a; --text-color: #a3cfa8;
-    --accent: #107C10; --accent-bright: #5DC21E; --border-color: #2b402c;
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
     --shadow-color: #080a08;
   }
-  body { background: var(--bg-color); color: var(--text-color); font-family: 'Share Tech Mono', monospace; margin: 0; padding: 20px; line-height: 1.6; }
-  .container { max-width: 900px; margin: 0 auto; }
-  h1, h2, h3 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; }
-  .box { background: var(--box-bg); border: 3px solid var(--border-color); box-shadow: 6px 6px 0 var(--shadow-color); padding: 25px; margin-bottom: 30px; }
-  .btn { font-family: 'Orbitron', sans-serif; border: 3px solid var(--border-color); padding: 10px 20px; color: var(--accent-bright); background: var(--bg-color); box-shadow: 4px 4px 0 var(--shadow-color); text-decoration: none; display: inline-block; }
-  .btn:hover { background: var(--accent); color: #fff; }
-  nav ul { list-style: none; padding: 0; display: flex; gap: 15px; flex-wrap: wrap; }
-  nav a { border: 2px solid var(--border-color); padding: 5px 10px; background: var(--bg-color); color: var(--accent-bright); text-transform: uppercase; font-size: 0.9rem; text-decoration: none; }
-  .evidence { border: 2px dashed var(--border-color); background: #0d100d; padding: 20px; text-align: center; color: #68856b; min-height: 200px; margin: 15px 0; }
-  .payload { background: #0d100d; border-left: 4px solid var(--accent-bright); padding: 15px; color: var(--accent-bright); word-break: break-all; }
-  footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 3px solid var(--border-color); font-size: 0.9rem; color: #68856b; }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.1rem;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.5rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin-bottom: 10px; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 2px;
+  }
+
+  header {
+    margin-bottom: 40px;
+  }
+
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+
+  a.btn {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.85rem;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    padding: 8px 14px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+  }
+  a.btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+  a.btn:active {
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    transform: translate(4px, 4px);
+  }
+
+  .btn-pdf {
+    border-color: #c0392b;
+    color: #e74c3c;
+  }
+  .btn-pdf:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+  }
+
+  .btn-details {
+    border-color: #2980b9;
+    color: #3498db;
+  }
+  .btn-details:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+  }
+
+  .sys-log {
+    color: #68856b;
+    font-size: 0.85rem;
+  }
+
+  /* --- ROADMAP STYLES --- */
+  .roadmap-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .roadmap-header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-bright);
+    text-shadow: 3px 3px 0px var(--shadow-color);
+  }
+
+  .roadmap-container {
+    position: relative;
+    padding: 20px 0;
+  }
+  .roadmap-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent-bright));
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .roadmap-item {
+    position: relative;
+    width: 50%;
+    padding: 0 40px;
+    box-sizing: border-box;
+    margin-bottom: 50px;
+  }
+  .roadmap-item:nth-child(odd) {
+    left: 0;
+    text-align: right;
+  }
+  .roadmap-item:nth-child(even) {
+    left: 50%;
+    text-align: left;
+  }
+
+  .roadmap-item::before {
+    content: attr(data-step);
+    position: absolute;
+    top: 20px;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-color);
+    border: 4px solid var(--accent-bright);
+    border-radius: 50%;
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .roadmap-item:nth-child(odd)::before {
+    right: -18px;
+  }
+  .roadmap-item:nth-child(even)::before {
+    left: -18px;
+  }
+
+  .roadmap-item::after {
+    content: '';
+    position: absolute;
+    top: 36px;
+    width: 24px;
+    height: 2px;
+    background: var(--accent-bright);
+  }
+  .roadmap-item:nth-child(odd)::after {
+    right: 0;
+  }
+  .roadmap-item:nth-child(even)::after {
+    left: 0;
+  }
+
+  .lab-card {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 20px;
+    text-align: left;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .lab-card:hover {
+    border-color: var(--accent-bright);
+    transform: translateY(-3px);
+  }
+  .lab-card h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .lab-meta {
+    font-size: 0.85rem;
+    color: #68856b;
+    margin-bottom: 10px;
+  }
+  .lab-desc {
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+  }
+  .lab-evidence {
+    border: 2px dashed var(--border-color);
+    background: #0d100d;
+    padding: 10px;
+    text-align: center;
+    color: #68856b;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lab-evidence img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border-color);
+  }
+  .lab-payload {
+    background: #0d100d;
+    border-left: 4px solid var(--accent-bright);
+    padding: 10px;
+    font-size: 0.85rem;
+    color: var(--accent-bright);
+    margin: 15px 0;
+    word-break: break-all;
+  }
+
+  .lab-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px dashed var(--border-color);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    .roadmap-container::before {
+      left: 24px;
+    }
+    .roadmap-item {
+      width: 100%;
+      left: 0 !important;
+      text-align: left !important;
+      padding-left: 70px;
+      padding-right: 10px;
+      margin-bottom: 40px;
+    }
+    .roadmap-item::before {
+      left: 6px !important;
+      right: auto !important;
+      top: 10px;
+    }
+    .roadmap-item::after {
+      left: 40px !important;
+      right: auto !important;
+      width: 24px;
+      top: 26px;
+    }
+    .roadmap-header h1 {
+      font-size: 1.6rem;
+    }
+    .lab-actions {
+      flex-direction: column;
+    }
+    .lab-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
+
   <header class="box">
-    <h1>LAB 01: File Path Traversal — Simple Case</h1>
-    <nav><ul>
-      <li><a href="../road-to-hall-of-fame.html">← ROAD TO HALL OF FAME</a></li>
-      <li><a href="../index.html">/inicio</a></li>
-    </ul></nav>
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="index.html#presentacion">/presentación</a></li>
+        <li><a href="index.html#perfil">/perfil</a></li>
+        <li><a href="index.html#contacto">/contacto</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <section class="box">
-    <h2>01. Objetivo del Laboratorio</h2>
-    <p>Acceder al contenido del archivo <code>/etc/passwd</code> explotando una vulnerabilidad de path traversal en el parámetro <code>filename</code>.</p>
-  </section>
+  <main>
+    <section class="roadmap-header">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ACTIVIDAD 08 — PORTSWIGGER WEB SECURITY ACADEMY ]</span>
+      <h1>ROAD TO HALL OF FAME</h1>
+      <p style="color: #68856b; max-width: 600px; margin: 0 auto;">
+        Ruta de progreso de laboratorios prácticos de File Path Traversal. 
+        Cada nodo representa una evidencia técnica documentada con su respectivo análisis de vulnerabilidad, payload y mitigación.
+      </p>
+    </section>
 
-  <section class="box">
-    <h2>02. Procedimiento Paso a Paso</h2>
-    <ol>
-      <li>Acceder al laboratorio en PortSwigger Web Security Academy.</li>
-      <li>Activar el proxy de Burp Suite e interceptar la petición de carga de imagen.</li>
-      <li>Enviar la petición al Repeater (<code>Ctrl+R</code>).</li>
-      <li>Modificar el parámetro <code>filename</code> por <code>../../../etc/passwd</code>.</li>
-      <li>Enviar la petición y analizar la respuesta.</li>
-    </ol>
-  </section>
+    <div class="roadmap-container">
 
-  <section class="box">
-    <h2>03. Request Interceptado</h2>
-    <div class="payload">GET /image?filename=../../../etc/passwd HTTP/2<br>Host: [laboratorio].web-security-academy.net</div>
-  </section>
+      <!-- LAB 1 -->
+      <div class="roadmap-item" data-step="01">
+        <div class="lab-card">
+          <h3>File Path Traversal — Simple Case</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Path Traversal</span>
+            <span class="tag">Burp Suite</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Acceder a archivos sensibles del servidor manipulando el parámetro <code>filename</code> mediante secuencias <code>../</code>.<br><br>
+            <strong>Descripción técnica:</strong> La aplicación carga imágenes de productos usando una ruta relativa sin validar la entrada del usuario. Al interceptar la petición GET en Burp Suite y reemplazar el valor por <code>../../../etc/passwd</code>, el servidor normaliza la ruta y devuelve el contenido del archivo objetivo.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab01-simple-case.png" alt="[Evidencia: Request interceptado y respuesta con /etc/passwd]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: request + payload + respuesta vulnerable + Lab Solved ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=../../../etc/passwd</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab01-simple-case.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab01-simple-case.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
 
-  <section class="box">
-    <h2>04. Evidencias</h2>
-    <div class="evidence">
-      <!-- Sube tu captura aquí -->
-      <img src="../evidencias/lab01-request.png" alt="Request interceptado" style="max-width:100%; display:none;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-      <span>[ Sube tu captura del request interceptado, payload y respuesta con /etc/passwd ]</span>
+      <!-- LAB 2 -->
+      <div class="roadmap-item" data-step="02">
+        <div class="lab-card">
+          <h3>Traversal Blocked — Absolute Path Bypass</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Absolute Path</span>
+            <span class="tag">Bypass</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Leer archivos del sistema cuando la aplicación bloquea secuencias de traversal relativas.<br><br>
+            <strong>Descripción técnica:</strong> El servidor sanitiza entradas con <code>../</code> pero acepta rutas absolutas. Al enviar <code>filename=/etc/passwd</code> directamente desde la raíz del sistema, se omite el directorio base de imágenes y se accede al archivo solicitado.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab02-absolute-path.png" alt="[Evidencia: Bypass con ruta absoluta]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Repeater con /etc/passwd absoluto + respuesta 200 OK ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=/etc/passwd</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab02-absolute-path.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab02-absolute-path.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 3 -->
+      <div class="roadmap-item" data-step="03">
+        <div class="lab-card">
+          <h3>Traversal Stripped — Non-Recursively</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Filter Bypass</span>
+            <span class="tag">URL Encoding</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Bypassar un filtro que elimina secuencias <code>../</code> de forma no recursiva.<br><br>
+            <strong>Descripción técnica:</strong> El servidor aplica un filtro que borra <code>../</code> una sola vez. Anidando la secuencia como <code>....//</code>, tras el primer filtrado queda <code>../</code>, permitiendo el traversal. También aplica codificación URL doble.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab03-stripped.png" alt="[Evidencia: Bypass de filtro no recursivo]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Payload anidado o doble URL-encode + Lab Solved ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=....//....//....//etc/passwd</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab03-stripped.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab03-stripped.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 4 -->
+      <div class="roadmap-item" data-step="04">
+        <div class="lab-card">
+          <h3>Traversal Stripped — Superfluous URL-Decode</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Double Decode</span>
+            <span class="tag">Burp Suite</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Explotar una doble decodificación URL para restaurar secuencias de traversal bloqueadas.<br><br>
+            <strong>Descripción técnica:</strong> La aplicación decodifica la entrada, aplica el filtro, y decodifica nuevamente. Enviando <code>%252e%252e%252f</code> (doble codificación de <code>../</code>) permite que el payload sobreviva al filtrado y se interprete correctamente.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab04-superfluous.png" alt="[Evidencia: Superfluous URL-decode]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %252e%252e%252f + respuesta con /etc/passwd ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=%252e%252e%252fetc/passwd</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab04-superfluous.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab04-superfluous.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 5 -->
+      <div class="roadmap-item" data-step="05">
+        <div class="lab-card">
+          <h3>Validation of Start of Path</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Path Validation</span>
+            <span class="tag">Traversal</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Bypassar la validación que exige que la ruta comience con un directorio esperado.<br><br>
+            <strong>Descripción técnica:</strong> El parámetro contiene la ruta completa <code>/var/www/images/</code>. El servidor valida el prefijo pero no la continuación. Al enviar <code>/var/www/images/../../../../etc/passwd</code>, el prefijo es válido y la normalización apunta a <code>/etc/passwd</code>.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab05-start-path.png" alt="[Evidencia: Validación de inicio de ruta]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Repeater con prefijo válido + traversal + Lab Solved ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=/var/www/images/../../../../etc/passwd</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab05-start-path.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab05-start-path.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 6 -->
+      <div class="roadmap-item" data-step="06">
+        <div class="lab-card">
+          <h3>Validation of File Extension — Null Byte Bypass</h3>
+          <div class="lab-meta">
+            <span class="tag">Apprentice</span>
+            <span class="tag">Null Byte</span>
+            <span class="tag">Extension Bypass</span>
+          </div>
+          <div class="lab-desc">
+            <strong>Objetivo:</strong> Bypassar la validación de extensión de archivo usando el byte nulo <code>%00</code>.<br><br>
+            <strong>Descripción técnica:</strong> La aplicación verifica que el nombre termine en <code>.png</code>. Al inyectar <code>../../../etc/passwd%00.png</code>, el byte nulo trunca la cadena en el sistema subyacente, abriendo <code>/etc/passwd</code> mientras la validación ve <code>.png</code>.
+          </div>
+          <div class="lab-evidence">
+            <img src="evidencias/lab06-null-byte.png" alt="[Evidencia: Null byte bypass]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %00.png + respuesta con contenido de /etc/passwd ]</span>
+          </div>
+          <div class="lab-payload">Payload: filename=../../../etc/passwd%00.png</div>
+          
+          <div class="lab-actions">
+            <a href="assets/lab06-null-byte.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="laboratorios/lab06-null-byte.html" class="btn btn-details">VER DETALLES →</a>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="evidence">
-      <img src="../evidencias/lab01-solved.png" alt="Lab Solved" style="max-width:100%; display:none;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-      <span>[ Sube tu captura de confirmación "Lab Solved" ]</span>
-    </div>
-  </section>
 
-  <section class="box">
-    <h2>05. Explicación del Payload</h2>
-    <p>La secuencia <code>../../../</code> asciende tres niveles desde el directorio de imágenes hasta la raíz del sistema (<code>/</code>), permitiendo acceder a <code>/etc/passwd</code>.</p>
-  </section>
-
-  <section class="box">
-    <h2>06. Mitigación</h2>
-    <ul>
-      <li>Validar y sanitizar todas las entradas de usuario.</li>
-      <li>Usar listas blancas de archivos permitidos.</li>
-      <li>Normalizar rutas con <code>getCanonicalPath()</code> antes de validar.</li>
-      <li>Evitar pasar entrada del usuario directamente a APIs del sistema de archivos.</li>
-    </ul>
-  </section>
+  </main>
 
   <footer>
-    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — CNO IV Seguridad Informática</p>
+    <p>© <span id="year"></span> Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>ROAD TO HALL OF FAME | Seguridad Informática</p>
   </footer>
+
 </div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
