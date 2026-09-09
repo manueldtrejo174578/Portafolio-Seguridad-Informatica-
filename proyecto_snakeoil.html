@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto SNAKEOIL — Walkthrough técnico | MDTS Portafolio</title>
+<meta name="description" content="Proyecto: SNAKEOIL | Writeup técnico y walkthrough completo - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --danger: #c94a4a;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-danger { border-color: var(--danger); color: var(--danger); }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  pre {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+    padding: 18px;
+    overflow-x: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent-bright);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .warning-box {
+    background: rgba(201, 162, 39, 0.1);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warning-box h4 { color: var(--warning); margin-top: 0; }
+
+  .success-box {
+    background: rgba(93, 194, 30, 0.1);
+    border: 2px solid var(--accent-bright);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .success-box h4 { color: var(--accent-bright); margin-top: 0; }
+
+  .danger-box {
+    background: rgba(201, 74, 74, 0.1);
+    border: 2px solid var(--danger);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .danger-box h4 { color: var(--danger); margin-top: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .screenshot {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+    padding: 0;
+    margin: 15px 0;
+    overflow: hidden;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .screenshot img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-caption {
+    padding: 10px;
+    text-align: center;
+    color: #68856b;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial1.html">/primer_parcial</a></li>
+        <li><a href="#info">/info</a></li>
+        <li><a href="#lab">/laboratorio</a></li>
+        <li><a href="#video">/video</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ PROYECTO — LABORATORIO DE CIBERSEGURIDAD ]</span>
+    <h1>SNAKEOIL | Writeup técnico</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Walkthrough técnico completo ]</p>
+    <p>
+      Este proyecto detalla la resolución de la máquina vulnerable SNAKEOIL de la serie digitalworld.local publicada en VulnHub. La resolución incluye el encadenamiento de una puerta trasera en una API REST, inyección de comandos, escalada de privilegios y análisis de código fuente.
+    </p>
+    <div class="tag-container">
+      <span class="tag">KALI LINUX</span>
+      <span class="tag">VULNHUB</span>
+      <span class="tag">PENTESTING</span>
+      <span class="tag tag-warning">COMMAND INJECTION</span>
+      <span class="tag tag-danger">PRIVILEGE ESCALATION</span>
+    </div>
+  </section>
+
+  <section class="box" id="info">
+    <h2>Resumen de la Máquina</h2>
+    <table>
+      <tr><th>Dato</th><th>Valor</th></tr>
+      <tr><td><strong>Objetivo</strong></td><td>192.168.138.130 (digitalworld.local: SNAKEOIL, VulnHub)</td></tr>
+      <tr><td><strong>Atacante</strong></td><td>Kali Linux — 192.168.138.128 (usuario papajohn)</td></tr>
+      <tr><td><strong>Sistema objetivo</strong></td><td>Debian (kernel Linux) — OpenSSH 7.9p1 Debian 10+deb10u2</td></tr>
+      <tr><td><strong>Puertos abiertos</strong></td><td>22/TCP (SSH), 80/TCP (HTTP), 8080/TCP (HTTP)</td></tr>
+      <tr><td><strong>Web</strong></td><td>nginx 1.14.2 + Flask (flask_restful) + SQLite</td></tr>
+      <tr><td><strong>Vector inicial</strong></td><td>Inyección de comandos en backdoor /run (clave: commandexecutionissecret)</td></tr>
+      <tr><td><strong>Escalada</strong></td><td>sudo su con contraseña reutilizada del código fuente</td></tr>
+      <tr><td><strong>Resultado</strong></td><td>root obtenido — COMPLETADO</td></tr>
+    </table>
+    
+    <div class="warning-box">
+      <h4>⚠️ Entorno Controlado</h4>
+      <p>Documento de laboratorio — entorno controlado y autorizado (red aislada VMnet, máquina vulnerable de VulnHub).</p>
+    </div>
+  </section>
+
+  <section class="box" id="lab">
+    <h2>1. Introducción y mapa de ataque</h2>
+    <p>SNAKEOIL es una máquina vulnerable de la serie digitalworld.local publicada en VulnHub. La descripción del laboratorio sugiere que el proyecto es un servicio web con componentes "de dudosa calidad" (snake oil), lo que anticipa una aplicación con funcionalidades ocultas y mala higiene de secretos.</p>
+    <p>El reto no depende de una sola falla. La resolución consiste en encadenar: una puerta trasera (backdoor) expuesta en una API REST, una inyección de comandos del sistema operativo, una reverse shell para obtener un intérprete interactivo, la lectura del código fuente de la aplicación que expone secretos hardcodeados y, finalmente, la reutilización de uno de esos secretos como contraseña para escalar a root.</p>
+
+    <h3>Mapa de la cadena de ataque:</h3>
+    <pre>Escaneo de red (arp-scan) + Nmap
+        |
+        v
+Puerto 8080: API REST Flask (nginx reverse proxy)
+        |
+        v
+Registro de usuario -> /login -> token JWT
+        |
+        v
+GET /secret -> secret_key: "commandexecutionissecret"
+        |
+        v
+POST /run -> inyeccion de comandos OS (www-data)
+        |
+        v
+Reverse shell (nc) -> shell como patrick
+        |
+        v
+Lectura de app.py -> JWT_SECRET_KEY hardcodeada
+        |
+        v
+sudo su + NOreasonableDOUBTthisPASSWORDisGOOD -> root</pre>
+
+    <h2>2. Preparación del entorno de laboratorio</h2>
+    <p>El laboratorio se montó de forma aislada para garantizar que las pruebas no afectaran redes externas ni terceros:</p>
+    <ul>
+      <li>Máquina atacante: Kali Linux (192.168.138.128) con herramientas de pentesting.</li>
+      <li>Máquina objetivo: digitalworld.local: SNAKEOIL (VulnHub), importada en VMware Workstation.</li>
+      <li>Red: segmento aislado tipo host-only/VMnet entre ambas máquinas; sin salida a Internet.</li>
+    </ul>
+    <p>Al arrancar el objetivo se observa el entorno gráfico con un usuario local visible: patrick.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_01.png" alt="Pantalla de inicio de sesión del objetivo">
+      <div class="screenshot-caption">Captura 1 — Pantalla de inicio de sesión del objetivo: usuario local "patrick" visible.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>3. Reconocimiento inicial</h2>
+    
+    <h3>3.1 Descubrimiento de hosts (arp-scan)</h3>
+    <p>La primera tarea fue identificar la dirección IP del objetivo dentro del segmento aislado utilizando <code>arp-scan</code>.</p>
+    <pre>arp-scan -I eth0 -l</pre>
+    <p>El sondeo reveló el objetivo en 192.168.138.130 con prefijo MAC de VMware.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_02.png" alt="arp-scan discovery">
+      <div class="screenshot-caption">Captura 2 — arp-scan: el objetivo 192.168.138.130 identificado por su MAC VMware.</div>
+    </div>
+
+    <h3>3.2 Escaneo completo de puertos y servicios (Nmap)</h3>
+    <p>Se ejecutó un escaneo completo de puertos TCP con detección de servicios, versiones y sistema operativo.</p>
+    <pre>nmap -sC -sV -O -p- -T4 192.168.138.130</pre>
+
+    <div class="screenshot">
+      <img src="img/PR_03.png" alt="Ejecución de Nmap">
+      <div class="screenshot-caption">Captura 3 — Ejecución del escaneo Nmap completo contra 192.168.138.130.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_04.png" alt="Resultados Nmap">
+      <div class="screenshot-caption">Captura 4 — Resultados de Nmap: puertos 22, 80 y 8080.</div>
+    </div>
+
+    <h3>3.3 Verificación del sitio web (puerto 80)</h3>
+    <p>La visita al puerto 80 muestra una página estática de confirmación: "Welcome to SNAKEOIL!".</p>
+
+    <div class="screenshot">
+      <img src="img/PR_05.png" alt="Sitio Web Puerto 80">
+      <div class="screenshot-caption">Captura 5 — Página principal del puerto 80: mensaje estático "Welcome to SNAKEOIL!".</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>4. Enumeración web y descubrimiento de la API</h2>
+    <h3>4.1 Fuzzing de directorios (Gobuster)</h3>
+    <p>Ante una superficie web mínima, se procedió a descubrir rutas ocultas mediante fuzzing sobre el puerto 8080.</p>
+    <pre>gobuster dir -u http://192.168.138.130:8080 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt</pre>
+
+    <div class="screenshot">
+      <img src="img/PR_06.png" alt="Resultados Gobuster">
+      <div class="screenshot-caption">Captura 6 — Gobuster sobre el puerto 8080: descubrimiento de endpoints de API y rutas del blog.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>5. Registro y autenticación en la API (JWT)</h2>
+    <p>El endpoint <code>/registration</code> acepta JSON y crea usuarios sin ninguna validación adicional. Posteriormente, el endpoint <code>/login</code> devuelve tokens de acceso JWT.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_07.png" alt="Registro y Login JWT">
+      <div class="screenshot-caption">Captura 7 — Registro y login en la API: obtención de access_token y refresh_token JWT.</div>
+    </div>
+
+    <h2>6. Endpoint /secret y obtención de la clave</h2>
+    <p>Recordando el 500 de /secret, se probó enviando la cookie de sesión obtenida, lo que filtró la clave del backdoor <code>commandexecutionissecret</code>.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_08.png" alt="Petición Endpoint /secret">
+      <div class="screenshot-caption">Captura 8 — Petición a /secret con cookie JWT: filtrado de secret_key.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>7. Explotación del backdoor /run</h2>
+    <p>El backdoor <code>/run</code> incluye una lista negra de cadenas prohibidas y un timeout de 1 segundo.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_09.png" alt="Pruebas /run">
+      <div class="screenshot-caption">Captura 9 — Pruebas sobre /run: "Banned command!" al detectar 'nc' y expiración de timeout.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_10.png" alt="Ejecución de comandos backdoor">
+      <div class="screenshot-caption">Captura 10 — Ejecución de comandos vía /run: salida de id (www-data) y pruebas de evasión.</div>
+    </div>
+
+    <h2>8. Reverse shell como usuario patrick</h2>
+    <p>Se generó un script para reverse shell. Los primeros intentos fallaron pero se subsanaron montando un servidor de Python en el atacante.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_11.png" alt="Intentos fallidos reverse shell">
+      <div class="screenshot-caption">Captura 11 — Creación de shell2.sh y primeros intentos fallidos de descarga.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_12.png" alt="Python HTTP Server">
+      <div class="screenshot-caption">Captura 12 — Registro de python3 -m http.server: descargas de shell desde el objetivo.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_13.png" alt="Reverse Shell conectada">
+      <div class="screenshot-caption">Captura 13 — Reverse shell activa: id/whoami como patrick, TTY con pty.spawn.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>9. Análisis del código fuente y secretos expuestos</h2>
+    <p>Dentro del directorio, la lectura del archivo <code>app.py</code> expuso la configuración de Flask y el funcionamiento completo del backdoor.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_14.png" alt="app.py imports">
+      <div class="screenshot-caption">Captura 14 — app.py: imports y funciones de acceso a SQLite.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_15.png" alt="app.py secretos">
+      <div class="screenshot-caption">Captura 15 — app.py: configuración con SECRET_KEY y JWT_SECRET_KEY hardcodeadas.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_16.png" alt="app.py rutas 1">
+      <div class="screenshot-caption">Captura 16 — app.py: rutas / y /create con consultas parametrizadas.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_17.png" alt="app.py rutas 2">
+      <div class="screenshot-caption">Captura 17 — app.py: rutas /edit y /delete y registro de recursos API.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_18.png" alt="app.py backdoor inicio">
+      <div class="screenshot-caption">Captura 18 — app.py: recursos de la API y comienzo de la puerta trasera /run.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_19.png" alt="app.py backdoor lista negra">
+      <div class="screenshot-caption">Captura 19 — app.py: lista negra del backdoor y ejecución Popen(..., shell=True).</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>10. Escalada de privilegios: sudo su → root</h2>
+    <p>La contraseña no era un secreto nuevo, sino la <code>JWT_SECRET_KEY</code> reutilizada para el usuario.</p>
+
+    <div class="screenshot">
+      <img src="img/PR_20.png" alt="Escalada a root">
+      <div class="screenshot-caption">Captura 20 — Escalada final: sudo su con la contraseña reutilizada → shell como root.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>11. Intentos fallidos y pruebas SSTI</h2>
+    <p>Se probó Server-Side Template Injection (SSTI), pero el contenido de los posts se almacena y renderiza literalmente, descartando el vector.</p>
+    
+    <div class="screenshot">
+      <img src="img/PR_21.png" alt="Prueba SSTI CLI">
+      <div class="screenshot-caption">Captura 21 — Prueba de SSTI: envío de {{7*7}} al post /1/edit.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_22.png" alt="Payload SSTI">
+      <div class="screenshot-caption">Captura 22 — Payload SSTI {{7*7}} utilizado en la prueba.</div>
+    </div>
+
+    <div class="screenshot">
+      <img src="img/PR_23.png" alt="Vista Render SSTI">
+      <div class="screenshot-caption">Captura 23 — Vista del post tras la edición: el payload se almacenó literal.</div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>12. Mitigaciones</h2>
+    <table>
+      <tr><th>Hallazgo</th><th>Mitigación</th></tr>
+      <tr><td>Backdoor /run con clave fija</td><td>Eliminar puertas traseras; proteger paneles administrativos.</td></tr>
+      <tr><td>Inyección de comandos (shell=True)</td><td>Nunca construir comandos con entrada del usuario; usar listas de argumentos sin shell.</td></tr>
+      <tr><td>JWT_SECRET_KEY hardcodeada</td><td>Externalizar secretos a variables de entorno o un gestor de secretos.</td></tr>
+      <tr><td>Reutilización de contraseña</td><td>Un secreto, un propósito; aplicar políticas de complejidad y contraseñas únicas.</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="video">
+    <h2>13_Video Walkthrough</h2>
+    <p>A continuación se muestra el video de YouTube con los pasos prácticos documentados en este reporte:</p>
+    <!-- Espacio para el video de YouTube -->
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 20px; border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--shadow-color);">
+      <!-- URL de Youtube genérica para reemplazo -->
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen title="SNAKEOIL Walkthrough Video"></iframe>
+    </div>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>14_Documento Original</h2>
+    <p>Descarga el documento de reporte técnico original en formato PDF, del cual fue basada la documentación de esta página.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="Proyecto.pdf" class="btn" download>📥 Descargar PDF del Reporte</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y JavaScript</p>
+  </footer>
+
+</div>
+</body>
+</html>
