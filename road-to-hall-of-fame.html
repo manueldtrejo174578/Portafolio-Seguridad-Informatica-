@@ -366,6 +366,7 @@
     }
   }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -392,7 +393,7 @@
 
   <main>
     <section class="roadmap-header">
-      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ACTIVIDAD 08 — PORTSWIGGER WEB SECURITY ACADEMY ]</span>
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ACTIVIDADES 07 A 12 — PORTSWIGGER WEB SECURITY ACADEMY ]</span>
       <h1>ROAD TO HALL OF FAME</h1>
       <p style="color: #68856b; max-width: 600px; margin: 0 auto;">
         Ruta de progreso de laboratorios prácticos de File Path Traversal. 
@@ -405,24 +406,25 @@
       <!-- LAB 1 -->
       <div class="roadmap-item" data-step="01">
         <div class="lab-card">
-          <h3>File Path Traversal — Simple Case</h3>
+          <h3>Actividad 07 — File Path Traversal: Simple Case</h3>
           <div class="lab-meta">
+            <span class="tag">Actividad 07</span>
             <span class="tag">Apprentice</span>
             <span class="tag">Path Traversal</span>
             <span class="tag">Burp Suite</span>
           </div>
           <div class="lab-desc">
-            <strong>Objetivo:</strong> Acceder a archivos sensibles del servidor manipulando el parámetro <code>filename</code> mediante secuencias <code>../</code>.<br><br>
-            <strong>Descripción técnica:</strong> La aplicación carga imágenes de productos usando una ruta relativa sin validar la entrada del usuario. Al interceptar la petición GET en Burp Suite y reemplazar el valor por <code>../../../etc/passwd</code>, el servidor normaliza la ruta y devuelve el contenido del archivo objetivo.
+            <strong>Objetivo:</strong> Leer el archivo <code>/etc/passwd</code> del servidor manipulando el parámetro <code>filename</code> con secuencias de retroceso <code>../</code>.<br><br>
+            <strong>Descripción técnica:</strong> La tienda carga las imágenes de los productos con una petición <code>GET /image?filename=...</code> sin validar la entrada del usuario. Usando Burp Suite (HTTP history → Repeater) se reemplazó el nombre de la imagen por <code>../../../../etc/passwd</code>; el servidor normalizó la ruta y devolvió el contenido del archivo objetivo con <code>HTTP/2 200 OK</code>.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab01-simple-case.png" alt="[Evidencia: Request interceptado y respuesta con /etc/passwd]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="img/12.png" alt="Evidencia: respuesta vulnerable con contenido de /etc/passwd" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span style="display:none; color:#5DC21E;">[ Sube tu captura: request + payload + respuesta vulnerable + Lab Solved ]</span>
           </div>
-          <div class="lab-payload">Payload: filename=../../../etc/passwd</div>
-          
+          <div class="lab-payload">Payload: filename=../../../../etc/passwd</div>
+
           <div class="lab-actions">
-            <a href="assets/lab01-simple-case.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="assets/lab07-simple-case.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
             <a href="laboratorios/lab01-simple-case.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
@@ -431,7 +433,7 @@
       <!-- LAB 2 -->
       <div class="roadmap-item" data-step="02">
         <div class="lab-card">
-          <h3>Traversal Blocked — Absolute Path Bypass</h3>
+          <h3>Actividad 08 — Traversal Blocked: Absolute Path Bypass</h3>
           <div class="lab-meta">
             <span class="tag">Apprentice</span>
             <span class="tag">Absolute Path</span>
@@ -457,7 +459,7 @@
       <!-- LAB 3 -->
       <div class="roadmap-item" data-step="03">
         <div class="lab-card">
-          <h3>Traversal Stripped — Non-Recursively</h3>
+          <h3>Actividad 09 — Traversal Stripped: Non-Recursively</h3>
           <div class="lab-meta">
             <span class="tag">Apprentice</span>
             <span class="tag">Filter Bypass</span>
@@ -483,7 +485,7 @@
       <!-- LAB 4 -->
       <div class="roadmap-item" data-step="04">
         <div class="lab-card">
-          <h3>Traversal Stripped — Superfluous URL-Decode</h3>
+          <h3>Actividad 10 — Traversal Stripped: Superfluous URL-Decode</h3>
           <div class="lab-meta">
             <span class="tag">Apprentice</span>
             <span class="tag">Double Decode</span>
@@ -509,7 +511,7 @@
       <!-- LAB 5 -->
       <div class="roadmap-item" data-step="05">
         <div class="lab-card">
-          <h3>Validation of Start of Path</h3>
+          <h3>Actividad 11 — Validation of Start of Path</h3>
           <div class="lab-meta">
             <span class="tag">Apprentice</span>
             <span class="tag">Path Validation</span>
@@ -535,7 +537,7 @@
       <!-- LAB 6 -->
       <div class="roadmap-item" data-step="06">
         <div class="lab-card">
-          <h3>Validation of File Extension — Null Byte Bypass</h3>
+          <h3>Actividad 12 — Validation of File Extension: Null Byte Bypass</h3>
           <div class="lab-meta">
             <span class="tag">Apprentice</span>
             <span class="tag">Null Byte</span>
@@ -549,7 +551,7 @@
             <img src="evidencias/lab06-null-byte.png" alt="[Evidencia: Null byte bypass]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %00.png + respuesta con contenido de /etc/passwd ]</span>
           </div>
-          <div class="lab-payload">Payload: filename=../../../etc/passwd%00.png</div>
+          <div class="lab-payload">Payload: filename=../../../../etc/passwd%00.png</div>
           
           <div class="lab-actions">
             <a href="assets/lab06-null-byte.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
