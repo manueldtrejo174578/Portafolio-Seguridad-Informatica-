@@ -245,9 +245,9 @@
     </div>
     <nav>
       <ul>
-        <li><a href="../index.html">/inicio</a></li>
-        <li><a href="../index.html#presentacion">/presentación</a></li>
-        <li><a href="../road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="index.html#presentacion">/presentación</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
       </ul>
     </nav>
   </header>
@@ -274,11 +274,11 @@
       <p>El laboratorio consiste en una tienda en línea ("WE LIKE TO SHOP") cuya carga de imágenes de productos es vulnerable a recorrido de rutas. Para resolverlo, se debe recuperar el contenido del archivo <code>/etc/passwd</code> del servidor.</p>
 
       <div class="evidence">
-        <img src="../img/1.png" alt="Descripción del laboratorio en PortSwigger">
+        <img src="img/1.png" alt="Descripción del laboratorio en PortSwigger">
         <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy (estado inicial: "Not solved").</div>
       </div>
       <div class="evidence">
-        <img src="../img/2.png" alt="Instancia del laboratorio abierta">
+        <img src="img/2.png" alt="Instancia del laboratorio abierta">
         <div class="cap"><strong>Evidencia 2:</strong> Acceso a la instancia del laboratorio — tienda "WE LIKE TO SHOP".</div>
       </div>
     </section>
@@ -331,46 +331,46 @@
       <h3>Paso 1 — Preparación del entorno</h3>
       <p>Se inició <strong style="color:#e0f2e3;">Burp Suite Community Edition v2026.3.2</strong> desde la máquina virtual de Kali Linux, seleccionando en las configuraciones iniciales <em>Temporary project in memory</em> y posteriormente <em>Use Burp defaults</em>.</p>
       <div class="evidence">
-        <img src="../img/3.png" alt="Burp Suite - Temporary project in memory">
+        <img src="img/3.png" alt="Burp Suite - Temporary project in memory">
         <div class="cap"><strong>Evidencia 3:</strong> Configuración inicial de Burp Suite — selección de "Temporary project in memory".</div>
       </div>
       <div class="evidence">
-        <img src="../img/4.png" alt="Burp Suite - Use Burp defaults">
+        <img src="img/4.png" alt="Burp Suite - Use Burp defaults">
         <div class="cap"><strong>Evidencia 4:</strong> Configuración de proyecto — selección de "Use Burp defaults" → "Start Burp".</div>
       </div>
 
       <h3>Paso 2 — Apertura del navegador integrado</h3>
       <p>Con Burp abierto en la pestaña <em>Proxy → Intercept</em>, se abrió el navegador integrado (Chromium embebido) mediante el botón <strong style="color:#e0f2e3;">"Open browser"</strong>, que ya viene configurado con el proxy (<code>127.0.0.1:8080</code>) y el certificado instalado. Se accedió a la URL del laboratorio proporcionada por PortSwigger.</p>
       <div class="evidence">
-        <img src="../img/5.png" alt="Burp Proxy - Open browser">
+        <img src="img/5.png" alt="Burp Proxy - Open browser">
         <div class="cap"><strong>Evidencia 5:</strong> Burp Suite — pestaña Proxy → Intercept con el interruptor "Intercept is off" y el botón "Open browser" resaltado.</div>
       </div>
 
       <h3>Paso 3 — Identificación del punto de ataque</h3>
       <p>Se desactivó temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página. Se navegó a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que disparó la petición que carga la imagen del producto.</p>
       <div class="evidence">
-        <img src="../img/6.png" alt="Tienda WE LIKE TO SHOP - View details">
+        <img src="img/6.png" alt="Tienda WE LIKE TO SHOP - View details">
         <div class="cap"><strong>Evidencia 6:</strong> Tienda "WE LIKE TO SHOP" — selección de un producto con "View details" para disparar la carga de la imagen.</div>
       </div>
       <p>Posteriormente se activó el interceptor ("Intercept is on") y se recargó la página para capturar el tráfico HTTP.</p>
       <div class="evidence">
-        <img src="../img/7.png" alt="Interceptor activado">
+        <img src="img/7.png" alt="Interceptor activado">
         <div class="cap"><strong>Evidencia 7:</strong> Interceptor activado — captura del tráfico HTTP hacia el servidor del laboratorio.</div>
       </div>
       <p>En <em>Proxy → HTTP history</em> se localizó la petición vulnerable que carga la imagen del producto mediante el parámetro <code>filename</code>.</p>
       <div class="evidence">
-        <img src="../img/8.png" alt="HTTP history - peticion GET">
+        <img src="img/8.png" alt="HTTP history - peticion GET">
         <div class="cap"><strong>Evidencia 8:</strong> HTTP history — petición GET capturada hacia la instancia del laboratorio (request interceptado).</div>
       </div>
 
       <h3>Paso 4 — Envío a Repeater</h3>
       <p>Seleccionando la petición en el historial, clic derecho → <strong style="color:#e0f2e3;">"Send to Repeater"</strong> (Ctrl+R). El módulo Repeater permite editar y reenviar la petición tantas veces como sea necesario, observando las respuestas del servidor en tiempo real, sin repetir la acción en el navegador.</p>
       <div class="evidence">
-        <img src="../img/9.png" alt="Send to Repeater">
+        <img src="img/9.png" alt="Send to Repeater">
         <div class="cap"><strong>Evidencia 9:</strong> Menú contextual — envío de la petición a Repeater.</div>
       </div>
       <div class="evidence">
-        <img src="../img/10.png" alt="Request original en Repeater">
+        <img src="img/10.png" alt="Request original en Repeater">
         <div class="cap"><strong>Evidencia 10:</strong> Petición original en Repeater — parámetro <code>filename</code> con el nombre legítimo de la imagen.</div>
       </div>
 
@@ -378,7 +378,7 @@
       <p>En la línea 1 del request se modificó el valor del parámetro <code>filename</code>, reemplazando el nombre de la imagen por la ruta maliciosa:</p>
       <div class="lab-payload">GET /image?filename=../../../../etc/passwd HTTP/2</div>
       <div class="evidence">
-        <img src="../img/11.png" alt="Payload en Repeater">
+        <img src="img/11.png" alt="Payload en Repeater">
         <div class="cap"><strong>Evidencia 11:</strong> Request modificado en Repeater — payload de path traversal <code>../../../../etc/passwd</code> inyectado en el parámetro filename.</div>
       </div>
       <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
@@ -386,14 +386,14 @@
       <h3>Paso 6 — Análisis de la respuesta</h3>
       <p>En el panel <em>Response</em> se observó una respuesta <code>HTTP/2 200 OK</code> con el contenido completo del archivo <code>/etc/passwd</code> del servidor. Esto confirma que el servidor resolvió la ruta fuera de su directorio de trabajo y leyó un archivo arbitrario del sistema operativo.</p>
       <div class="evidence">
-        <img src="../img/12.png" alt="Respuesta vulnerable /etc/passwd">
+        <img src="img/12.png" alt="Respuesta vulnerable /etc/passwd">
         <div class="cap"><strong>Evidencia 12:</strong> Respuesta vulnerable — HTTP/2 200 OK con el contenido de <code>/etc/passwd</code> (root, daemon, bin, sys, usuarios del sistema, etc.).</div>
       </div>
 
       <h3>Paso 7 — Confirmación del laboratorio resuelto</h3>
       <p>Se regresó a la pestaña del laboratorio en el navegador y se recargó la página (F5). Apareció el banner verde: <strong style="color:#e0f2e3;">"Congratulations, you solved the lab!"</strong></p>
       <div class="evidence">
-        <img src="../img/13.png" alt="Lab solved">
+        <img src="img/13.png" alt="Lab solved">
         <div class="cap"><strong>Evidencia 13:</strong> Confirmación de "Lab Solved" — laboratorio File Path Traversal, simple case resuelto.</div>
       </div>
       <div class="solved-banner">✔ LAB SOLVED — FILE PATH TRAVERSAL, SIMPLE CASE</div>
@@ -446,7 +446,7 @@
       <h2>09_Conclusión</h2>
       <p>El laboratorio demuestra de manera práctica cómo una omisión aparentemente menor —no validar un parámetro— permite a un atacante remoto leer archivos arbitrarios del servidor sin autenticación. La vulnerabilidad de File Path Traversal evidencia la importancia de la validación de entradas, el principio de mínimo privilegio y la verificación de rutas canónicas como controles fundamentales en la seguridad de aplicaciones web.</p>
       <div style="margin-top: 30px; text-align: center;">
-        <a href="../assets/lab07-simple-case.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
+        <a href="lab07-simple-case.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
       </div>
       <p class="sys-log" style="text-align:center; margin-top: 15px;">[ Reporte técnico — Actividad 07: File Path Traversal, Simple Case ]</p>
     </section>
