@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDTS — Lab 07: File Path Traversal Simple Case | CNO IV</title>
+<meta name="description" content="Actividad 07 — Road to Hall of Fame: File Path Traversal Simple Case. PortSwigger Web Security Academy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.4rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 40px; }
+  h3 { font-size: 1.1rem; color: var(--accent-bright); margin-bottom: 10px; }
+
+  a { color: var(--accent-bright); text-decoration: none; font-weight: bold; }
+  a:hover { text-decoration: underline; background-color: var(--accent); color: #ffffff; }
+
+  code {
+    background: #0d100d;
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    color: var(--accent-bright);
+    font-size: 0.95rem;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-red { border-color: #c0392b; color: #e74c3c; }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  a.btn {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  a.btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+  a.btn:active {
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    transform: translate(4px, 4px);
+  }
+
+  .btn-pdf { border-color: #c0392b; color: #e74c3c; }
+  .btn-pdf:hover { background: #c0392b; border-color: #c0392b; }
+
+  /* --- Evidencias --- */
+  .evidence {
+    background: #0d100d;
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 15px;
+    margin: 25px 0;
+  }
+  .evidence img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border-color);
+  }
+  .evidence .cap {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #68856b;
+    border-top: 2px dashed var(--border-color);
+    padding-top: 8px;
+  }
+  .evidence .cap strong { color: var(--accent-bright); }
+
+  .lab-payload {
+    background: #0d100d;
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    color: var(--accent-bright);
+    margin: 15px 0;
+    word-break: break-all;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--bg-color);
+    color: #e0f2e3;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+  td { background: #0d100d; }
+
+  ol li, ul li { margin-bottom: 8px; }
+
+  .solved-banner {
+    background: var(--accent);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    margin: 20px 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.4rem; }
+    .container { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="../index.html">/inicio</a></li>
+        <li><a href="../index.html#presentacion">/presentación</a></li>
+        <li><a href="../road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 07 ]</span>
+      <h1>Lab 07: File Path Traversal — Simple Case</h1>
+      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition</p>
+      <div style="margin-top: 15px;">
+        <span class="tag">Actividad 07</span>
+        <span class="tag">Nivel: Apprentice</span>
+        <span class="tag">Path Traversal</span>
+        <span class="tag">Lectura arbitraria de archivos</span>
+        <span class="tag-red">Burp Suite</span>
+      </div>
+    </section>
+
+    <!-- 1. NOMBRE -->
+    <section class="box">
+      <h2>01_Nombre del laboratorio</h2>
+      <p><strong style="color:#e0f2e3;">File Path Traversal, Simple Case</strong></p>
+      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-simple" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-simple</a></p>
+      <p>El laboratorio consiste en una tienda en línea ("WE LIKE TO SHOP") cuya carga de imágenes de productos es vulnerable a recorrido de rutas. Para resolverlo, se debe recuperar el contenido del archivo <code>/etc/passwd</code> del servidor.</p>
+
+      <div class="evidence">
+        <img src="../img/1.png" alt="Descripción del laboratorio en PortSwigger">
+        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy (estado inicial: "Not solved").</div>
+      </div>
+      <div class="evidence">
+        <img src="../img/2.png" alt="Instancia del laboratorio abierta">
+        <div class="cap"><strong>Evidencia 2:</strong> Acceso a la instancia del laboratorio — tienda "WE LIKE TO SHOP".</div>
+      </div>
+    </section>
+
+    <!-- 2. NIVEL -->
+    <section class="box">
+      <h2>02_Nivel</h2>
+      <p><strong style="color:#e0f2e3;">Apprentice</strong> (principiante).</p>
+      <p>Este laboratorio es la introducción a la vulnerabilidad de recorrido de rutas, donde la aplicación no aplica ninguna validación sobre la entrada del usuario.</p>
+    </section>
+
+    <!-- 3. TIPO -->
+    <section class="box">
+      <h2>03_Tipo de explotación</h2>
+      <p><strong style="color:#e0f2e3;">File Path Traversal</strong> (también conocido como <em>Directory Traversal</em> o recorrido de directorios), clasificado dentro de las vulnerabilidades de <strong style="color:#e0f2e3;">lectura arbitraria de archivos</strong> (Arbitrary File Read).</p>
+      <p>La vulnerabilidad ocurre cuando una aplicación web utiliza nombres de archivo proporcionados por el usuario para abrir o cargar archivos del servidor, sin validar ni sanitizar la entrada. El atacante manipula la ruta con secuencias de retroceso de directorio (<code>../</code>) para navegar fuera del directorio previsto y acceder a archivos sensibles del sistema de archivos.</p>
+      <p>Si no existe validación, el atacante puede enviar:</p>
+      <div class="lab-payload">GET /image?filename=../../../../etc/passwd</div>
+      <p>El servidor recibe la cadena completa y, al no estar mitigado, la resuelve y muestra el contenido del archivo del sistema operativo.</p>
+      <p><strong style="color:#e0f2e3;">¿Qué archivos puede intentar leer un atacante?</strong></p>
+      <ul>
+        <li>Linux: <code>/etc/passwd</code>, <code>/etc/shadow</code>, <code>/var/log/apache2/access.log</code>, archivos privados de usuarios en <code>/home/</code></li>
+        <li>Windows: <code>C:\Windows\system.ini</code>, <code>C:\Users\&lt;Usuario&gt;\...</code></li>
+      </ul>
+      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> lectura de archivos sensibles, obtención de credenciales de base de datos, conocimiento de la estructura interna del servidor, lectura de logs y metadatos de sesión, e identificación de rutas para ataques mayores (RCE, LFI, explotación de carga de archivos).</p>
+    </section>
+
+    <!-- 4. OBJETIVO -->
+    <section class="box">
+      <h2>04_Objetivo del laboratorio</h2>
+      <p>Demostrar la explotación de una vulnerabilidad de File Path Traversal mediante la manipulación del parámetro <code>filename</code> de la petición HTTP que carga las imágenes de los productos, con el fin de <strong style="color:#e0f2e3;">leer el contenido del archivo <code>/etc/passwd</code> del servidor</strong> y obtener la confirmación de "Lab solved" en la Web Security Academy.</p>
+    </section>
+
+    <!-- 5. EXPLICACION -->
+    <section class="box">
+      <h2>05_Explicación técnica de la vulnerabilidad</h2>
+      <p>La tienda en línea del laboratorio carga las imágenes de los productos a través de una petición HTTP GET con un parámetro <code>filename</code> que indica el nombre del archivo de imagen:</p>
+      <div class="lab-payload">GET /image?filename=71.jpg HTTP/2</div>
+      <p>El servidor concatena este valor a su directorio de trabajo (por ejemplo, <code>/var/www/images/</code>) y devuelve el archivo solicitado.</p>
+      <h3>La falla de seguridad</h3>
+      <p>El servidor <strong style="color:#e0f2e3;">confía ciegamente en la entrada del usuario</strong>: no verifica que el nombre del archivo corresponda a un archivo real de imágenes, no elimina las secuencias <code>../</code> y no restringe la lectura a su directorio de trabajo. Esto viola el principio de validación de entradas y el de mínimo privilegio en el acceso al sistema de archivos.</p>
+      <h3>Principio de defensa que se vulnera</h3>
+      <p>La ruta canónica (la ruta real y definitiva tras normalizar <code>../</code>, <code>./</code> y enlaces simbólicos) nunca se comprueba contra el directorio permitido. En un sistema correctamente defendido, la aplicación debería verificar que la ruta resultante siga dentro del directorio base antes de abrir el archivo.</p>
+    </section>
+
+    <!-- 6. PROCEDIMIENTO -->
+    <section class="box">
+      <h2>06_Procedimiento paso a paso</h2>
+
+      <h3>Paso 1 — Preparación del entorno</h3>
+      <p>Se inició <strong style="color:#e0f2e3;">Burp Suite Community Edition v2026.3.2</strong> desde la máquina virtual de Kali Linux, seleccionando en las configuraciones iniciales <em>Temporary project in memory</em> y posteriormente <em>Use Burp defaults</em>.</p>
+      <div class="evidence">
+        <img src="../img/3.png" alt="Burp Suite - Temporary project in memory">
+        <div class="cap"><strong>Evidencia 3:</strong> Configuración inicial de Burp Suite — selección de "Temporary project in memory".</div>
+      </div>
+      <div class="evidence">
+        <img src="../img/4.png" alt="Burp Suite - Use Burp defaults">
+        <div class="cap"><strong>Evidencia 4:</strong> Configuración de proyecto — selección de "Use Burp defaults" → "Start Burp".</div>
+      </div>
+
+      <h3>Paso 2 — Apertura del navegador integrado</h3>
+      <p>Con Burp abierto en la pestaña <em>Proxy → Intercept</em>, se abrió el navegador integrado (Chromium embebido) mediante el botón <strong style="color:#e0f2e3;">"Open browser"</strong>, que ya viene configurado con el proxy (<code>127.0.0.1:8080</code>) y el certificado instalado. Se accedió a la URL del laboratorio proporcionada por PortSwigger.</p>
+      <div class="evidence">
+        <img src="../img/5.png" alt="Burp Proxy - Open browser">
+        <div class="cap"><strong>Evidencia 5:</strong> Burp Suite — pestaña Proxy → Intercept con el interruptor "Intercept is off" y el botón "Open browser" resaltado.</div>
+      </div>
+
+      <h3>Paso 3 — Identificación del punto de ataque</h3>
+      <p>Se desactivó temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página. Se navegó a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que disparó la petición que carga la imagen del producto.</p>
+      <div class="evidence">
+        <img src="../img/6.png" alt="Tienda WE LIKE TO SHOP - View details">
+        <div class="cap"><strong>Evidencia 6:</strong> Tienda "WE LIKE TO SHOP" — selección de un producto con "View details" para disparar la carga de la imagen.</div>
+      </div>
+      <p>Posteriormente se activó el interceptor ("Intercept is on") y se recargó la página para capturar el tráfico HTTP.</p>
+      <div class="evidence">
+        <img src="../img/7.png" alt="Interceptor activado">
+        <div class="cap"><strong>Evidencia 7:</strong> Interceptor activado — captura del tráfico HTTP hacia el servidor del laboratorio.</div>
+      </div>
+      <p>En <em>Proxy → HTTP history</em> se localizó la petición vulnerable que carga la imagen del producto mediante el parámetro <code>filename</code>.</p>
+      <div class="evidence">
+        <img src="../img/8.png" alt="HTTP history - peticion GET">
+        <div class="cap"><strong>Evidencia 8:</strong> HTTP history — petición GET capturada hacia la instancia del laboratorio (request interceptado).</div>
+      </div>
+
+      <h3>Paso 4 — Envío a Repeater</h3>
+      <p>Seleccionando la petición en el historial, clic derecho → <strong style="color:#e0f2e3;">"Send to Repeater"</strong> (Ctrl+R). El módulo Repeater permite editar y reenviar la petición tantas veces como sea necesario, observando las respuestas del servidor en tiempo real, sin repetir la acción en el navegador.</p>
+      <div class="evidence">
+        <img src="../img/9.png" alt="Send to Repeater">
+        <div class="cap"><strong>Evidencia 9:</strong> Menú contextual — envío de la petición a Repeater.</div>
+      </div>
+      <div class="evidence">
+        <img src="../img/10.png" alt="Request original en Repeater">
+        <div class="cap"><strong>Evidencia 10:</strong> Petición original en Repeater — parámetro <code>filename</code> con el nombre legítimo de la imagen.</div>
+      </div>
+
+      <h3>Paso 5 — Ejecución del ataque</h3>
+      <p>En la línea 1 del request se modificó el valor del parámetro <code>filename</code>, reemplazando el nombre de la imagen por la ruta maliciosa:</p>
+      <div class="lab-payload">GET /image?filename=../../../../etc/passwd HTTP/2</div>
+      <div class="evidence">
+        <img src="../img/11.png" alt="Payload en Repeater">
+        <div class="cap"><strong>Evidencia 11:</strong> Request modificado en Repeater — payload de path traversal <code>../../../../etc/passwd</code> inyectado en el parámetro filename.</div>
+      </div>
+      <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
+
+      <h3>Paso 6 — Análisis de la respuesta</h3>
+      <p>En el panel <em>Response</em> se observó una respuesta <code>HTTP/2 200 OK</code> con el contenido completo del archivo <code>/etc/passwd</code> del servidor. Esto confirma que el servidor resolvió la ruta fuera de su directorio de trabajo y leyó un archivo arbitrario del sistema operativo.</p>
+      <div class="evidence">
+        <img src="../img/12.png" alt="Respuesta vulnerable /etc/passwd">
+        <div class="cap"><strong>Evidencia 12:</strong> Respuesta vulnerable — HTTP/2 200 OK con el contenido de <code>/etc/passwd</code> (root, daemon, bin, sys, usuarios del sistema, etc.).</div>
+      </div>
+
+      <h3>Paso 7 — Confirmación del laboratorio resuelto</h3>
+      <p>Se regresó a la pestaña del laboratorio en el navegador y se recargó la página (F5). Apareció el banner verde: <strong style="color:#e0f2e3;">"Congratulations, you solved the lab!"</strong></p>
+      <div class="evidence">
+        <img src="../img/13.png" alt="Lab solved">
+        <div class="cap"><strong>Evidencia 13:</strong> Confirmación de "Lab Solved" — laboratorio File Path Traversal, simple case resuelto.</div>
+      </div>
+      <div class="solved-banner">✔ LAB SOLVED — FILE PATH TRAVERSAL, SIMPLE CASE</div>
+    </section>
+
+    <!-- 7. PAYLOAD -->
+    <section class="box">
+      <h2>07_Explicación del payload</h2>
+      <p><strong style="color:#e0f2e3;">Payload utilizado:</strong></p>
+      <div class="lab-payload">../../../../etc/passwd</div>
+      <table>
+        <thead>
+          <tr><th>Elemento</th><th>Función</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>../</code></td>
+            <td>Secuencia de retroceso de directorio (<em>parent directory</em>). Cada ocurrencia le indica al sistema de archivos que suba un nivel en la jerarquía de directorios.</td>
+          </tr>
+          <tr>
+            <td><code>../../../../</code></td>
+            <td>Cuatro retrocesos consecutivos. Partiendo del directorio de trabajo del servidor (<code>/var/www/images/</code>), los retrocesos consumen los niveles <code>images/</code>, <code>www/</code>, <code>var/</code> y la raíz <code>/</code>, hasta posicionarse en el directorio raíz del sistema de archivos.</td>
+          </tr>
+          <tr>
+            <td><code>etc/passwd</code></td>
+            <td>Ruta del archivo objetivo relativa a la raíz. El archivo <code>/etc/passwd</code> es legible por cualquier usuario en Linux y contiene la lista de cuentas del sistema, lo que lo convierte en el objetivo clásico para demostrar lectura arbitraria de archivos sin necesidad de privilegios elevados.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong style="color:#e0f2e3;">¿Por qué funciona?</strong> El servidor construye la ruta concatenando su directorio base con la entrada del usuario sin sanitizar:</p>
+      <div class="lab-payload">/var/www/images/ + ../../../../etc/passwd  →  /etc/passwd</div>
+      <p>El sistema operativo normaliza la ruta resolviendo los <code>../</code>, y el resultado final apunta directamente a <code>/etc/passwd</code>. Como la aplicación abre cualquier ruta que recibe, el contenido del archivo se devuelve en el cuerpo de la respuesta HTTP. La ausencia total de validación (filtros de secuencias, listas blancas o verificación de ruta canónica) es lo que hace posible el ataque.</p>
+    </section>
+
+    <!-- 8. MITIGACION -->
+    <section class="box">
+      <h2>08_Mitigación recomendada</h2>
+      <ol>
+        <li><strong style="color:#e0f2e3;">No pasar la entrada del usuario directamente a las APIs del sistema de archivos.</strong> Es la medida más efectiva. En su lugar, usar identificadores indirectos (IDs numéricos) mapeados del lado del servidor a archivos permitidos.</li>
+        <li><strong style="color:#e0f2e3;">Validación con ruta canónica.</strong> Obtener la ruta real del archivo (<code>getCanonicalPath()</code> en Java, <code>realpath()</code> en PHP, <code>os.path.realpath()</code> en Python) después de que el sistema operativo elimine <code>../</code>, <code>./</code> y enlaces simbólicos, y verificar que comience con el directorio base permitido.</li>
+        <li><strong style="color:#e0f2e3;">Lista blanca de archivos permitidos.</strong> Aceptar únicamente nombres de archivo que coincidan con un patrón conocido y seguro (por ejemplo, solo alfanuméricos con extensión <code>.jpg</code>).</li>
+        <li><strong style="color:#e0f2e3;">Listas blancas de valores aceptados</strong> para cualquier parámetro que influya en la resolución de rutas.</li>
+        <li><strong style="color:#e0f2e3;">Ejecución del proceso del servidor con el mínimo privilegio</strong>, para que un archivo comprometido exponga la menor cantidad de información posible.</li>
+        <li><strong style="color:#e0f2e3;">Uso de un sistema de almacenamiento separado</strong> (por ejemplo, servir las imágenes desde un servicio dedicado o un bucket con acceso restringido), de modo que la aplicación web no tenga acceso directo al sistema de archivos del servidor.</li>
+      </ol>
+    </section>
+
+    <!-- 9. CONCLUSION -->
+    <section class="box">
+      <h2>09_Conclusión</h2>
+      <p>El laboratorio demuestra de manera práctica cómo una omisión aparentemente menor —no validar un parámetro— permite a un atacante remoto leer archivos arbitrarios del servidor sin autenticación. La vulnerabilidad de File Path Traversal evidencia la importancia de la validación de entradas, el principio de mínimo privilegio y la verificación de rutas canónicas como controles fundamentales en la seguridad de aplicaciones web.</p>
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="../assets/lab07-simple-case.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
+      </div>
+      <p class="sys-log" style="text-align:center; margin-top: 15px;">[ Reporte técnico — Actividad 07: File Path Traversal, Simple Case ]</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>ROAD TO HALL OF FAME | Seguridad Informática</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
