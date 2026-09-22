@@ -117,6 +117,7 @@
     text-transform: uppercase;
     border-radius: 2px;
   }
+  .tag-blue { border-color: #3498db; color: #3498db; }
 
   a.btn {
     font-family: 'Orbitron', sans-serif;
@@ -386,7 +387,7 @@
         <li><a href="index.html#presentacion">/presentación</a></li>
         <li><a href="index.html#perfil">/perfil</a></li>
         <li><a href="index.html#contacto">/contacto</a></li>
-        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+        <li><a href="road-to-hall-of-fame.html" target="_self">/road-to-hall-of-fame</a></li>
       </ul>
     </nav>
   </header>
@@ -425,7 +426,7 @@
 
           <div class="lab-actions">
             <a href="lab07-simple-case.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab01-simple-case.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab07-simple-case.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
@@ -435,23 +436,24 @@
         <div class="lab-card">
           <h3>Actividad 08 — Traversal Blocked: Absolute Path Bypass</h3>
           <div class="lab-meta">
-            <span class="tag">Apprentice</span>
+            <span class="tag">Actividad 08</span>
+            <span class="tag tag-blue">Practitioner</span>
             <span class="tag">Absolute Path</span>
             <span class="tag">Bypass</span>
           </div>
           <div class="lab-desc">
-            <strong>Objetivo:</strong> Leer archivos del sistema cuando la aplicación bloquea secuencias de traversal relativas.<br><br>
-            <strong>Descripción técnica:</strong> El servidor sanitiza entradas con <code>../</code> pero acepta rutas absolutas. Al enviar <code>filename=/etc/passwd</code> directamente desde la raíz del sistema, se omite el directorio base de imágenes y se accede al archivo solicitado.
+            <strong>Objetivo:</strong> Leer archivos del sistema evadiendo la defensa de la aplicación que bloquea secuencias de traversal relativas (<code>../</code>).<br><br>
+            <strong>Descripción técnica:</strong> El servidor aplica una lista negra a secuencias como <code>../</code> pero acepta rutas absolutas directamente hacia la API de archivos. Al interceptar la petición y enviar <code>filename=/etc/passwd</code> desde la raíz del sistema (<code>/</code>), se salta el directorio base de imágenes, logrando leer el archivo.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab02-absolute-path.png" alt="[Evidencia: Bypass con ruta absoluta]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="img/7.png" alt="[Evidencia: Bypass con ruta absoluta en Repeater]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span style="display:none; color:#5DC21E;">[ Sube tu captura: Repeater con /etc/passwd absoluto + respuesta 200 OK ]</span>
           </div>
           <div class="lab-payload">Payload: filename=/etc/passwd</div>
           
           <div class="lab-actions">
-            <a href="lab02-absolute-path.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab02-absolute-path.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab08-filepath.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="lab08-filepath.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
