@@ -490,23 +490,24 @@
         <div class="lab-card">
           <h3>Actividad 10 — Traversal Stripped: Superfluous URL-Decode</h3>
           <div class="lab-meta">
-            <span class="tag">Apprentice</span>
+            <span class="tag">Actividad 10</span>
+            <span class="tag tag-blue">Practitioner</span>
             <span class="tag">Double Decode</span>
             <span class="tag">Burp Suite</span>
           </div>
           <div class="lab-desc">
             <strong>Objetivo:</strong> Explotar una doble decodificación URL para restaurar secuencias de traversal bloqueadas.<br><br>
-            <strong>Descripción técnica:</strong> La aplicación decodifica la entrada, aplica el filtro, y decodifica nuevamente. Enviando <code>%252e%252e%252f</code> (doble codificación de <code>../</code>) permite que el payload sobreviva al filtrado y se interprete correctamente.
+            <strong>Descripción técnica:</strong> La aplicación decodifica la entrada, aplica el filtro, y decodifica nuevamente. Enviando <code>%252e%252e%252f</code> (doble codificación de <code>../</code>) permite que el payload sobreviva al filtrado (ya que se lee como %2e%2e%2f) y se interprete correctamente tras la segunda decodificación insegura.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab04-superfluous.png" alt="[Evidencia: Superfluous URL-decode]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="img/lab10_7.png" alt="[Evidencia: Superfluous URL-decode]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %252e%252e%252f + respuesta con /etc/passwd ]</span>
           </div>
           <div class="lab-payload">Payload: filename=%252e%252e%252fetc/passwd</div>
           
           <div class="lab-actions">
-            <a href="lab04-superfluous.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab04-superfluous.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab10-urldecode.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="lab10-urldecode.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
