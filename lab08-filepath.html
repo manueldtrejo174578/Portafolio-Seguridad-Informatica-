@@ -275,11 +275,11 @@
       <p>El laboratorio presenta un mecanismo de defensa básico (bloqueo de secuencias de recorrido relativo) que el atacante debe evadir usando una ruta absoluta directa hacia el archivo objetivo para recuperar el contenido de <code>/etc/passwd</code>.</p>
 
       <div class="evidence">
-        <img src="img/1.png" alt="Descripción del laboratorio en PortSwigger">
+        <img src="img/lab08_1.png" alt="Descripción del laboratorio en PortSwigger">
         <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.</div>
       </div>
       <div class="evidence">
-        <img src="img/2.png" alt="Instancia del laboratorio abierta">
+        <img src="img/lab08_2.png" alt="Instancia del laboratorio abierta">
         <div class="cap"><strong>Evidencia 2:</strong> Acceso a la instancia del laboratorio — tienda "WE LIKE TO SHOP".</div>
       </div>
     </section>
@@ -326,28 +326,28 @@
       <h3>Paso 1 — Preparación del entorno</h3>
       <p>Se inició Burp Suite Community Edition seleccionando en las configuraciones iniciales <em>Temporary project in memory</em> y posteriormente <em>Use Burp defaults</em>.</p>
       <div class="evidence">
-        <img src="img/3.png" alt="Burp Suite - Temporary project in memory">
+        <img src="img/lab08_3.png" alt="Burp Suite - Temporary project in memory">
         <div class="cap"><strong>Evidencia 3:</strong> Configuración inicial de Burp Suite para un proyecto temporal en memoria.</div>
       </div>
 
       <h3>Paso 2 — Interceptación y Navegación</h3>
       <p>Con Burp abierto en la pestaña <em>Proxy → Intercept</em>, se abrió el navegador integrado y se accedió a la URL del laboratorio. Se desactivó el interceptor para que el sitio cargara correctamente.</p>
       <div class="evidence">
-        <img src="img/4.png" alt="Burp Proxy - Open browser">
+        <img src="img/lab08_4.png" alt="Burp Proxy - Open browser">
         <div class="cap"><strong>Evidencia 4:</strong> Panel Proxy Intercept encendido para capturar tráfico desde el navegador integrado.</div>
       </div>
 
       <h3>Paso 3 — Identificación de la petición objetivo</h3>
       <p>Se navegó a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que disparó la petición que carga la imagen del producto. Se buscó esta petición en la pestaña <em>HTTP history</em>.</p>
       <div class="evidence">
-        <img src="img/5.png" alt="Tienda WE LIKE TO SHOP - View details">
+        <img src="img/lab08_5.png" alt="Tienda WE LIKE TO SHOP - View details">
         <div class="cap"><strong>Evidencia 5:</strong> Navegación en la tienda para visualizar un producto.</div>
       </div>
 
       <h3>Paso 4 — Preparación del Ataque en Repeater</h3>
       <p>Una vez localizada la petición GET hacia el endpoint de imágenes (<code>GET /image?filename=...</code>), se envió la solicitud al módulo Repeater (clic derecho → <strong style="color:#e0f2e3;">"Send to Repeater"</strong>).</p>
       <div class="evidence">
-        <img src="img/6.png" alt="Send to Repeater">
+        <img src="img/lab08_6.png" alt="Send to Repeater">
         <div class="cap"><strong>Evidencia 6:</strong> Envío de la solicitud HTTP interceptada al módulo Repeater para su manipulación.</div>
       </div>
 
@@ -355,7 +355,7 @@
       <p>En la línea 1 del request, dentro de la pestaña Repeater, se modificó el valor del parámetro <code>filename</code>. Sabiendo que los saltos <code>../</code> están bloqueados, se reemplazó el nombre original de la imagen por la ruta absoluta maliciosa directamente:</p>
       <div class="lab-payload">GET /image?filename=/etc/passwd HTTP/2</div>
       <div class="evidence">
-        <img src="img/7.png" alt="Payload con ruta absoluta en Repeater">
+        <img src="img/lab08_7.png" alt="Payload con ruta absoluta en Repeater">
         <div class="cap"><strong>Evidencia 7:</strong> Request modificado en Repeater. Se observa el payload inyectado: <code>/etc/passwd</code> evadiendo el filtro.</div>
       </div>
       <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
@@ -363,7 +363,7 @@
       <h3>Paso 6 — Análisis y Confirmación</h3>
       <p>En el panel <em>Response</em> se observó una respuesta <code>HTTP/2 200 OK</code> devolviendo el contenido completo del archivo de usuarios. Al regresar al navegador y recargar, se validó la resolución del reto.</p>
       <div class="evidence">
-        <img src="img/8.png" alt="Respuesta 200 OK y Lab Solved">
+        <img src="img/lab08_8.png" alt="Respuesta 200 OK y Lab Solved">
         <div class="cap"><strong>Evidencia 8:</strong> El servidor respondió con el contenido de <code>/etc/passwd</code>, confirmando el bypass del filtro y resolviendo exitosamente el laboratorio.</div>
       </div>
       <div class="solved-banner">✔ LAB SOLVED — ABSOLUTE PATH BYPASS</div>
