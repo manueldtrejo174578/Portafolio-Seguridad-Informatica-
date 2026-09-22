@@ -463,23 +463,24 @@
         <div class="lab-card">
           <h3>Actividad 09 — Traversal Stripped: Non-Recursively</h3>
           <div class="lab-meta">
-            <span class="tag">Apprentice</span>
+            <span class="tag">Actividad 09</span>
+            <span class="tag tag-blue">Practitioner</span>
             <span class="tag">Filter Bypass</span>
-            <span class="tag">URL Encoding</span>
+            <span class="tag">Nested Traversal</span>
           </div>
           <div class="lab-desc">
-            <strong>Objetivo:</strong> Bypassar un filtro que elimina secuencias <code>../</code> de forma no recursiva.<br><br>
-            <strong>Descripción técnica:</strong> El servidor aplica un filtro que borra <code>../</code> una sola vez. Anidando la secuencia como <code>....//</code>, tras el primer filtrado queda <code>../</code>, permitiendo el traversal. También aplica codificación URL doble.
+            <strong>Objetivo:</strong> Bypassar un filtro que elimina secuencias <code>../</code> de forma no recursiva para leer el archivo de usuarios del servidor.<br><br>
+            <strong>Descripción técnica:</strong> El servidor aplica un filtro que borra <code>../</code> una sola vez y no repite el escaneo. Anidando la secuencia como <code>....//</code>, tras el primer filtrado queda el salto malicioso real (<code>../</code>), permitiendo evadir la defensa.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab03-stripped.png" alt="[Evidencia: Bypass de filtro no recursivo]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Payload anidado o doble URL-encode + Lab Solved ]</span>
+            <img src="img/lab09_7.png" alt="[Evidencia: Bypass de filtro no recursivo]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Payload anidado + Respuesta 200 OK ]</span>
           </div>
           <div class="lab-payload">Payload: filename=....//....//....//etc/passwd</div>
           
           <div class="lab-actions">
-            <a href="lab03-stripped.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab03-stripped.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab09-filepathtransversal.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="lab09-filepathtransversal.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
