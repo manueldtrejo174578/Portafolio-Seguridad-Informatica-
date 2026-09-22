@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDTS — Lab 09: Traversal Stripped Non-Recursively | CNO IV</title>
+<meta name="description" content="Actividad 09 — Road to Hall of Fame: File path traversal, traversal sequences stripped non-recursively. PortSwigger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.4rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 40px; }
+  h3 { font-size: 1.1rem; color: var(--accent-bright); margin-bottom: 10px; }
+
+  a { color: var(--accent-bright); text-decoration: none; font-weight: bold; }
+  a:hover { text-decoration: underline; background-color: var(--accent); color: #ffffff; }
+
+  code {
+    background: #0d100d;
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    color: var(--accent-bright);
+    font-size: 0.95rem;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-red { border-color: #c0392b; color: #e74c3c; }
+  .tag-blue { border-color: #3498db; color: #3498db; }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  a.btn {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  a.btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+  a.btn:active {
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    transform: translate(4px, 4px);
+  }
+
+  .btn-pdf { border-color: #c0392b; color: #e74c3c; }
+  .btn-pdf:hover { background: #c0392b; border-color: #c0392b; }
+
+  /* --- Evidencias --- */
+  .evidence {
+    background: #0d100d;
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 15px;
+    margin: 25px 0;
+  }
+  .evidence img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border-color);
+  }
+  .evidence .cap {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #68856b;
+    border-top: 2px dashed var(--border-color);
+    padding-top: 8px;
+  }
+  .evidence .cap strong { color: var(--accent-bright); }
+
+  .lab-payload {
+    background: #0d100d;
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    color: var(--accent-bright);
+    margin: 15px 0;
+    word-break: break-all;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--bg-color);
+    color: #e0f2e3;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+  td { background: #0d100d; }
+
+  ol li, ul li { margin-bottom: 8px; }
+
+  .solved-banner {
+    background: var(--accent);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    margin: 20px 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.4rem; }
+    .container { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="index.html#presentacion">/presentación</a></li>
+        <li><a href="index.html#perfil">/perfil</a></li>
+        <li><a href="index.html#contacto">/contacto</a></li>
+        <li><a href="road-to-hall-of-fame.html" target="_self">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 09 ]</span>
+      <h1>Lab 09: Traversal Stripped Non-Recursively</h1>
+      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition</p>
+      <div style="margin-top: 15px;">
+        <span class="tag">Actividad 09</span>
+        <span class="tag tag-blue">Nivel: Practitioner</span>
+        <span class="tag">Path Traversal</span>
+        <span class="tag">Filter Bypass</span>
+        <span class="tag-red">Burp Suite</span>
+      </div>
+    </section>
+
+    <!-- 1. NOMBRE -->
+    <section class="box">
+      <h2>01_Nombre del laboratorio</h2>
+      <p><strong style="color:#e0f2e3;">File path traversal, traversal sequences stripped non-recursively</strong></p>
+      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-sequences-stripped-non-recursively" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-sequences-stripped-non-recursively</a></p>
+      <p>Este laboratorio presenta un filtro de seguridad que intenta sanitizar la entrada eliminando las secuencias de recorrido (<code>../</code>). El atacante debe evadirlo aprovechando que la eliminación no se realiza de forma recursiva.</p>
+
+      <div class="evidence">
+        <img src="img/lab09_1.png" alt="Descripción del laboratorio en PortSwigger">
+        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.</div>
+      </div>
+    </section>
+
+    <!-- 2. NIVEL -->
+    <section class="box">
+      <h2>02_Nivel</h2>
+      <p><strong style="color:#3498db;">Practitioner</strong> (Intermedio).</p>
+      <p>El reto sube de nivel al obligar al atacante a evadir una defensa activa implementada en el backend. Se requiere comprender el comportamiento de los filtros de reemplazo de cadenas (stripping) y explotar fallos en su lógica secuencial.</p>
+    </section>
+
+    <!-- 3. TIPO -->
+    <section class="box">
+      <h2>03_Tipo de explotación</h2>
+      <p><strong style="color:#e0f2e3;">File Path Traversal</strong> (también conocido como Directory Traversal o recorrido de directorios), evadiendo filtros de sanitización (Filter Bypass).</p>
+      <p>La vulnerabilidad ocurre cuando la aplicación implementa un filtro de seguridad defectuoso. El desarrollador utiliza una función de reemplazo de cadenas (como <code>str.replace("../", "")</code>) para eliminar las secuencias peligrosas de la entrada del usuario, pero solo lo ejecuta una vez por coincidencia (de forma secuencial y no recursiva).</p>
+      <p>Al no aplicar el filtro repetidamente hasta que no queden más secuencias, un atacante puede ofuscar el payload anidando caracteres (por ejemplo, <code>....//</code>).</p>
+      <p>Cuando la aplicación procesa esta cadena, elimina el <code>../</code> interior, y los caracteres restantes se unen para formar un nuevo <code>../</code> válido que el sistema de archivos interpretará sin problemas.</p>
+      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> Las mismas que un Path Traversal clásico (lectura arbitraria de archivos sensibles, código fuente y credenciales), demostrando que las listas negras y las funciones de reemplazo simples son ineficaces para sanitizar rutas.</p>
+    </section>
+
+    <!-- 4. OBJETIVO -->
+    <section class="box">
+      <h2>04_Objetivo del laboratorio</h2>
+      <p>Demostrar la explotación de una vulnerabilidad de File Path Traversal <strong style="color:#e0f2e3;">evadiendo un filtro de sanitización no recursivo</strong>. Esto se logra inyectando secuencias de recorrido anidadas (<code>....//</code>) a través del parámetro <code>filename</code> de la petición HTTP que carga las imágenes de los productos, con el fin de generar secuencias válidas en el backend, leer el contenido del archivo <code>/etc/passwd</code> del servidor y obtener la confirmación de "Lab solved".</p>
+    </section>
+
+    <!-- 5. EXPLICACION -->
+    <section class="box">
+      <h2>05_Explicación técnica de la vulnerabilidad</h2>
+      <p>La aplicación web procesa la carga de imágenes mediante la siguiente petición:</p>
+      <div class="lab-payload">GET /image?filename=71.jpg HTTP/2</div>
+      <p>Para protegerse de ataques de recorrido de rutas, el backend incluye una línea de código que busca activamente la subcadena <code>../</code> (y posiblemente <code>..\</code>) y la reemplaza por un string vacío ("").</p>
+      <h3>Fallo de lógica (No-Recursividad)</h3>
+      <p>El error arquitectónico radica en que este mecanismo no es recursivo. Si la entrada del atacante es <code>....//</code>, el filtro actúa de la siguiente manera:</p>
+      <ul>
+        <li>Analiza el string: <code>..</code> + <code>../</code> + <code>/</code></li>
+        <li>Identifica la secuencia prohibida en el medio: <code>../</code></li>
+        <li>La elimina.</li>
+        <li>Concatena lo que queda: los primeros <code>..</code> con la última <code>/</code>.</li>
+      </ul>
+      <p>El resultado final enviado al sistema de archivos es: <code>../</code></p>
+      <p>Dado que el filtro ya terminó su ciclo de ejecución, esta nueva secuencia resultante nunca es evaluada ni eliminada, permitiendo al atacante retroceder directorios en el sistema de archivos del servidor hasta llegar a la raíz.</p>
+    </section>
+
+    <!-- 6. PROCEDIMIENTO -->
+    <section class="box">
+      <h2>06_Procedimiento paso a paso</h2>
+
+      <h3>Paso 1 — Preparación del entorno</h3>
+      <p>Se inicia Burp Suite Community Edition desde la máquina virtual, seleccionando en las configuraciones iniciales, <em>Temporary project in memory</em> y posteriormente <em>Use Burp defaults</em>.</p>
+      <div class="evidence">
+        <img src="img/lab09_2.png" alt="Burp Suite - Temporary project in memory">
+        <div class="cap"><strong>Evidencia 2:</strong> Configuración inicial de Burp Suite.</div>
+      </div>
+
+      <h3>Paso 2 — Interceptación y Navegación</h3>
+      <p>Con Burp abierto en la pestaña <em>Proxy → Intercept</em>, se abre el navegador integrado y se accede a la URL del laboratorio. En Burp Suite se desactiva temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página de la tienda.</p>
+      <div class="evidence">
+        <img src="img/lab09_3.png" alt="Burp Proxy - Open browser">
+        <div class="cap"><strong>Evidencia 3:</strong> Panel Proxy Intercept apagado ("Intercept is off").</div>
+      </div>
+
+      <h3>Paso 3 — Identificación de la petición objetivo</h3>
+      <p>Se navega a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que dispara la petición que carga la imagen del producto.</p>
+      <div class="evidence">
+        <img src="img/lab09_4.png" alt="Tienda WE LIKE TO SHOP - View details">
+        <div class="cap"><strong>Evidencia 4:</strong> Interacción con la aplicación web para generar tráfico objetivo.</div>
+      </div>
+
+      <h3>Paso 4 — Preparación del Ataque en Repeater</h3>
+      <p>Se busca en el historial (pestaña <em>Proxy → HTTP history</em>) la petición GET que carga la imagen y se selecciona con clic derecho → <strong style="color:#e0f2e3;">"Send to Repeater"</strong>.</p>
+      <div class="evidence">
+        <img src="img/lab09_5.png" alt="Send to Repeater">
+        <div class="cap"><strong>Evidencia 5:</strong> Envío de la solicitud HTTP interceptada al módulo Repeater para inyectar el payload.</div>
+      </div>
+
+      <h3>Paso 5 — Modificación del Payload (Ofuscación)</h3>
+      <p>En la línea 1 del request, dentro de la pestaña Repeater, se modifica el valor del parámetro <code>filename</code>, inyectando el payload ofuscado (anidado) que evadirá el filtro no recursivo:</p>
+      <div class="lab-payload">GET /image?filename=....//....//....//etc/passwd HTTP/2</div>
+      <div class="evidence">
+        <img src="img/lab09_6.png" alt="Payload ofuscado en Repeater">
+        <div class="cap"><strong>Evidencia 6:</strong> Request modificado en Repeater con el payload de secuencias anidadas <code>....//</code>.</div>
+      </div>
+      <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
+
+      <h3>Paso 6 — Análisis y Confirmación</h3>
+      <p>En el panel <em>Response</em> se observa una respuesta <code>HTTP/2 200 OK</code>. Al examinar el cuerpo de la respuesta, se visualizará el contenido completo del archivo <code>/etc/passwd</code> del servidor, validando que el filtro eliminó el contenido interior pero dejó pasar nuestra secuencia armada:</p>
+      <div class="evidence">
+        <img src="img/lab09_7.png" alt="Respuesta 200 OK">
+        <div class="cap"><strong>Evidencia 7:</strong> El servidor devolvió el contenido de <code>/etc/passwd</code>, confirmando el bypass del filtro.</div>
+      </div>
+      
+      <p>Esto confirma que la técnica de anidación evadió la medida de seguridad. Se regresa a la pestaña del laboratorio en el navegador y se recarga la página (F5).</p>
+      <div class="evidence">
+        <img src="img/lab09_8.png" alt="Lab Solved">
+        <div class="cap"><strong>Evidencia 8:</strong> Confirmación en el laboratorio: Lab Solved!.</div>
+      </div>
+      <div class="solved-banner">✔ LAB SOLVED — TRAVERSAL STRIPPED NON-RECURSIVELY</div>
+    </section>
+
+    <!-- 7. PAYLOAD -->
+    <section class="box">
+      <h2>07_Explicación del payload</h2>
+      <p><strong style="color:#e0f2e3;">Payload utilizado:</strong></p>
+      <div class="lab-payload">....//....//....//etc/passwd</div>
+      <ul>
+        <li><strong style="color:#e0f2e3;"><code>....//</code></strong>: Es una secuencia de salto de directorio ofuscada mediante anidación.</li>
+      </ul>
+      <p><strong>Estructura enviada:</strong> <code>..[../]/</code></p>
+      <ul>
+        <li>El filtro de la aplicación detecta y elimina estrictamente el patrón <code>../</code> que se encuentra en el interior de los corchetes ilustrativos.</li>
+        <li>Una vez eliminado, los dos puntos iniciales (<code>..</code>) se concatenan con la barra diagonal final (<code>/</code>), dando como resultado una secuencia limpia y funcional: <code>../</code>.</li>
+        <li>Al concatenar esta ofuscación tres veces (<code>....//....//....//</code>), nos aseguramos de que, tras pasar por el filtro, el backend reciba <code>../../../</code>, lo cual es suficiente para salir de los directorios web y llegar a la raíz del sistema de archivos (<code>/</code>).</li>
+      </ul>
+      <p>Finalmente, <code>etc/passwd</code> es la ruta del archivo objetivo que se anexa para realizar la lectura no autorizada de los usuarios del sistema.</p>
+    </section>
+
+    <!-- 8. MITIGACION -->
+    <section class="box">
+      <h2>08_Mitigación recomendada</h2>
+      <ol>
+        <li><strong style="color:#e0f2e3;">Evitar listas negras y funciones de reemplazo:</strong> Nunca se deben utilizar funciones como <code>replace()</code> para intentar limpiar o sanitizar entradas maliciosas (listas negras). Los atacantes siempre encontrarán formas de evadirlas (anidación, codificación URL, byte nulo, etc.).</li>
+        <li><strong style="color:#e0f2e3;">Uso de identificadores indirectos:</strong> Como estándar de oro, no pasar el input del usuario a las APIs del sistema de archivos. Referenciar los archivos mediante un hash o un ID de base de datos (por ejemplo, <code>id=71</code> corresponde internamente a <code>/var/www/images/producto71.jpg</code>).</li>
+        <li><strong style="color:#e0f2e3;">Validación con ruta canónica (Canonicalización):</strong> Si se debe procesar el nombre del archivo enviado por el usuario, la aplicación debe resolver la ruta absoluta real (usando APIs como <code>getCanonicalPath()</code> o <code>realpath()</code>) que elimina cualquier secuencia matemática de directorios, y posteriormente verificar rigurosamente que esta ruta final comience con el directorio base permitido.</li>
+        <li><strong style="color:#e0f2e3;">Lista blanca (Whitelist) estricta:</strong> Validar que el valor del parámetro filename solo contenga caracteres alfanuméricos válidos y una extensión permitida (ej. solo letras, números y <code>.png/.jpg</code>), rechazando la solicitud por completo si contiene puntos consecutivos o barras diagonales. No intentar "arreglar" la cadena, simplemente rechazarla.</li>
+      </ol>
+    </section>
+
+    <!-- 9. CONCLUSION -->
+    <section class="box">
+      <h2>09_Conclusión</h2>
+      <p>Este laboratorio destaca un principio clave en ciberseguridad: "Nunca trates de arreglar (sanitizar) entradas maliciosas; valídalas o recházalas". El intento de la aplicación de limpiar los caracteres prohibidos empleando una metodología de lista negra falló categóricamente al no considerar vectores de evasión como las secuencias anidadas, dejando expuesto el sistema a una explotación crítica.</p>
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="lab09-filepathtransversal.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
+      </div>
+      <p class="sys-log" style="text-align:center; margin-top: 15px;">[ Reporte técnico — Actividad 09: Traversal sequences stripped non-recursively ]</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>ROAD TO HALL OF FAME | Seguridad Informática</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
