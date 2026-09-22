@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDTS — Lab 10: Superfluous URL-Decode | CNO IV</title>
+<meta name="description" content="Actividad 10 — Road to Hall of Fame: File path traversal, traversal sequences stripped with superfluous URL-decode. PortSwigger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.4rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 40px; }
+  h3 { font-size: 1.1rem; color: var(--accent-bright); margin-bottom: 10px; }
+
+  a { color: var(--accent-bright); text-decoration: none; font-weight: bold; }
+  a:hover { text-decoration: underline; background-color: var(--accent); color: #ffffff; }
+
+  code {
+    background: #0d100d;
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    color: var(--accent-bright);
+    font-size: 0.95rem;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-red { border-color: #c0392b; color: #e74c3c; }
+  .tag-blue { border-color: #3498db; color: #3498db; }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  a.btn {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  a.btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+  a.btn:active {
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    transform: translate(4px, 4px);
+  }
+
+  .btn-pdf { border-color: #c0392b; color: #e74c3c; }
+  .btn-pdf:hover { background: #c0392b; border-color: #c0392b; }
+
+  /* --- Evidencias --- */
+  .evidence {
+    background: #0d100d;
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 15px;
+    margin: 25px 0;
+  }
+  .evidence img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border-color);
+  }
+  .evidence .cap {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #68856b;
+    border-top: 2px dashed var(--border-color);
+    padding-top: 8px;
+  }
+  .evidence .cap strong { color: var(--accent-bright); }
+
+  .lab-payload {
+    background: #0d100d;
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    color: var(--accent-bright);
+    margin: 15px 0;
+    word-break: break-all;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--bg-color);
+    color: #e0f2e3;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+  td { background: #0d100d; }
+
+  ol li, ul li { margin-bottom: 8px; }
+
+  .solved-banner {
+    background: var(--accent);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    margin: 20px 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.4rem; }
+    .container { padding: 0; }
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="index.html#presentacion">/presentación</a></li>
+        <li><a href="index.html#perfil">/perfil</a></li>
+        <li><a href="index.html#contacto">/contacto</a></li>
+        <li><a href="road-to-hall-of-fame.html" target="_self">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 10 ]</span>
+      <h1>Lab 10: Traversal Stripped with Superfluous URL-Decode</h1>
+      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition</p>
+      <div style="margin-top: 15px;">
+        <span class="tag">Actividad 10</span>
+        <span class="tag tag-blue">Nivel: Practitioner</span>
+        <span class="tag">Path Traversal</span>
+        <span class="tag">Double URL Encode</span>
+        <span class="tag-red">Burp Suite</span>
+      </div>
+    </section>
+
+    <!-- 1. NOMBRE -->
+    <section class="box">
+      <h2>01_Nombre del laboratorio</h2>
+      <p><strong style="color:#e0f2e3;">File path traversal, traversal sequences stripped with superfluous URL-decode</strong></p>
+      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-superfluous-url-decode" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-superfluous-url-decode</a></p>
+      <p>Este laboratorio presenta un escenario donde la aplicación web intenta bloquear los ataques de Path Traversal eliminando secuencias <code>../</code>, pero introduce una nueva vulnerabilidad al decodificar la entrada de forma superflua.</p>
+
+      <div class="evidence">
+        <img src="img/lab10_1.png" alt="Descripción del laboratorio en PortSwigger">
+        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.</div>
+      </div>
+    </section>
+
+    <!-- 2. NIVEL -->
+    <section class="box">
+      <h2>02_Nivel</h2>
+      <p><strong style="color:#3498db;">Practitioner</strong> (Intermedio).</p>
+      <p>La dificultad radica en identificar discrepancias entre cómo el servidor web maneja la codificación y cómo lo hace el código de la aplicación (backend). El atacante debe ofuscar el payload lo suficiente para pasar el primer filtro y depender de un error lógico de decodificación posterior para reconstruirlo.</p>
+    </section>
+
+    <!-- 3. TIPO -->
+    <section class="box">
+      <h2>03_Tipo de explotación</h2>
+      <p><strong style="color:#e0f2e3;">File Path Traversal</strong> (Arbitrary File Read) con evasión de filtros mediante <strong style="color:#e0f2e3;">Double URL Encoding</strong>.</p>
+      <p>Por lo general, los servidores web (como Apache, Nginx o IIS) decodifican automáticamente la URL de una petición HTTP antes de pasarla a la aplicación web. Si la aplicación web incluye código que vuelve a decodificar explícitamente los datos de entrada de forma manual, se crea una discrepancia peligrosa.</p>
+      <p>Un atacante puede aplicar una "doble codificación URL" a su payload. Cuando el servidor web recibe la petición, realiza la primera decodificación. El filtro de seguridad analiza la cadena resultante, y al seguir estando codificada parcialmente, no detecta ninguna firma maliciosa (no encuentra la secuencia literal <code>../</code>).</p>
+      <p>Sin embargo, después de pasar la validación con éxito, la aplicación vuelve a decodificar la cadena (decodificación superflua), devolviendo el payload malicioso a su forma original justo antes de pasarlo a la API del sistema de archivos.</p>
+      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> Lectura de archivos sensibles del sistema operativo y evasión efectiva de Firewalls de Aplicaciones Web (WAF) o filtros de sanitización implementados en el código.</p>
+    </section>
+
+    <!-- 4. OBJETIVO -->
+    <section class="box">
+      <h2>04_Objetivo del laboratorio</h2>
+      <p>Demostrar la explotación de una vulnerabilidad de File Path Traversal evadiendo un filtro de seguridad. Esto se logra ofuscando el parámetro <code>filename</code> mediante una técnica de doble codificación URL (<code>%252e%252e%252f</code>) para reconstruir el salto de directorio en el backend, con el fin de leer el contenido del archivo <code>/etc/passwd</code> del servidor y obtener la confirmación de "Lab solved".</p>
+    </section>
+
+    <!-- 5. EXPLICACION -->
+    <section class="box">
+      <h2>05_Explicación técnica de la vulnerabilidad</h2>
+      <p>La aplicación web utiliza el parámetro <code>filename</code> para cargar imágenes:</p>
+      <div class="lab-payload">GET /image?filename=71.jpg HTTP/2</div>
+      <p>La defensa de la aplicación consta de dos partes:</p>
+      <ol>
+        <li>Elimina explícitamente las secuencias de recorrido (<code>../</code>).</li>
+        <li>Posteriormente (y de forma insegura), decodifica la URL de la entrada del usuario antes de utilizarla para acceder al sistema de archivos.</li>
+      </ol>
+      <p>Si enviamos el payload estándar <code>../../../etc/passwd</code>, el filtro lo elimina y la explotación falla. Si enviamos el payload con codificación URL simple (<code>%2e%2e%2f</code>), el servidor web frontend lo decodifica automáticamente a <code>../</code> antes de que llegue a la aplicación, por lo que el filtro del backend también lo detecta y lo elimina.</p>
+      <h3>El proceso del Bypass con Doble Codificación</h3>
+      <p>Al enviar una doble codificación (<code>%252e%252e%252f</code>):</p>
+      <ul>
+        <li><strong>Paso 1 (Servidor Web):</strong> Decodifica los <code>%25</code> (que es el símbolo <code>%</code> en URL encoding). La cadena se convierte en <code>%2e%2e%2f</code>.</li>
+        <li><strong>Paso 2 (Filtro):</strong> El filtro de seguridad busca la cadena literal <code>../</code>. Como la entrada actual es <code>%2e%2e%2f</code>, el filtro no detecta peligro y permite que continúe el flujo.</li>
+        <li><strong>Paso 3 (Decodificación Superflua):</strong> La aplicación decodifica explícitamente la cadena <code>%2e%2e%2f</code> transformándola en <code>../</code>.</li>
+        <li><strong>Paso 4 (Ejecución):</strong> El sistema de archivos recibe la ruta con los saltos de directorio procesados y devuelve el archivo no autorizado.</li>
+      </ul>
+    </section>
+
+    <!-- 6. PROCEDIMIENTO -->
+    <section class="box">
+      <h2>06_Procedimiento paso a paso</h2>
+
+      <h3>Paso 1 — Preparación del entorno</h3>
+      <p>Se inicia Burp Suite Community Edition desde la máquina virtual, seleccionando <em>Temporary project in memory</em> y <em>Use Burp defaults</em>.</p>
+      <div class="evidence">
+        <img src="img/lab10_2.png" alt="Burp Suite - Configuración inicial">
+        <div class="cap"><strong>Evidencia 2:</strong> Configuración del proyecto temporal en Burp Suite.</div>
+      </div>
+
+      <h3>Paso 2 — Interceptación y Navegación</h3>
+      <p>Con Burp abierto, se abre el navegador integrado y se accede a la URL del laboratorio. Se apaga el interceptor para permitir la carga correcta de los recursos visuales.</p>
+      <div class="evidence">
+        <img src="img/lab10_3.png" alt="Burp Proxy - Intercept off">
+        <div class="cap"><strong>Evidencia 3:</strong> Interceptor desactivado temporalmente.</div>
+      </div>
+
+      <h3>Paso 3 — Generación de tráfico objetivo</h3>
+      <p>Se navega a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que dispara la petición GET que solicita la imagen del producto.</p>
+      <div class="evidence">
+        <img src="img/lab10_4.png" alt="Navegación de producto">
+        <div class="cap"><strong>Evidencia 4:</strong> Accediendo a los detalles del producto para capturar la petición de carga de la imagen.</div>
+      </div>
+
+      <h3>Paso 4 — Enviar a Repeater</h3>
+      <p>Se localiza en el historial HTTP la petición GET correspondiente (<code>GET /image?filename=...</code>) y se envía al módulo Repeater para inyectar el payload modificado.</p>
+      <div class="evidence">
+        <img src="img/lab10_5.png" alt="Send to Repeater">
+        <div class="cap"><strong>Evidencia 5:</strong> Enviando el request interceptado al Repeater.</div>
+      </div>
+
+      <h3>Paso 5 — Modificación del Payload (Doble URL Encode)</h3>
+      <p>En la pestaña Repeater, se modifica el valor del parámetro <code>filename</code> y se inyecta el payload ofuscado con doble codificación hexadecimal:</p>
+      <div class="lab-payload">GET /image?filename=%252e%252e%252f%252e%252e%252f%252e%252e%252fetc/passwd HTTP/2</div>
+      <div class="evidence">
+        <img src="img/lab10_6.png" alt="Payload modificado en Repeater">
+        <div class="cap"><strong>Evidencia 6:</strong> Request modificado con la técnica Double URL Encoding evadiendo el filtro de texto plano.</div>
+      </div>
+      <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
+
+      <h3>Paso 6 — Confirmación de Explotación</h3>
+      <p>En el panel <em>Response</em> se observa un código de estado <code>HTTP/2 200 OK</code>. Dentro del cuerpo de la respuesta se visualiza el contenido del archivo de usuarios del sistema Linux, demostrando que el ataque tuvo éxito.</p>
+      <div class="evidence">
+        <img src="img/lab10_7.png" alt="Respuesta 200 OK con passwd">
+        <div class="cap"><strong>Evidencia 7:</strong> Visualización del archivo <code>/etc/passwd</code> devuelto por el servidor vulnerable.</div>
+      </div>
+      
+      <p>Se regresa a la pestaña del laboratorio en el navegador y se recarga la página, confirmando la resolución.</p>
+      <div class="evidence">
+        <img src="img/lab10_8.png" alt="Lab Solved">
+        <div class="cap"><strong>Evidencia 8:</strong> El sistema de PortSwigger acredita la resolución del laboratorio.</div>
+      </div>
+      <div class="solved-banner">✔ LAB SOLVED — TRAVERSAL STRIPPED WITH SUPERFLUOUS URL-DECODE</div>
+    </section>
+
+    <!-- 7. PAYLOAD -->
+    <section class="box">
+      <h2>07_Explicación del payload</h2>
+      <p><strong style="color:#e0f2e3;">Payload utilizado:</strong></p>
+      <div class="lab-payload">%252e%252e%252f%252e%252e%252f%252e%252e%252fetc/passwd</div>
+      <p>Este payload es la representación de <code>../../../etc/passwd</code> codificada dos veces mediante URL Encoding (Hexadecimal).</p>
+      
+      <p><strong style="color:#e0f2e3;">Codificación Simple:</strong></p>
+      <ul>
+        <li>Punto <code>.</code> = <code>%2e</code></li>
+        <li>Barra <code>/</code> = <code>%2f</code></li>
+        <li>Secuencia <code>../</code> = <code>%2e%2e%2f</code></li>
+      </ul>
+
+      <p><strong style="color:#e0f2e3;">Doble Codificación:</strong></p>
+      <p>Para codificar esto por segunda vez, se codifica el símbolo de porcentaje (<code>%</code>).</p>
+      <ul>
+        <li>Símbolo <code>%</code> = <code>%25</code></li>
+        <li>Por lo tanto, <code>%2e</code> se convierte en <code>%252e</code></li>
+        <li>Y <code>%2f</code> se convierte en <code>%252f</code></li>
+        <li>Secuencia doblemente codificada = <code>%252e%252e%252f</code></li>
+      </ul>
+      <p>Al repetir este bloque tres veces, nos aseguramos de escalar suficientes niveles en el árbol de directorios para llegar a la raíz. Finalmente se concatena la ruta del archivo deseado <code>etc/passwd</code> (el cual no es estrictamente necesario codificar porque el filtro no busca estas palabras alfabéticas de todos modos).</p>
+    </section>
+
+    <!-- 8. MITIGACION -->
+    <section class="box">
+      <h2>08_Mitigación recomendada</h2>
+      <ol>
+        <li><strong style="color:#e0f2e3;">Evitar decodificaciones manuales innecesarias:</strong> Confiar en que los frameworks modernos y los servidores web ya realizan la normalización y decodificación URL de las peticiones entrantes de forma estándar. No incluir funciones como <code>urldecode()</code> a nivel de código de aplicación a menos que esté estrictamente justificado, ya que introducen inconsistencias.</li>
+        <li><strong style="color:#e0f2e3;">El orden de las operaciones es crítico:</strong> Si es absolutamente necesario decodificar la entrada manualmente, la validación de seguridad (filtros, listas blancas) <strong>siempre</strong> debe realizarse al final, *después* de que se hayan completado todas las decodificaciones. Jamás se debe validar una cadena y luego decodificarla.</li>
+        <li><strong style="color:#e0f2e3;">Uso de referencias indirectas (Recomendación óptima):</strong> Al igual que en todos los casos de Path Traversal, la mejor defensa es evitar referenciar directamente los nombres de archivo en los parámetros HTTP. Utilizar en su lugar un identificador único (ID de base de datos) para mapear internamente la imagen que se desea mostrar.</li>
+        <li><strong style="color:#e0f2e3;">Canonicalización estricta:</strong> Resolver siempre la ruta final absoluta de la solicitud (<code>realpath()</code>) y verificar que esté contenida dentro del directorio restringido antes de abrir el recurso (ej. <code>startsWith("/var/www/images/")</code>).</li>
+      </ol>
+    </section>
+
+    <!-- 9. CONCLUSION -->
+    <section class="box">
+      <h2>09_Conclusión</h2>
+      <p>La validación de datos a menudo se ve frustrada por diferencias en la forma en que los distintos componentes de la arquitectura web interpretan o manipulan una entrada. La doble decodificación URL ilustra perfectamente cómo una medida de seguridad válida (el filtro) queda inoperativa simplemente porque se ejecuta en la fase incorrecta del flujo de procesamiento de la cadena.</p>
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="lab10-superfluous.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
+      </div>
+      <p class="sys-log" style="text-align:center; margin-top: 15px;">[ Reporte técnico — Actividad 10: Traversal stripped with superfluous URL-decode ]</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>ROAD TO HALL OF FAME | Seguridad Informática</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
