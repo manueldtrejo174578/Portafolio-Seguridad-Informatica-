@@ -517,23 +517,24 @@
         <div class="lab-card">
           <h3>Actividad 11 — Validation of Start of Path</h3>
           <div class="lab-meta">
-            <span class="tag">Apprentice</span>
+            <span class="tag">Actividad 11</span>
+            <span class="tag tag-blue">Practitioner</span>
             <span class="tag">Path Validation</span>
             <span class="tag">Traversal</span>
           </div>
           <div class="lab-desc">
             <strong>Objetivo:</strong> Bypassar la validación que exige que la ruta comience con un directorio esperado.<br><br>
-            <strong>Descripción técnica:</strong> El parámetro contiene la ruta completa <code>/var/www/images/</code>. El servidor valida el prefijo pero no la continuación. Al enviar <code>/var/www/images/../../../../etc/passwd</code>, el prefijo es válido y la normalización apunta a <code>/etc/passwd</code>.
+            <strong>Descripción técnica:</strong> El parámetro contiene la ruta completa <code>/var/www/images/</code>. El servidor valida el prefijo pero no la continuación. Al enviar <code>/var/www/images/../../../etc/passwd</code>, el prefijo es válido y la normalización apunta a <code>/etc/passwd</code>.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab05-start-path.png" alt="[Evidencia: Validación de inicio de ruta]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="img/lab11_7.png" alt="[Evidencia: Validación de inicio de ruta]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span style="display:none; color:#5DC21E;">[ Sube tu captura: Repeater con prefijo válido + traversal + Lab Solved ]</span>
           </div>
-          <div class="lab-payload">Payload: filename=/var/www/images/../../../../etc/passwd</div>
+          <div class="lab-payload">Payload: filename=/var/www/images/../../../etc/passwd</div>
           
           <div class="lab-actions">
-            <a href="lab05-start-path.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab05-start-path.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab11-validation.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="lab11-validation.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
