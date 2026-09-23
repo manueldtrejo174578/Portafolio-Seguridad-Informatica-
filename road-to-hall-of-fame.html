@@ -544,23 +544,23 @@
         <div class="lab-card">
           <h3>Actividad 12 — Validation of File Extension: Null Byte Bypass</h3>
           <div class="lab-meta">
-            <span class="tag">Apprentice</span>
+            <span class="tag tag-blue" style="border-color: #3498db; color: #3498db;">Practitioner</span>
             <span class="tag">Null Byte</span>
             <span class="tag">Extension Bypass</span>
           </div>
           <div class="lab-desc">
             <strong>Objetivo:</strong> Bypassar la validación de extensión de archivo usando el byte nulo <code>%00</code>.<br><br>
-            <strong>Descripción técnica:</strong> La aplicación verifica que el nombre termine en <code>.png</code>. Al inyectar <code>../../../etc/passwd%00.png</code>, el byte nulo trunca la cadena en el sistema subyacente, abriendo <code>/etc/passwd</code> mientras la validación ve <code>.png</code>.
+            <strong>Descripción técnica:</strong> La aplicación verifica que el nombre termine obligatoriamente en <code>.png</code>. Al inyectar <code>../../../etc/passwd%00.png</code>, la validación de la aplicación (alto nivel) lo aprueba, pero el byte nulo trunca la cadena en las APIs del sistema subyacente (C/C++), ignorando la extensión y abriendo <code>/etc/passwd</code>.
           </div>
           <div class="lab-evidence">
-            <img src="evidencias/lab06-null-byte.png" alt="[Evidencia: Null byte bypass]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %00.png + respuesta con contenido de /etc/passwd ]</span>
+            <img src="img/lab12_7.png" alt="[Evidencia: Null byte bypass]" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; color:#5DC21E;">[ Sube tu captura: Request con %00.png + respuesta con /etc/passwd ]</span>
           </div>
-          <div class="lab-payload">Payload: filename=../../../../etc/passwd%00.png</div>
+          <div class="lab-payload">Payload: filename=../../../etc/passwd%00.png</div>
           
           <div class="lab-actions">
-            <a href="lab06-null-byte.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
-            <a href="lab06-null-byte.html" class="btn btn-details">VER DETALLES →</a>
+            <a href="lab12-nullbyte.pdf" class="btn btn-pdf" download>⬇ REPORTE</a>
+            <a href="lab12-nullbyte.html" class="btn btn-details">VER DETALLES →</a>
           </div>
         </div>
       </div>
