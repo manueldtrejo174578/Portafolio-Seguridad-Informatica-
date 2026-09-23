@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDTS — Lab 11: Validation of Start of Path | CNO IV</title>
+<meta name="description" content="Actividad 11 — Road to Hall of Fame: File path traversal, validation of start of path. PortSwigger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.4rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 40px; }
+  h3 { font-size: 1.1rem; color: var(--accent-bright); margin-bottom: 10px; }
+
+  a { color: var(--accent-bright); text-decoration: none; font-weight: bold; }
+  a:hover { text-decoration: underline; background-color: var(--accent); color: #ffffff; }
+
+  code {
+    background: #0d100d;
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    color: var(--accent-bright);
+    font-size: 0.95rem;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-red { border-color: #c0392b; color: #e74c3c; }
+  .tag-blue { border-color: #3498db; color: #3498db; }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  a.btn {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  a.btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+  a.btn:active {
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    transform: translate(4px, 4px);
+  }
+
+  .btn-pdf { border-color: #c0392b; color: #e74c3c; }
+  .btn-pdf:hover { background: #c0392b; border-color: #c0392b; }
+
+  .evidence {
+    background: #0d100d;
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 15px;
+    margin: 25px 0;
+  }
+  .evidence img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border-color);
+  }
+  .evidence .cap {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #68856b;
+    border-top: 2px dashed var(--border-color);
+    padding-top: 8px;
+  }
+  .evidence .cap strong { color: var(--accent-bright); }
+
+  .lab-payload {
+    background: #0d100d;
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    color: var(--accent-bright);
+    margin: 15px 0;
+    word-break: break-all;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: var(--bg-color);
+    color: #e0f2e3;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+  td { background: #0d100d; }
+
+  ol li, ul li { margin-bottom: 8px; }
+
+  .solved-banner {
+    background: var(--accent);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    margin: 20px 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.4rem; }
+    .container { padding: 0; }
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="index.html#presentacion">/presentación</a></li>
+        <li><a href="index.html#perfil">/perfil</a></li>
+        <li><a href="index.html#contacto">/contacto</a></li>
+        <li><a href="road-to-hall-of-fame.html" target="_self">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 11 ]</span>
+      <h1>Lab 11: Validation of Start of Path</h1>
+      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition</p>
+      <div style="margin-top: 15px;">
+        <span class="tag">Actividad 11</span>
+        <span class="tag tag-blue">Nivel: Practitioner</span>
+        <span class="tag">Path Traversal</span>
+        <span class="tag">Path Validation Bypass</span>
+        <span class="tag-red">Burp Suite</span>
+      </div>
+    </section>
+
+    <!-- 1. NOMBRE -->
+    <section class="box">
+      <h2>01_Nombre del laboratorio</h2>
+      <p><strong style="color:#e0f2e3;">File path traversal, validation of start of path</strong></p>
+      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-validate-start-of-path" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-validate-start-of-path</a></p>
+      <p>Este laboratorio presenta un mecanismo de defensa basado en la validación del prefijo de la ruta. La aplicación comprueba que el input del usuario comience con el directorio esperado, pero es vulnerable porque no restringe ni valida el resto de la cadena.</p>
+
+      <div class="evidence">
+        <img src="img/lab11_1.png" alt="Descripción del laboratorio en PortSwigger">
+        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.</div>
+      </div>
+    </section>
+
+    <!-- 2. NIVEL -->
+    <section class="box">
+      <h2>02_Nivel</h2>
+      <p><strong style="color:#3498db;">Practitioner</strong> (Intermedio).</p>
+      <p>El desafío consiste en evadir una medida de validación positiva incompleta. El atacante debe respetar la regla inicial (el prefijo de la ruta) para sortear el filtro de seguridad, y posteriormente abusar de la falta de validación en la cola de la cadena.</p>
+    </section>
+
+    <!-- 3. TIPO -->
+    <section class="box">
+      <h2>03_Tipo de explotación</h2>
+      <p><strong style="color:#e0f2e3;">File Path Traversal</strong> (Arbitrary File Read) con evasión de validación de prefijo (Path Validation Bypass).</p>
+      <p>La vulnerabilidad ocurre cuando los desarrolladores intentan asegurar el acceso a archivos requiriendo que la ruta solicitada comience con una cadena fija (por ejemplo, el directorio base de imágenes). Esto generalmente se implementa usando funciones como <code>startsWith()</code> en Java, <code>strpos() === 0</code> en PHP o <code>startswith()</code> en Python.</p>
+      <p>El fallo de seguridad radica en que verificar únicamente el inicio de la cadena no impide el uso de secuencias de recorrido (<code>../</code>) en la parte posterior de la misma. Un atacante puede proporcionar el prefijo exacto que la aplicación espera, evadiendo así la comprobación, y luego anexar secuencias de retroceso para navegar fuera de ese directorio y acceder a archivos sensibles del sistema operativo.</p>
+      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> Lectura de archivos críticos del sistema, acceso a código fuente y evasión de políticas de control de acceso basadas en nombres o rutas de directorio.</p>
+    </section>
+
+    <!-- 4. OBJETIVO -->
+    <section class="box">
+      <h2>04_Objetivo del laboratorio</h2>
+      <p>Demostrar la explotación de una vulnerabilidad de File Path Traversal evadiendo un filtro de validación de inicio de ruta. Esto se logra enviando la ruta base esperada por la aplicación seguida de secuencias de retroceso de directorio a través del parámetro <code>filename</code>, con el fin de leer el contenido del archivo <code>/etc/passwd</code> del servidor y obtener la confirmación de "Lab solved".</p>
+    </section>
+
+    <!-- 5. EXPLICACION -->
+    <section class="box">
+      <h2>05_Explicación técnica de la vulnerabilidad</h2>
+      <p>En este escenario, la tienda en línea requiere que se le pase la ruta absoluta del directorio donde residen las imágenes al cargar un producto:</p>
+      <div class="lab-payload">GET /image?filename=/var/www/images/71.jpg HTTP/2</div>
+      <p>Para proteger el servidor, la aplicación implementa una validación que comprueba si el valor proporcionado por el usuario en el parámetro <code>filename</code> comienza exactamente con la ruta predefinida <code>/var/www/images/</code>.</p>
+      <p>El problema técnico es que esta validación solo inspecciona el prefijo de la entrada y asume erróneamente que, si comienza bien, toda la ruta es segura. No elimina ni bloquea las secuencias <code>../</code>.</p>
+      <p>Si un atacante envía <code>/var/www/images/../../../etc/passwd</code>, la aplicación aprueba la entrada porque la condición del prefijo se cumple de manera estricta (<code>startsWith("/var/www/images/")</code> devuelve <code>true</code>). Luego, al pasar esta cadena completa a las APIs del sistema de archivos, el sistema operativo resuelve dinámicamente la ruta: entra a los directorios y luego las secuencias <code>../</code> anulan el directorio base subiendo niveles hasta la raíz, terminando por resolver y devolver el archivo objetivo.</p>
+    </section>
+
+    <!-- 6. PROCEDIMIENTO -->
+    <section class="box">
+      <h2>06_Procedimiento paso a paso</h2>
+
+      <h3>Paso 1 — Preparación del entorno</h3>
+      <p>Se inicia Burp Suite Community Edition desde la máquina virtual, seleccionando <em>Temporary project in memory</em> y <em>Use Burp defaults</em>.</p>
+      <div class="evidence">
+        <img src="img/lab11_2.png" alt="Burp Suite - Configuración inicial">
+        <div class="cap"><strong>Evidencia 2:</strong> Configuración del proyecto temporal y por defecto en Burp Suite.</div>
+      </div>
+
+      <h3>Paso 2 — Interceptación y Navegación</h3>
+      <p>Con Burp abierto en la pestaña <em>Proxy → Intercept</em>, se abre el navegador integrado y se accede a la URL del laboratorio. Se desactiva temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página de la tienda.</p>
+      <div class="evidence">
+        <img src="img/lab11_3.png" alt="Burp Proxy - Intercept off">
+        <div class="cap"><strong>Evidencia 3:</strong> Interceptor desactivado para la carga inicial del sitio web.</div>
+      </div>
+
+      <h3>Paso 3 — Generación de tráfico objetivo</h3>
+      <p>Se navega a la página de un producto (clic en <strong style="color:#e0f2e3;">"View details"</strong>), lo que dispara la petición GET que solicita la imagen del producto.</p>
+      <div class="evidence">
+        <img src="img/lab11_4.png" alt="Navegación de producto">
+        <div class="cap"><strong>Evidencia 4:</strong> Interacción con la tienda para visualizar los detalles de un artículo.</div>
+      </div>
+
+      <h3>Paso 4 — Enviar a Repeater</h3>
+      <p>Se busca en el historial (pestaña <em>Proxy → HTTP history</em>) la petición GET que carga la imagen (similar a <code>GET /image?filename=/var/www/images/71.jpg</code>) y se envía al módulo Repeater (clic derecho → <strong style="color:#e0f2e3;">"Send to Repeater"</strong>).</p>
+      <div class="evidence">
+        <img src="img/lab11_5.png" alt="Send to Repeater">
+        <div class="cap"><strong>Evidencia 5:</strong> Identificando y enviando el request vulnerable al módulo Repeater.</div>
+      </div>
+
+      <h3>Paso 5 — Modificación del Payload (Bypass por Prefijo)</h3>
+      <p>En la pestaña Repeater, se modifica el valor del parámetro <code>filename</code>, manteniendo el inicio de ruta esperado por el backend y concatenando el payload malicioso:</p>
+      <div class="lab-payload">GET /image?filename=/var/www/images/../../../etc/passwd HTTP/2</div>
+      <div class="evidence">
+        <img src="img/lab11_6.png" alt="Payload modificado en Repeater">
+        <div class="cap"><strong>Evidencia 6:</strong> Request modificado con la técnica Path Validation Bypass. Se respeta el prefijo pero se añaden secuencias <code>../</code>.</div>
+      </div>
+      <p>Se presionó <strong style="color:#e0f2e3;">"Send"</strong>.</p>
+
+      <h3>Paso 6 — Confirmación de Explotación</h3>
+      <p>En el panel <em>Response</em> se observa un código de estado <code>HTTP/2 200 OK</code>. Dentro del cuerpo de la respuesta se visualiza el contenido del archivo de usuarios del sistema Linux, demostrando que la técnica del prefijo válido logró evadir el filtro.</p>
+      <div class="evidence">
+        <img src="img/lab11_7.png" alt="Respuesta 200 OK con passwd">
+        <div class="cap"><strong>Evidencia 7:</strong> El servidor devuelve el contenido de <code>/etc/passwd</code>, demostrando la lectura arbitraria del archivo.</div>
+      </div>
+      
+      <p>Se regresa a la pestaña del laboratorio en el navegador y se recarga la página, confirmando la resolución.</p>
+      <div class="evidence">
+        <img src="img/lab11_8.png" alt="Lab Solved">
+        <div class="cap"><strong>Evidencia 8:</strong> El sistema de PortSwigger acredita la resolución del laboratorio.</div>
+      </div>
+      <div class="solved-banner">✔ LAB SOLVED — VALIDATION OF START OF PATH</div>
+    </section>
+
+    <!-- 7. PAYLOAD -->
+    <section class="box">
+      <h2>07_Explicación del payload</h2>
+      <p><strong style="color:#e0f2e3;">Payload utilizado:</strong></p>
+      <div class="lab-payload">/var/www/images/../../../etc/passwd</div>
+      <p>El payload consta de tres partes fundamentales que trabajan en conjunto para engañar a la aplicación y al sistema de archivos:</p>
+      
+      <ul>
+        <li><strong style="color:#e0f2e3;"><code>/var/www/images/</code></strong> : Es el prefijo obligatorio que la aplicación exige para dar por válida la solicitud. Al incluirlo al principio, el filtro de seguridad (ej. <code>startsWith</code>) devuelve verdadero y deja pasar la petición.</li>
+        <li><strong style="color:#e0f2e3;"><code>../../../</code></strong> : Son las secuencias de retroceso de directorio relativas. Una vez que la ruta base es aceptada, estas secuencias indican al sistema operativo que suba de nivel. Partiendo desde el directorio <code>images/</code>, el primer <code>../</code> sube a <code>www/</code>, el segundo a <code>var/</code> y el tercero llega directamente a la raíz del sistema de archivos <code>/</code>.</li>
+        <li><strong style="color:#e0f2e3;"><code>etc/passwd</code></strong> : Es la ruta relativa desde la raíz hacia el archivo objetivo que contiene la lista de usuarios del sistema Linux, el cual es finalmente devuelto al usuario.</li>
+      </ul>
+    </section>
+
+    <!-- 8. MITIGACION -->
+    <section class="box">
+      <h2>08_Mitigación recomendada</h2>
+      <ol>
+        <li><strong style="color:#e0f2e3;">Canonicalización estricta de rutas (El enfoque correcto):</strong> Validar si una cadena "comienza con" cierto texto no es una medida de seguridad válida para nombres de archivos. La aplicación debe resolver primero la ruta real del archivo (ruta canónica) utilizando APIs como <code>getCanonicalPath()</code> en Java o <code>realpath()</code> en PHP. Estas funciones obligan al sistema a resolver todos los <code>../</code> y enlaces simbólicos.</li>
+        <li><strong style="color:#e0f2e3;">Validación posterior a la canonicalización:</strong> Una vez obtenida la ruta canónica final y limpia, *ahora sí* se debe comprobar si dicha ruta comienza estrictamente con el directorio base permitido (ej. <code>/var/www/images/</code>). De esta forma, cualquier intento de escape será detectado porque la ruta real devuelta por el sistema operativo ya no comenzará con <code>/var/www/images/</code>.</li>
+        <li><strong style="color:#e0f2e3;">Identificadores indirectos:</strong> Evitar a toda costa que el usuario pueda interactuar o enviar rutas completas del servidor. Es mucho más seguro mapear las imágenes a un ID numérico (<code>?id=71</code>) o a un nombre de archivo simple (<code>?file=71.jpg</code>) que enviar la ruta de un directorio, restringiendo la validación a expresiones regulares (alfanuméricos + extensión).</li>
+      </ol>
+    </section>
+
+    <!-- 9. CONCLUSION -->
+    <section class="box">
+      <h2>09_Conclusión</h2>
+      <p>Este laboratorio subraya un error común de programación: validar parcialmente una entrada y asumir que su totalidad es segura. La validación del "inicio de la ruta" no tiene sentido sin resolver previamente las secuencias de escape. Aplicar la canonicalización de rutas antes de cualquier verificación de directorio es indispensable para prevenir vulnerabilidades de File Path Traversal.</p>
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="lab11-validation.pdf" class="btn btn-pdf" download>⬇ DESCARGAR REPORTE COMPLETO (PDF)</a>
+      </div>
+      <p class="sys-log" style="text-align:center; margin-top: 15px;">[ Reporte técnico — Actividad 11: Validation of start of path ]</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>ROAD TO HALL OF FAME | Seguridad Informática</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
