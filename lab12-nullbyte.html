@@ -60,7 +60,7 @@
   <header class="box">
     <div class="id-card">
       <div>
-        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong>[cite: 7]<br>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
         <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
       </div>
       <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
@@ -76,9 +76,9 @@
 
   <main>
     <section class="box">
-      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 12 ]</span>[cite: 7]
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ ROAD TO HALL OF FAME — ACTIVIDAD 12 ]</span>
       <h1>Lab 12: File Path Traversal — Null Byte Bypass</h1>
-      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition[cite: 7]</p>
+      <p class="sys-log">PortSwigger Web Security Academy | Herramienta: Burp Suite Community Edition</p>
       <div style="margin-top: 15px;">
         <span class="tag">Actividad 12</span>
         <span class="tag tag-blue">Practitioner</span>
@@ -90,84 +90,84 @@
     <!-- 1. NOMBRE -->
     <section class="box">
       <h2>01_Nombre del laboratorio</h2>
-      <p><strong style="color:#e0f2e3;">File path traversal, validation of file extension with null byte bypass</strong>[cite: 7]</p>
-      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass</a>[cite: 7]</p>
+      <p><strong style="color:#e0f2e3;">File path traversal, validation of file extension with null byte bypass</strong></p>
+      <p>URL del laboratorio: <a href="https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass" target="_blank" rel="noopener">https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass</a></p>
       <div class="evidence">
         <img src="img/lab12_1.png" alt="Descripción del laboratorio en PortSwigger">
-        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 1:</strong> Página de descripción del laboratorio en PortSwigger Web Security Academy.</div>
       </div>
     </section>
 
     <!-- 2 & 3. NIVEL Y TIPO -->
     <section class="box">
       <h2>02_Nivel y 03_Tipo de explotación</h2>
-      <p><strong>Nivel:</strong> <strong style="color:#3498db;">Practitioner</strong> (Intermedio).[cite: 7]</p>
-      <p>Este laboratorio utiliza una validación estricta de la extensión del archivo, requiriendo que la entrada termine con una extensión de imagen permitida (.png o .jpg).[cite: 7] El atacante debe evadir este control inyectando un byte nulo (%00) para truncar la cadena a nivel del sistema operativo.[cite: 7]</p>
-      <p><strong>Tipo de explotación:</strong> File Path Traversal (Arbitrary File Read) con Null Byte Injection (Evasión por byte nulo).[cite: 7]</p>
-      <p>Esta vulnerabilidad ocurre debido a una discrepancia en cómo los diferentes niveles tecnológicos manejan las cadenas de texto (strings).[cite: 7] Las aplicaciones web modernas (escritas en Java, PHP, Python) manejan las cadenas con un atributo de longitud, por lo que el byte nulo (\x00 o %00) es considerado solo un carácter más.[cite: 7]</p>
-      <p>Sin embargo, las APIs del sistema de archivos subyacente (y las funciones de C/C++ en las que se basan) utilizan "cadenas terminadas en nulo" (null-terminated strings).[cite: 7] Esto significa que cuando el sistema operativo lee la ruta, se detiene exactamente donde encuentra el primer byte nulo, ignorando cualquier cosa que esté escrita después.[cite: 7]</p>
-      <p>Al enviar <code>../../../etc/passwd%00.png</code>, la validación web verifica el final y ve <code>.png</code> (aprobando la petición), pero el sistema operativo corta la cadena en el <code>%00</code> y abre únicamente <code>../../../etc/passwd</code>.[cite: 7]</p>
-      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> Evasión de validaciones de extensión, lectura arbitraria de archivos y potencial ejecución remota de código (RCE) si se combina con vulnerabilidades de subida de archivos (File Upload).[cite: 7]</p>
+      <p><strong>Nivel:</strong> <strong style="color:#3498db;">Practitioner</strong> (Intermedio).</p>
+      <p>Este laboratorio utiliza una validación estricta de la extensión del archivo, requiriendo que la entrada termine con una extensión de imagen permitida (.png o .jpg). El atacante debe evadir este control inyectando un byte nulo (%00) para truncar la cadena a nivel del sistema operativo.</p>
+      <p><strong>Tipo de explotación:</strong> File Path Traversal (Arbitrary File Read) con Null Byte Injection (Evasión por byte nulo).</p>
+      <p>Esta vulnerabilidad ocurre debido a una discrepancia en cómo los diferentes niveles tecnológicos manejan las cadenas de texto (strings). Las aplicaciones web modernas (escritas en Java, PHP, Python) manejan las cadenas con un atributo de longitud, por lo que el byte nulo (\x00 o %00) es considerado solo un carácter más.</p>
+      <p>Sin embargo, las APIs del sistema de archivos subyacente (y las funciones de C/C++ en las que se basan) utilizan "cadenas terminadas en nulo" (null-terminated strings). Esto significa que cuando el sistema operativo lee la ruta, se detiene exactamente donde encuentra el primer byte nulo, ignorando cualquier cosa que esté escrita después.</p>
+      <p>Al enviar <code>../../../etc/passwd%00.png</code>, la validación web verifica el final y ve <code>.png</code> (aprobando la petición), pero el sistema operativo corta la cadena en el <code>%00</code> y abre únicamente <code>../../../etc/passwd</code>.</p>
+      <p><strong style="color:#e0f2e3;">Consecuencias:</strong> Evasión de validaciones de extensión, lectura arbitraria de archivos y potencial ejecución remota de código (RCE) si se combina con vulnerabilidades de subida de archivos (File Upload).</p>
     </section>
 
     <!-- 4 & 5. OBJETIVO Y EXPLICACIÓN TÉCNICA -->
     <section class="box">
       <h2>04_Objetivo y 05_Explicación técnica</h2>
-      <p><strong>Objetivo del laboratorio:</strong> Demostrar la explotación de una vulnerabilidad de File Path Traversal evadiendo un filtro de validación de extensión.[cite: 7] Esto se logra inyectando un byte nulo (%00) seguido de la extensión requerida en el parámetro filename, con el fin de engañar a la validación, leer el contenido del archivo /etc/passwd del servidor y obtener la confirmación de "Lab solved".[cite: 7]</p>
-      <p><strong>Explicación técnica:</strong> La aplicación carga las imágenes de la tienda mediante la petición <code>GET /image?filename=71 HTTP/2</code>.[cite: 7] El backend implementa una verificación de seguridad que se asegura de que el valor del parámetro termine estrictamente con la extensión esperada, usando funciones como <code>endsWith(".png")</code>.[cite: 7]</p>
-      <p>El atacante aprovecha la inyección del byte nulo (Null Byte) en formato URL-encode (%00).[cite: 7] Cuando se procesa el payload <code>../../../etc/passwd%00.png</code>:[cite: 7]</p>
+      <p><strong>Objetivo del laboratorio:</strong> Demostrar la explotación de una vulnerabilidad de File Path Traversal evadiendo un filtro de validación de extensión. Esto se logra inyectando un byte nulo (%00) seguido de la extensión requerida en el parámetro filename, con el fin de engañar a la validación, leer el contenido del archivo /etc/passwd del servidor y obtener la confirmación de "Lab solved".</p>
+      <p><strong>Explicación técnica:</strong> La aplicación carga las imágenes de la tienda mediante la petición <code>GET /image?filename=71 HTTP/2</code>. El backend implementa una verificación de seguridad que se asegura de que el valor del parámetro termine estrictamente con la extensión esperada, usando funciones como <code>endsWith(".png")</code>.</p>
+      <p>El atacante aprovecha la inyección del byte nulo (Null Byte) en formato URL-encode (%00). Cuando se procesa el payload <code>../../../etc/passwd%00.png</code>:</p>
       <ul>
-        <li>El validador de la aplicación web analiza la cadena completa, comprueba los últimos 4 caracteres y confirma que son .png. El filtro lo aprueba como seguro.[cite: 7]</li>
-        <li>La aplicación pasa esta ruta a la API del sistema de archivos (ej. la función fopen() en C).[cite: 7]</li>
-        <li>El sistema operativo lee la cadena y se detiene al encontrar el terminador nulo (%00).[cite: 7]</li>
-        <li>Toda la parte de la extensión .png es truncada (ignorada). El archivo que realmente se busca y se abre es /etc/passwd.[cite: 7]</li>
+        <li>El validador de la aplicación web analiza la cadena completa, comprueba los últimos 4 caracteres y confirma que son .png. El filtro lo aprueba como seguro.</li>
+        <li>La aplicación pasa esta ruta a la API del sistema de archivos (ej. la función fopen() en C).</li>
+        <li>El sistema operativo lee la cadena y se detiene al encontrar el terminador nulo (%00).</li>
+        <li>Toda la parte de la extensión .png es truncada (ignorada). El archivo que realmente se busca y se abre es /etc/passwd.</li>
       </ul>
     </section>
 
     <!-- 6. PROCEDIMIENTO PASO A PASO -->
     <section class="box">
       <h2>06_Procedimiento paso a paso</h2>
-      <p>Se inicia Burp Suite Community Edition desde la máquina virtual, seleccionando en las configuraciones iniciales, Temporary project in memory y posteriormente Use Burp defaults.[cite: 7]</p>
+      <p>Se inicia Burp Suite Community Edition desde la máquina virtual, seleccionando en las configuraciones iniciales, Temporary project in memory y posteriormente Use Burp defaults.</p>
       <div class="evidence">
         <img src="img/lab12_2.png" alt="Burp Suite Inicio">
-        <div class="cap"><strong>Evidencia 2:</strong> Configuración inicial de Burp Suite.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 2:</strong> Configuración inicial de Burp Suite.</div>
       </div>
       
-      <p>Con Burp abierto en la pestaña Proxy > Intercept, se abre el navegador integrado y se accede a la URL del laboratorio proporcionada por PortSwigger.[cite: 7]</p>
+      <p>Con Burp abierto en la pestaña Proxy > Intercept, se abre el navegador integrado y se accede a la URL del laboratorio proporcionada por PortSwigger.</p>
       <div class="evidence">
         <img src="img/lab12_3.png" alt="Intercept is off">
-        <div class="cap"><strong>Evidencia 3:</strong> Interceptor apagado en Burp Suite.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 3:</strong> Interceptor apagado en Burp Suite.</div>
       </div>
 
-      <p>En Burp Suite se desactiva temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página de la tienda.[cite: 7] Se navega a la página de un producto (clic en "View details"), lo que dispara la petición que carga la imagen del producto.[cite: 7]</p>
+      <p>En Burp Suite se desactiva temporalmente el interceptor ("Intercept is off") para permitir la carga completa de la página de la tienda. Se navega a la página de un producto (clic en "View details"), lo que dispara la petición que carga la imagen del producto.</p>
       <div class="evidence">
         <img src="img/lab12_4.png" alt="Tienda online">
-        <div class="cap"><strong>Evidencia 4:</strong> Carga de la tienda y selección del producto.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 4:</strong> Carga de la tienda y selección del producto.</div>
       </div>
 
-      <p>Se busca en el historial (pestaña Proxy > HTTP history) la petición GET que carga la imagen y se selecciona con clic derecho → "Send to Repeater".[cite: 7] El módulo Repeater permite editar y reenviar la petición observando las respuestas del servidor en tiempo real.[cite: 7]</p>
+      <p>Se busca en el historial (pestaña Proxy > HTTP history) la petición GET que carga la imagen y se selecciona con clic derecho → "Send to Repeater". El módulo Repeater permite editar y reenviar la petición observando las respuestas del servidor en tiempo real.</p>
       <div class="evidence">
         <img src="img/lab12_5.png" alt="HTTP History">
-        <div class="cap"><strong>Evidencia 5:</strong> Petición enviada al Repeater desde el historial HTTP.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 5:</strong> Petición enviada al Repeater desde el historial HTTP.</div>
       </div>
 
-      <p>En la línea 1 del request, dentro de la pestaña Repeater, se modifica el valor del parámetro filename, inyectando las secuencias de retroceso, el archivo objetivo, el byte nulo y la extensión esperada:[cite: 7]</p>
-      <div class="lab-payload">GET /image?filename=../../../etc/passwd%00.png HTTP/2[cite: 7]</div>
+      <p>En la línea 1 del request, dentro de la pestaña Repeater, se modifica el valor del parámetro filename, inyectando las secuencias de retroceso, el archivo objetivo, el byte nulo y la extensión esperada:</p>
+      <div class="lab-payload">GET /image?filename=../../../etc/passwd%00.png HTTP/2</div>
       <div class="evidence">
         <img src="img/lab12_6.png" alt="Payload modificado en Repeater">
-        <div class="cap"><strong>Evidencia 6:</strong> Modificación del payload en la pestaña Repeater.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 6:</strong> Modificación del payload en la pestaña Repeater.</div>
       </div>
 
-      <p>Se presiona "Send".[cite: 7] En el panel Response se observa una respuesta HTTP/2 200 OK. En el cuerpo de la respuesta se visualiza el contenido completo del archivo /etc/passwd del servidor, validando que el byte nulo truncó la validación exitosamente:[cite: 7]</p>
+      <p>Se presiona "Send". En el panel Response se observa una respuesta HTTP/2 200 OK. En el cuerpo de la respuesta se visualiza el contenido completo del archivo /etc/passwd del servidor, validando que el byte nulo truncó la validación exitosamente:</p>
       <div class="evidence">
         <img src="img/lab12_7.png" alt="Respuesta 200 OK con /etc/passwd">
-        <div class="cap"><strong>Evidencia 7:</strong> Visualización del archivo /etc/passwd en la respuesta del servidor.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 7:</strong> Visualización del archivo /etc/passwd en la respuesta del servidor.</div>
       </div>
 
-      <p>Se regresa a la pestaña del laboratorio en el navegador y se recarga la página (F5). Apareció el banner verde: LAB Solved![cite: 7]</p>
+      <p>Se regresa a la pestaña del laboratorio en el navegador y se recarga la página (F5). Apareció el banner verde: LAB Solved!</p>
       <div class="evidence">
         <img src="img/lab12_8.png" alt="Lab Solved Banner">
-        <div class="cap"><strong>Evidencia 8:</strong> Confirmación de laboratorio resuelto.[cite: 7]</div>
+        <div class="cap"><strong>Evidencia 8:</strong> Confirmación de laboratorio resuelto.</div>
       </div>
       <div class="solved-banner">✔ LAB SOLVED — NULL BYTE BYPASS</div>
     </section>
@@ -176,20 +176,20 @@
     <section class="box">
       <h2>07_Explicación del payload y 08_Mitigación recomendada</h2>
       <p><strong>Payload utilizado:</strong></p>
-      <div class="lab-payload">../../../etc/passwd%00.png[cite: 7]</div>
+      <div class="lab-payload">../../../etc/passwd%00.png</div>
       <ul>
-        <li><code>../../../</code>: Secuencias relativas de recorrido de directorio para retroceder desde la carpeta de imágenes hasta la raíz del sistema de archivos (/).[cite: 7]</li>
-        <li><code>etc/passwd</code>: La ruta del archivo objetivo que contiene la lista de usuarios.[cite: 7]</li>
-        <li><code>%00</code>: El Null Byte (byte nulo) codificado en URL.[cite: 7] Actúa como el carácter de terminación de cadena (String terminator, \0).[cite: 7] Le indica al sistema operativo "aquí termina el texto, ignora todo lo que siga".[cite: 7]</li>
-        <li><code>.png</code>: La extensión de imagen obligatoria requerida por el filtro de la aplicación web.[cite: 7] Pasa la comprobación de seguridad endsWith(), pero es completamente ignorada por el sistema de archivos gracias al byte nulo que la precede.[cite: 7]</li>
+        <li><code>../../../</code>: Secuencias relativas de recorrido de directorio para retroceder desde la carpeta de imágenes hasta la raíz del sistema de archivos (/).</li>
+        <li><code>etc/passwd</code>: La ruta del archivo objetivo que contiene la lista de usuarios.</li>
+        <li><code>%00</code>: El Null Byte (byte nulo) codificado en URL. Actúa como el carácter de terminación de cadena (String terminator, \0). Le indica al sistema operativo "aquí termina el texto, ignora todo lo que siga".</li>
+        <li><code>.png</code>: La extensión de imagen obligatoria requerida por el filtro de la aplicación web. Pasa la comprobación de seguridad endsWith(), pero es completamente ignorada por el sistema de archivos gracias al byte nulo que la precede.</li>
       </ul>
       
       <p><strong>Mitigación recomendada:</strong></p>
       <ul>
-        <li><strong>Rechazar bytes nulos:</strong> Cualquier petición que contenga un byte nulo (%00 o \x00) en parámetros de texto debe ser catalogada como maliciosa y bloqueada de inmediato, ya que no tiene uso legítimo en una cadena de ruta de archivo.[cite: 7]</li>
-        <li><strong>Canonicalización antes de validar:</strong> Extraer la ruta canónica del archivo (usando getCanonicalPath() o equivalentes) antes de validar la extensión.[cite: 7] Las funciones de canonicalización suelen fallar o lanzar excepciones si encuentran bytes nulos, bloqueando el ataque por defecto.[cite: 7]</li>
-        <li><strong>Validación de lista blanca y tipos MIME:</strong> En lugar de comprobar simplemente cómo termina una cadena de texto, validar rigurosamente que la ruta contenga únicamente caracteres alfanuméricos puros.[cite: 7] Además, se debe verificar el tipo MIME real (Magic Bytes) del archivo al subirlo, no solo su extensión.[cite: 7]</li>
-        <li><strong>Almacenamiento indirecto (Identificadores):</strong> Dejar de usar el nombre del archivo enviado por el usuario como identificador directo para acceder al disco.[cite: 7] Consultar un ID numérico (?id=71) contra una base de datos que contenga la ruta real, eliminando por completo la posibilidad de inyección en rutas.[cite: 7]</li>
+        <li><strong>Rechazar bytes nulos:</strong> Cualquier petición que contenga un byte nulo (%00 o \x00) en parámetros de texto debe ser catalogada como maliciosa y bloqueada de inmediato, ya que no tiene uso legítimo en una cadena de ruta de archivo.</li>
+        <li><strong>Canonicalización antes de validar:</strong> Extraer la ruta canónica del archivo (usando getCanonicalPath() o equivalentes) antes de validar la extensión. Las funciones de canonicalización suelen fallar o lanzar excepciones si encuentran bytes nulos, bloqueando el ataque por defecto.</li>
+        <li><strong>Validación de lista blanca y tipos MIME:</strong> En lugar de comprobar simplemente cómo termina una cadena de texto, validar rigurosamente que la ruta contenga únicamente caracteres alfanuméricos puros. Además, se debe verificar el tipo MIME real (Magic Bytes) del archivo al subirlo, no solo su extensión.</li>
+        <li><strong>Almacenamiento indirecto (Identificadores):</strong> Dejar de usar el nombre del archivo enviado por el usuario como identificador directo para acceder al disco. Consultar un ID numérico (?id=71) contra una base de datos que contenga la ruta real, eliminando por completo la posibilidad de inyección en rutas.</li>
       </ul>
 
       <div style="margin-top: 30px; text-align: center;">
