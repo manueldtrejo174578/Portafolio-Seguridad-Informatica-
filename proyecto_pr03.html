@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto P2 — Blindando la información | MDTS Portafolio</title>
+<meta name="description" content="Proyecto P2: Blindando la información - Auditoría Red Team y gobernanza ISO/IEC 27001 sobre INTERAFAS-LAB - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --danger: #c94a4a;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-danger { border-color: var(--danger); color: var(--danger); }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .warning-box {
+    background: rgba(201, 162, 39, 0.1);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warning-box h4 { color: var(--warning); margin-top: 0; }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .deliverable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .deliverable-card {
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 20px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .deliverable-card:hover {
+    border-color: var(--accent-bright);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .deliverable-card h4 { color: var(--accent-bright); margin-top: 0; }
+  .deliverable-card p { font-size: 0.95rem; margin: 8px 0 0 0; }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial1.html">/primer_parcial</a></li>
+        <li><a href="parcial2.html">/segundo_parcial</a></li>
+        <li><a href="#contexto">/contexto</a></li>
+        <li><a href="#entregables">/entregables</a></li>
+        <li><a href="#descarga">/descargar_zip</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ PROYECTO INTEGRADOR — SEGUNDO PARCIAL ]</span>
+    <h1>BLINDANDO LA INFORMACIÓN</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Gobernanza y cumplimiento sobre INTERAFAS-LAB ]</p>
+    <p>
+      Proyecto P2 de la materia CNO IV (Seguridad Informática). El ejercicio integra una auditoría de seguridad ofensiva de caja negra (Red Team) sobre el entorno académico controlado INTERAFAS-LAB —que simula a un organismo operador de servicios de agua— con la gobernanza que responde a sus hallazgos: un Sistema de Gestión de Seguridad de la Información basado en ISO/IEC 27001:2022, un Plan de Comunicación de Crisis y un Plan de Respuesta ante Incidentes con playbooks de CISA.
+    </p>
+    <div class="tag-container">
+      <span class="tag">RED TEAM</span>
+      <span class="tag">BLACK-BOX</span>
+      <span class="tag tag-danger">IT → OT</span>
+      <span class="tag tag-warning">ISO/IEC 27001:2022</span>
+      <span class="tag tag-info">SGSI</span>
+      <span class="tag tag-info">CISA PLAYBOOKS</span>
+    </div>
+  </section>
+
+  <section class="box" id="contexto">
+    <h2>Resumen del Proyecto</h2>
+    <table>
+      <tr><th>Dato</th><th>Valor</th></tr>
+      <tr><td><strong>Organización</strong></td><td>INTERAFAS — Organismo Operador de Servicios de Agua (entorno académico controlado)</td></tr>
+      <tr><td><strong>Materia</strong></td><td>CNO IV (T37A): Seguridad Informática · Mtro. Servando López Contreras</td></tr>
+      <tr><td><strong>Autor</strong></td><td>Manuel Darío Trejo Salazar (Matrícula 174578)</td></tr>
+      <tr><td><strong>Enfoque</strong></td><td>Prueba de penetración de caja negra (Red Team) + gobernanza y cumplimiento</td></tr>
+      <tr><td><strong>Ventana de ejecución</strong></td><td>08 – 11 de octubre de 2026 · Intento 1</td></tr>
+      <tr><td><strong>Alcance técnico</strong></td><td>Portal web ciudadano, APIs internas, base de datos institucional y frontera IT/OT (gateway, telemetría HMI y firmware RTU — simulado)</td></tr>
+      <tr><td><strong>Resultado</strong></td><td>20/20 banderas obtenidas · cadena de ataque IT → OT completada (simulada)</td></tr>
+      <tr><td><strong>Clasificación</strong></td><td>CONFIDENCIAL — Uso académico</td></tr>
+    </table>
+
+    <div class="warning-box">
+      <h4>⚠️ Entorno Controlado</h4>
+      <p>Documento de laboratorio — entorno controlado y autorizado. Todo el impacto sobre el proceso físico es simulado dentro del laboratorio aislado. Esta página documenta el contexto y los entregables del proyecto; por confidencialidad del manual de la práctica, no se publica el paso a paso de explotación ni las evidencias detalladas de los hallazgos.</p>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>1. Contexto del laboratorio</h2>
+    <p>INTERAFAS-LAB replica la operación de un organismo de infraestructura crítica del agua. Su superficie combina una capa corporativa (IT) —portal ciudadano con trámites, expedientes, pagos y contrataciones, APIs internas y una base de datos institucional— con una capa operacional (OT) simulada compuesta por un gateway entre redes, telemetría HMI/SCADA y el proceso de actualización de firmware de un RTU que controla el servicio.</p>
+    <p>La evaluación ofensiva se condujo bajo la modalidad de caja negra: sin conocimiento previo del sistema y asumiendo el rol de un atacante externo. El objetivo no fue únicamente encontrar fallas, sino demostrar cómo se encadenan: la combinación de exposición de información, fallas de control de acceso, inyección SQL y una confianza indebida en la frontera IT/OT permitió recorrer la ruta completa hasta la manipulación simulada del proceso físico.</p>
+
+    <h3>Distribución de severidad de los hallazgos:</h3>
+    <table>
+      <tr><th>Crítica</th><th>Alta</th><th>Media</th><th>Baja</th></tr>
+      <tr><td><strong style="color: var(--danger);">5</strong></td><td><strong style="color: var(--warning);">10</strong></td><td><strong style="color: var(--info);">4</strong></td><td><strong>1</strong></td></tr>
+    </table>
+    <p class="sys-log">Total de vulnerabilidades comprobadas: 20. El hallazgo central de la auditoría es la ausencia de defensa en profundidad y de segmentación efectiva entre las redes IT y OT.</p>
+
+    <h3>Mapa de alto nivel de la cadena IT → OT:</h3>
+    <div class="chain-step"><strong>1. Reconocimiento</strong> — exposición de archivos de configuración, respaldos y metadatos que revelan la arquitectura interna.</div>
+    <div class="chain-step"><strong>2. Escalamiento en la capa IT</strong> — fallas de control de acceso (IDOR/BOLA, sesión, roles y lógica de negocio).</div>
+    <div class="chain-step"><strong>3. Obtención de credenciales</strong> — inyección SQL que permite volcar la base de datos, incluidas credenciales de soporte.</div>
+    <div class="chain-step"><strong>4. Ruptura del perímetro IT → OT</strong> — confianza indebida en el control de acceso de la frontera entre redes.</div>
+    <div class="chain-step"><strong>5. Lectura de telemetría operacional</strong> — acceso no autorizado a datos de proceso en tiempo real.</div>
+    <div class="chain-step"><strong>6. Compromiso de integridad</strong> — actualización de firmware validada solo por integridad (checksum), sin autenticidad (firma).</div>
+    <div class="chain-step"><strong>7. Impacto final simulado</strong> — manipulación de una variable de control del proceso, con consecuencias catastróficas en el laboratorio.</div>
+  </section>
+
+  <section class="box">
+    <h2>2. Mitigaciones principales</h2>
+    <table>
+      <tr><th>Hallazgo</th><th>Mitigación</th></tr>
+      <tr><td>Inyección SQL</td><td>Consultas parametrizadas, validación estricta de entrada y mínimo privilegio en la base de datos.</td></tr>
+      <tr><td>Fallas de control de acceso (IDOR/BOLA, roles, sesión)</td><td>Validar la autorización del lado servidor en cada operación y gestionar roles exclusivamente en el servidor.</td></tr>
+      <tr><td>Confianza indebida en la frontera IT/OT</td><td>Segmentación de redes (modelo de zonas y conductos, IEC 62443) y autenticación fuerte en la red operacional.</td></tr>
+      <tr><td>Firmware sin verificación de firma</td><td>Verificar la firma digital del emisor, no solo el checksum de integridad (NIST SP 800-193).</td></tr>
+      <tr><td>Exposición de información y artefactos residuales</td><td>Hardening del servidor, mensajes de error genéricos y verificación de artefactos en el pipeline de despliegue.</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="entregables">
+    <h2>3. Entregables del proyecto</h2>
+    <p>Los hallazgos técnicos de la auditoría se tradujeron en los entregables de gobernanza y cumplimiento que conforman el Proyecto P2:</p>
+    <div class="deliverable-grid">
+      <div class="deliverable-card">
+        <h4>01 · Informe de Seguridad Ofensiva</h4>
+        <p>Auditoría Red Team de caja negra: 20 hallazgos con su evidencia, impacto y recomendaciones de remediación, incluyendo el análisis de la cadena de ataque IT → OT.</p>
+      </div>
+      <div class="deliverable-card">
+        <h4>02 · Propuesta de Gobernanza ISO/IEC 27001</h4>
+        <p>SGSI con declaración de alcance, 20 políticas funcionales por activo, matriz RACI, apreciación de riesgos y plan de mejora continua bajo el ciclo PDCA.</p>
+      </div>
+      <div class="deliverable-card">
+        <h4>03 · Plan de Comunicación de Crisis</h4>
+        <p>Comité de crisis, niveles de activación, vocería única, plantillas de mensajes y preguntas frecuentes para la gestión de la comunicación ante incidentes.</p>
+      </div>
+      <div class="deliverable-card">
+        <h4>04 · Plan de Respuesta ante Incidentes</h4>
+        <p>CSIRT, clasificación por severidad, ciclo de respuesta basado en los playbooks de CISA y 5 playbooks específicos derivados de los hallazgos del laboratorio.</p>
+      </div>
+    </div>
+    <div class="info-box">
+      <h4>ℹ️ Nota</h4>
+      <p>Los cuatro documentos completos se incluyen en el archivo comprimido del proyecto. El contenido de esta página es un resumen con fines de portafolio.</p>
+    </div>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>4_Descarga del Proyecto</h2>
+    <p>Descarga el archivo comprimido con los entregables completos del Proyecto P2 — Blindando la información.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-PR03.zip" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-PR03.zip</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
