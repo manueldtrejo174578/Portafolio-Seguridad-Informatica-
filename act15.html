@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 15 — La fotografía como testigo | MDTS Portafolio</title>
+<meta name="description" content="Actividad 15: La fotografía como testigo - extracción de metadatos GPS para geolocalización con ExifToolGUI - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ TERCER PARCIAL — ACTIVIDAD 15 ]</span>
+    <h1>LA FOTOGRAFÍA COMO TESTIGO</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Extracción de metadatos GPS para geolocalización ]</p>
+    <p>
+      Actividad de informática forense en la que se analizan los metadatos de dos archivos con ExifToolGUI: un documento de Word de INTERPOL y una fotografía tomada con un teléfono Xiaomi. El objetivo es demostrar cuánta información “oculta” guarda un archivo y cómo puede usarse como evidencia, incluso para ubicar el lugar exacto donde se tomó una foto.
+    </p>
+    <div class="tag-container">
+      <span class="tag">FORENSE DIGITAL</span>
+      <span class="tag">EXIFTOOL</span>
+      <span class="tag tag-info">METADATOS</span>
+      <span class="tag tag-info">EXIF / GPS</span>
+      <span class="tag tag-warning">OSINT</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. ¿Qué se hizo?</h2>
+    <p>Los metadatos son “datos sobre los datos”: información que un programa o una cámara guarda automáticamente dentro del archivo, como el autor, la fecha, el equipo utilizado o la ubicación. No se ven al abrir el archivo, pero herramientas como ExifTool permiten leerlos.</p>
+
+    <div class="chain-step"><strong>Parte I · Documento de INTERPOL</strong> — se analizó el archivo <em>WOA database application form.docx</em> y se identificó su clasificación, la plantilla utilizada, el tiempo de edición, la organización propietaria, la autora y las fechas de creación y modificación.</div>
+    <div class="chain-step"><strong>Parte II · Fotografía XiaomiMiA2Lite.jpg</strong> — se obtuvieron los datos de captura (ISO, apertura, longitud focal, flash y fecha) y las coordenadas GPS, que permitieron ubicar el lugar de la toma en Burpham, Guildford (Surrey, Inglaterra).</div>
+    <div class="chain-step"><strong>Limpieza</strong> — por último, se eliminaron todos los metadatos de una copia de la fotografía y se verificó que ya no conservara datos EXIF ni GPS.</div>
+
+    <table>
+      <tr><th>Dato</th><th>Valor</th></tr>
+      <tr><td><strong>Herramienta</strong></td><td>ExifToolGUI (ExifTool 12.68)</td></tr>
+      <tr><td><strong>Archivos analizados</strong></td><td>WOA database application form.docx · XiaomiMiA2Lite.jpg</td></tr>
+      <tr><td><strong>Materia</strong></td><td>CNO IV: Seguridad Informática</td></tr>
+    </table>
+
+    <div class="info-box">
+      <h4>ℹ️ Conclusión</h4>
+      <p>Un archivo puede hablar por sí mismo: sin abrir su contenido es posible saber quién lo hizo, cuándo y, en el caso de una foto, dónde. Por eso los metadatos son útiles como evidencia en una investigación, y también por eso conviene eliminarlos antes de compartir archivos en internet.</p>
+    </div>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>2. Capturas</h2>
+    <p>Antes y después de eliminar los metadatos de la fotografía con ExifToolGUI. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Captura 1 · Antes: metadatos originales de la fotografía</h4>
+      <a href="act15-captura1.png" target="_blank" rel="noopener">
+        <img src="act15-captura1.png" alt="ExifToolGUI mostrando los metadatos completos de XiaomiMiA2Lite.jpg, incluido el modelo Mi A2 Lite" loading="lazy">
+      </a>
+      <figcaption>XiaomiMiA2Lite.jpg (15 kB): conserva sus grupos de metadatos, como IFD0 con la marca y el modelo del teléfono (Xiaomi Mi A2 Lite), la fecha de captura y los datos GPS.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 2 · Después: fotografía sin metadatos</h4>
+      <a href="act15-captura2.png" target="_blank" rel="noopener">
+        <img src="act15-captura2.png" alt="ExifToolGUI mostrando XiaomiMiA2Lite.jpg después de eliminar sus metadatos" loading="lazy">
+      </a>
+      <figcaption>XiaomiMiA2Lite.jpg (251 bytes): solo quedan los datos del sistema y del formato JPEG; ya no hay información de la cámara, la fecha ni la ubicación.</figcaption>
+    </figure>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>3_Descarga del documento</h2>
+    <p>Descarga el documento con las preguntas de la actividad y sus respuestas.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-ACT15.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-ACT15.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
