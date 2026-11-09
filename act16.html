@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 16 — La verdad en los bits | MDTS Portafolio</title>
+<meta name="description" content="Actividad 16: La verdad en los bits - adquisición forense bit a bit de una memoria USB con FTK Imager - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+
+  .hash {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    padding: 12px 15px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .hash .label { color: #68856b; font-size: 0.85rem; display: block; }
+  .hash code { color: #e0f2e3; font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .match { color: var(--accent-bright); font-weight: bold; }
+  .warn-box {
+    background: rgba(201, 162, 39, 0.08);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warn-box h4 { color: var(--warning); margin-top: 0; }
+  .warn-box ul { margin-bottom: 0; padding-left: 20px; }
+  ul.lines li { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#resultados">/resultados</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ TERCER PARCIAL — ACTIVIDAD 16 ]</span>
+    <h1>LA VERDAD EN LOS BITS</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Adquisición forense con FTK Imager ]</p>
+    <p>
+      Práctica de informática forense en la que se crea una imagen bit a bit de una memoria USB, tratada como evidencia de un caso de fraude bancario. La copia se hace con Exterro FTK Imager en formato Raw (dd) y su integridad se comprueba con los hashes MD5 y SHA-1. Así, el análisis se puede hacer sobre la imagen, sin tocar nunca el dispositivo original.
+    </p>
+    <div class="tag-container">
+      <span class="tag">FORENSE DIGITAL</span>
+      <span class="tag">FTK IMAGER</span>
+      <span class="tag tag-info">IMAGEN RAW (DD)</span>
+      <span class="tag tag-info">MD5 / SHA-1</span>
+      <span class="tag tag-warning">CADENA DE CUSTODIA</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. ¿Qué se hizo?</h2>
+    <p>En informática forense nunca se trabaja sobre la evidencia original: primero se obtiene una copia exacta, sector por sector, y se demuestra con hashes que es idéntica. Esta actividad cubre esa primera fase, la <strong>adquisición</strong>.</p>
+
+    <div class="chain-step"><strong>1 · Preparación</strong>: se abrió FTK Imager como administrador y se creó la carpeta de destino InfoCrim13 en el Escritorio.</div>
+    <div class="chain-step"><strong>2 · Selección de la evidencia</strong>: File → Create Disk Image → Physical Drive → memoria USB SanDisk Cruzer Blade (\\.\PHYSICALDRIVE1).</div>
+    <div class="chain-step"><strong>3 · Configuración</strong>: formato Raw (dd), datos del caso InfoCrim-01_21.11.2023, nombre infocrim_TrejoSalazarManuelDarío y fragmentos de 1,500 MB.</div>
+    <div class="chain-step"><strong>4 · Adquisición</strong>: copia completa de la memoria, de las 12:02:36 a las 12:10:41.</div>
+    <div class="chain-step"><strong>5 · Verificación</strong>: FTK recalculó los hashes MD5 y SHA-1 de la imagen y los comparó con los del dispositivo.</div>
+    <div class="chain-step"><strong>6 · Documentación</strong>: capturas de cada paso y el reporte .txt generado automáticamente.</div>
+
+    <h3>Formatos de imagen forense</h3>
+    <table>
+      <tr><th>Formato</th><th>Descripción</th></tr>
+      <tr><td><strong>Raw (dd)</strong></td><td>Copia en crudo, sector por sector, sin compresión ni metadatos. Pesa lo mismo que el dispositivo y lo abre casi cualquier herramienta. Los datos del caso y los hashes van en un .txt aparte.</td></tr>
+      <tr><td><strong>E01 (EWF)</strong></td><td>Formato de EnCase. Guarda dentro del archivo los datos del caso, una suma de verificación por bloque y el hash MD5. Admite compresión y se divide en .E01, .E02… Es el estándar de facto.</td></tr>
+      <tr><td><strong>SMART</strong></td><td>Formato de ASR Data (.s01, .s02…). También guarda metadatos y admite compresión, pero lo soportan muy pocas herramientas.</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="resultados">
+    <h2>2. Resultados</h2>
+    <table>
+      <tr><th>Dato</th><th>Valor</th></tr>
+      <tr><td><strong>Caso</strong></td><td>InfoCrim-01_21.11.2023 · CNO IV, análisis de incidente de fraude bancario</td></tr>
+      <tr><td><strong>Herramienta</strong></td><td>Exterro FTK Imager 8.3.0.27 · Windows 11 Pro</td></tr>
+      <tr><td><strong>Evidencia</strong></td><td>Memoria USB SanDisk Cruzer Blade · 15,264 MB</td></tr>
+      <tr><td><strong>Formato</strong></td><td>Raw (dd) en fragmentos de 1,500 MB</td></tr>
+      <tr><td><strong>Inicio / fin</strong></td><td>12:02:36 → 12:10:41 (8 de noviembre de 2026)</td></tr>
+      <tr><td><strong>Duración</strong></td><td>8 min 05 s · aprox. 31.5 MB/s</td></tr>
+      <tr><td><strong>Sectores copiados</strong></td><td>31,260,672 × 512 bytes = 16,005,464,064 bytes</td></tr>
+      <tr><td><strong>Archivos generados</strong></td><td>12: 11 segmentos (.001–.011) y 1 reporte (.001.txt)</td></tr>
+    </table>
+
+    <h3>Verificación de integridad</h3>
+    <div class="hash"><span class="label">MD5 · computed hash = report hash</span><code>478c614e08d39c13f777e11b99819a82</code> <span class="match">✔ Match</span></div>
+    <div class="hash"><span class="label">SHA-1 · hash del reporte = hash de la verificación</span><code>29ab3896408494e4f62c1939b5bf5d32b1ecd31a</code> <span class="match">✔ Coincide</span></div>
+
+    <div class="info-box">
+      <h4>ℹ️ ¿Qué demuestran estos resultados?</h4>
+      <p>Cambiar un solo bit produciría un hash totalmente distinto, así que si los hashes coinciden, la imagen es una réplica exacta de la USB. Además, se copiaron los 31,260,672 sectores del dispositivo, no solo los archivos visibles. Por eso la imagen también incluye el espacio sin asignar, donde pueden quedar restos de archivos borrados.</p>
+    </div>
+
+    <div class="warn-box">
+      <h4>⚠️ Limitaciones de la práctica</h4>
+      <ul>
+        <li>No se usó bloqueador de escritura (así lo indicaba la guía). En un caso real es obligatorio, porque Windows puede modificar metadatos de la USB al conectarla.</li>
+        <li>MD5 y SHA-1 tienen colisiones conocidas, por lo que hoy se recomienda calcular también SHA-256.</li>
+      </ul>
+    </div>
+
+    <h3>Posibles líneas de investigación</h3>
+    <ul class="lines">
+      <li>Montar la imagen en solo lectura o cargarla en Autopsy para revisar archivos activos y eliminados.</li>
+      <li>Hacer file carving del espacio sin asignar en busca de comprobantes u hojas de cálculo borradas.</li>
+      <li>Construir una línea de tiempo con las fechas de creación, modificación y acceso (MAC times) y con los metadatos de los documentos.</li>
+      <li>Buscar por palabras clave números de cuenta, CLABE, tarjetas o correos relacionados con el fraude.</li>
+      <li>Cruzar el número de serie de la USB con el registro USBSTOR de los equipos sospechosos.</li>
+    </ul>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>3. Capturas</h2>
+    <p>Proceso completo de la adquisición en FTK Imager. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Captura 1 · Ejecutar FTK Imager como administrador</h4>
+      <a href="img/act16_1.png" target="_blank" rel="noopener">
+        <img src="img/act16_1.png" alt="Menú Inicio de Windows con FTK Imager y la opción Ejecutar como administrador" loading="lazy">
+      </a>
+      <figcaption>FTK Imager en el menú Inicio de Windows con la opción “Ejecutar como administrador”, necesaria para que el programa pueda leer los discos físicos.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 2 · Ventana principal de FTK Imager</h4>
+      <a href="img/act16_2.png" target="_blank" rel="noopener">
+        <img src="img/act16_2.png" alt="Ventana principal de Exterro FTK Imager 8.3.0.27" loading="lazy">
+      </a>
+      <figcaption>Exterro FTK Imager 8.3.0.27 recién abierto, con los paneles Evidence Tree, File List y Custom Content Sources todavía vacíos.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 3 · Select Source: Physical Drive</h4>
+      <a href="img/act16_3.png" target="_blank" rel="noopener">
+        <img src="img/act16_3.png" alt="Ventana Select Source con Physical Drive seleccionado" loading="lazy">
+      </a>
+      <figcaption>Se eligió Physical Drive para copiar el dispositivo completo, sector por sector, incluidos el espacio sin asignar y los restos de archivos borrados.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 4 · Select Drive: la memoria USB</h4>
+      <a href="img/act16_4.png" target="_blank" rel="noopener">
+        <img src="img/act16_4.png" alt="Ventana Select Drive con la USB SanDisk Cruzer Blade seleccionada" loading="lazy">
+      </a>
+      <figcaption>Se seleccionó \\.\PHYSICALDRIVE1, una SanDisk Cruzer Blade de 16 GB, con cuidado de no elegir el disco del sistema.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 5 · Select Image Type: Raw (dd)</h4>
+      <a href="img/act16_5.png" target="_blank" rel="noopener">
+        <img src="img/act16_5.png" alt="Ventana Select Image Type con Raw (dd) seleccionado" loading="lazy">
+      </a>
+      <figcaption>Se eligió el formato Raw (dd): una copia en crudo, sin compresión, que puede abrir prácticamente cualquier herramienta forense.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 6 · Evidence Item Information</h4>
+      <a href="img/act16_6.png" target="_blank" rel="noopener">
+        <img src="img/act16_6.png" alt="Ventana Evidence Item Information con los datos del caso" loading="lazy">
+      </a>
+      <figcaption>Datos del caso InfoCrim-01_21.11.2023, con el examinador y las notas de la adquisición.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 7 · Carpeta de destino InfoCrim13</h4>
+      <a href="img/act16_7.png" target="_blank" rel="noopener">
+        <img src="img/act16_7.png" alt="Carpeta InfoCrim13 en el Escritorio" loading="lazy">
+      </a>
+      <figcaption>Carpeta creada en el Escritorio para guardar la imagen forense.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 8 · Select Image Destination</h4>
+      <a href="img/act16_8.png" target="_blank" rel="noopener">
+        <img src="img/act16_8.png" alt="Ventana Select Image Destination con la carpeta y el nombre del archivo" loading="lazy">
+      </a>
+      <figcaption>Destino: InfoCrim13. Nombre: infocrim_TrejoSalazarManuelDarío. Fragmentos de 1,500 MB.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 9 · Create Image: listo para iniciar</h4>
+      <a href="img/act16_9.png" target="_blank" rel="noopener">
+        <img src="img/act16_9.png" alt="Ventana Create Image con la imagen de destino y la verificación activada" loading="lazy">
+      </a>
+      <figcaption>La imagen de destino quedó agregada y la casilla “Verify images after they are created” está activada.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 10 · Adquisición en curso</h4>
+      <a href="img/act16_10.png" target="_blank" rel="noopener">
+        <img src="img/act16_10.png" alt="Barra de progreso de FTK Imager creando la imagen" loading="lazy">
+      </a>
+      <figcaption>FTK Imager copiando la memoria sector por sector (Creating image…).</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 11 · Imagen creada</h4>
+      <a href="img/act16_11.png" target="_blank" rel="noopener">
+        <img src="img/act16_11.png" alt="Ventana de FTK Imager con Image created successfully y 0:08:05" loading="lazy">
+      </a>
+      <figcaption>“Image created successfully”, con un tiempo transcurrido de 0:08:05.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 12 · Verificación de integridad</h4>
+      <a href="img/act16_12.png" target="_blank" rel="noopener">
+        <img src="img/act16_12.png" alt="Ventana Drive/Image Verify Results con hashes MD5 y SHA-1" loading="lazy">
+      </a>
+      <figcaption>Drive/Image Verify Results: 31,260,672 sectores, el hash MD5 con resultado Match y el hash SHA-1.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 13 · Archivos generados</h4>
+      <a href="img/act16_13.png" target="_blank" rel="noopener">
+        <img src="img/act16_13.png" alt="Explorador de archivos mostrando los 11 segmentos y el reporte txt" loading="lazy">
+      </a>
+      <figcaption>11 segmentos de la imagen (.001 a .011) y el reporte .001.txt dentro de InfoCrim13.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 14 · Reporte de la adquisición (.txt)</h4>
+      <a href="img/act16_14.png" target="_blank" rel="noopener">
+        <img src="img/act16_14.png" alt="Reporte txt de FTK Imager abierto en el Bloc de notas" loading="lazy">
+      </a>
+      <figcaption>Reporte que genera FTK Imager: datos del caso, equipo, dispositivo, hashes y horas de inicio y fin.</figcaption>
+    </figure>
+
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>4_Descarga del documento</h2>
+    <p>Descarga el reporte completo de la actividad, con las respuestas y el informe ejecutivo.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-ACT16.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-ACT16.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
