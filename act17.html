@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 17 — La memoria del crimen | MDTS Portafolio</title>
+<meta name="description" content="Actividad 17: La memoria del crimen - extracción de evidencia de un volcado RAM con Volatility - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+
+  .hash {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    padding: 12px 15px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .hash .label { color: #68856b; font-size: 0.85rem; display: block; }
+  .hash code { color: #e0f2e3; font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .match { color: var(--accent-bright); font-weight: bold; }
+  .warn-box {
+    background: rgba(201, 162, 39, 0.08);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warn-box h4 { color: var(--warning); margin-top: 0; }
+  .warn-box ul { margin-bottom: 0; padding-left: 20px; }
+  ul.lines li { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#resultados">/resultados</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ TERCER PARCIAL — ACTIVIDAD 17 ]</span>
+    <h1>LA MEMORIA DEL CRIMEN</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Extracción de evidencia de un volcado RAM con Volatility ]</p>
+    <p>
+      Práctica de análisis forense de memoria volátil sobre el volcado RAM (OtterCTF) de un presunto cibercriminal. Con Volatility se obtuvieron, desde Kali Linux, la hora de la captura, el sistema operativo, la contraseña del usuario, el nombre del equipo, las conexiones de red, los procesos sospechosos, los correos usados para ingeniería social y la cartera Bitcoin del ransomware. Todo eso solo existía en la RAM y se habría perdido al apagar el equipo.
+    </p>
+    <div class="tag-container">
+      <span class="tag">FORENSE DIGITAL</span>
+      <span class="tag">VOLATILITY 2.6 / 3</span>
+      <span class="tag tag-info">MEMORIA VOLÁTIL</span>
+      <span class="tag tag-info">KALI LINUX</span>
+      <span class="tag tag-warning">RANSOMWARE</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. ¿Qué se hizo?</h2>
+    <p>La memoria RAM guarda lo que el equipo estaba haciendo en el momento de la captura: procesos en ejecución, conexiones abiertas o recién cerradas, credenciales cargadas y datos que el usuario escribió. <strong>Volatility</strong> reconstruye esas estructuras del kernel de Windows a partir del archivo de volcado.</p>
+
+    <div class="chain-step"><strong>1 · Preparación</strong>: se unieron los 7 volúmenes (OtterCTF.zip.001 a .007), se descomprimió la imagen OtterCTF.vmem (2 GB) y se descargó Volatility 2.6 standalone. También se instaló Volatility 3.</div>
+    <div class="chain-step"><strong>2 · Identificación del sistema</strong>: imageinfo y windows.info para obtener la hora de la captura, el sistema operativo y el perfil Win7SP1x64.</div>
+    <div class="chain-step"><strong>3 · Credenciales y Registro</strong>: hashdump, lsadump, hivelist y printkey para obtener la contraseña del usuario y el nombre del equipo.</div>
+    <div class="chain-step"><strong>4 · Red y procesos</strong>: netscan y pstree para encontrar el servidor malicioso y la cadena de ejecución del malware.</div>
+    <div class="chain-step"><strong>5 · Extracción de artefactos</strong>: memdump de chrome.exe y del proceso 3720, y búsqueda con strings de los correos, el mensaje de rescate y la cartera Bitcoin.</div>
+    <div class="chain-step"><strong>6 · Verificación externa</strong>: geolocalización de la IP del servidor y consulta de la cartera en la lista negra BTC Black.</div>
+
+    <h3>Plugins utilizados</h3>
+    <table>
+      <tr><th>Plugin</th><th>¿Para qué sirve?</th></tr>
+      <tr><td><strong>imageinfo</strong></td><td>Lee el bloque KDBG para sugerir el perfil del sistema y la fecha y hora del volcado.</td></tr>
+      <tr><td><strong>windows.info</strong></td><td>Volatility 3: versión del kernel (NtMajor/NtMinor), tipo de producto y arquitectura.</td></tr>
+      <tr><td><strong>hashdump</strong></td><td>Extrae los hashes NTLM de la base SAM usando la llave del hive SYSTEM.</td></tr>
+      <tr><td><strong>lsadump</strong></td><td>Descifra los secretos LSA; en DefaultPassword queda la contraseña del inicio de sesión automático.</td></tr>
+      <tr><td><strong>hivelist / printkey</strong></td><td>Listan los hives del Registro cargados en memoria y leen una llave en concreto.</td></tr>
+      <tr><td><strong>netscan</strong></td><td>Busca estructuras de conexiones TCP/UDP, tanto activas como ya cerradas.</td></tr>
+      <tr><td><strong>pstree</strong></td><td>Muestra los procesos en árbol (padre → hijo) para detectar orígenes anómalos.</td></tr>
+      <tr><td><strong>memdump</strong></td><td>Vuelca toda la memoria de un proceso a un archivo para analizarla con strings y grep.</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="resultados">
+    <h2>2. Resultados</h2>
+    <table>
+      <tr><th>Pregunta</th><th>Hallazgo</th></tr>
+      <tr><td><strong>1 · Hora del volcado</strong></td><td>2018-08-04 19:34:22 UTC · hora local 22:34:22 (+0300)</td></tr>
+      <tr><td><strong>2 · Sistema operativo</strong></td><td>Windows 7 SP1 de 64 bits (x64) · perfil Win7SP1x64</td></tr>
+      <tr><td><strong>3 · Contraseña</strong></td><td>Usuario Rick → <strong>MortyIsReallyAnOtter</strong> (secreto DefaultPassword)</td></tr>
+      <tr><td><strong>4 · IP local</strong></td><td>192.168.202.131</td></tr>
+      <tr><td><strong>5 · Registro</strong></td><td>SYSTEM, SAM, SECURITY, SOFTWARE, DEFAULT y \Users\Rick\ntuser.dat</td></tr>
+      <tr><td><strong>6 · Nombre del equipo</strong></td><td><strong>WIN-LO6FAF3DTFE</strong> (contiene las iniciales FAF3 y TFE)</td></tr>
+      <tr><td><strong>7 · Procesos clave</strong></td><td>LunarMS.exe (708) · Rick And Morty (3820) → vmware-tray.exe (3720)</td></tr>
+      <tr><td><strong>8 · Servidor malicioso</strong></td><td>77.102.199.102:7575 · Londres, Reino Unido (Virgin Media)</td></tr>
+      <tr><td><strong>9 · Correos</strong></td><td>rickopicko@mail.com y rickypinky@mail.com · webmail mail.com en Google Chrome</td></tr>
+      <tr><td><strong>10 · Cartera Bitcoin</strong></td><td><strong>1MmpEmebJkqXG8nQv4cjJSmxZQFVmFo63M</strong> · no reportada en BTC Black</td></tr>
+    </table>
+
+    <h3>Cadena de infección</h3>
+    <div class="hash"><span class="label">BitTorrent → descarga falsa</span><code>Rick And Morty season 1 download.exe · PID 3820</code></div>
+    <div class="hash"><span class="label">lanza un proceso disfrazado de VMware</span><code>vmware-tray.exe · PID 3720 · PPID 3820</code></div>
+    <div class="hash"><span class="label">mensaje oculto del ransomware (pide 0.16 BTC)</span><code>1MmpEmebJkqXG8nQv4cjJSmxZQFVmFo63M</code> <span class="match">✔ Extraída</span></div>
+
+    <div class="info-box">
+      <h4>ℹ️ ¿Cómo se vinculan los hallazgos con el caso?</h4>
+      <p>El nombre del equipo contiene las iniciales <strong>FAF3</strong> (SEDENE) y <strong>TFE</strong> (CNDI); la contraseña hace referencia al alias <strong>“Morty”</strong> y los correos al alias <strong>“Ricky”</strong>; LunarMS.exe confirma el uso de los <strong>servidores Lunar</strong>, y los procesos de BitTorrent corresponden al <strong>servicio Torrent</strong> mencionado en las hipótesis.</p>
+    </div>
+
+    <div class="warn-box">
+      <h4>⚠️ Observaciones</h4>
+      <ul>
+        <li>La conexión de LunarMS.exe aparece como CLOSED: ya había terminado al capturar la RAM, pero netscan la recupera de memoria.</li>
+        <li>La geolocalización por IP es aproximada y el atacante pudo usar VPN o proxy; debe confirmarse con el proveedor.</li>
+        <li>La URL de BTC Black indicada en la actividad ya da error 404; la verificación se hizo en el formulario actual del sitio.</li>
+      </ul>
+    </div>
+
+    <h3>Posibles líneas de investigación</h3>
+    <ul class="lines">
+      <li>Solicitar a Virgin Media, por vía legal, el titular de la IP 77.102.199.102 en la fecha del volcado.</li>
+      <li>Requerir a mail.com los datos de registro y accesos de las cuentas rickopicko y rickypinky.</li>
+      <li>Rastrear la cartera Bitcoin en exploradores de bloques y casas de cambio.</li>
+      <li>Analizar el ejecutable del proceso 3720 en un entorno aislado para obtener sus indicadores de compromiso.</li>
+      <li>Revisar los .torrent y el historial de BitTorrent para identificar a quienes distribuyen el archivo falso.</li>
+      <li>Cruzar la zona horaria UTC+3 y los alias con el canal de Telegram y el enlace de Reddit.</li>
+    </ul>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>3. Capturas</h2>
+    <p>Comandos ejecutados en Kali Linux y su salida. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Captura 1 · Preparación del entorno</h4>
+      <a href="img/act17_1.jpg" target="_blank" rel="noopener">
+        <img src="img/act17_1.jpg" alt="Los 7 volúmenes OtterCTF.zip, la imagen OtterCTF.vmem" loading="lazy">
+      </a>
+      <figcaption>Los 7 volúmenes unidos y descomprimidos: OtterCTF.vmem de 2.0 GB y Volatility 2.6 standalone (vol2) listo para usarse.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 2 · Punto 1 · imageinfo</h4>
+      <a href="img/act17_2.png" target="_blank" rel="noopener">
+        <img src="img/act17_2.png" alt="Salida de imageinfo con el perfil sugerido y la fecha del volcado" loading="lazy">
+      </a>
+      <figcaption>Perfil sugerido Win7SP1x64. Image date and time: 2018-08-04 19:34:22 UTC; hora local 22:34:22 +0300.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 3 · Punto 2 · windows.info (Volatility 3)</h4>
+      <a href="img/act17_3.png" target="_blank" rel="noopener">
+        <img src="img/act17_3.png" alt="Salida de windows.info con NtMajorVersion 6 y NtMinorVersion 1" loading="lazy">
+      </a>
+      <figcaption>NtMajorVersion 6 y NtMinorVersion 1 (Windows 7), NtProductWinNt y arquitectura de 64 bits. El error de la última línea es de la librería magic de Python y no afecta los resultados.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 4 · Punto 3 · hashdump</h4>
+      <a href="img/act17_4.png" target="_blank" rel="noopener">
+        <img src="img/act17_4.png" alt="Salida de hashdump con los hashes de Administrator, Guest y Rick" loading="lazy">
+      </a>
+      <figcaption>Hashes NTLM de la base SAM. Rick: 518172d012f97d3a8fcc089615283940; Administrator y Guest tienen la contraseña vacía.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 5 · Punto 3 · lsadump</h4>
+      <a href="img/act17_5.png" target="_blank" rel="noopener">
+        <img src="img/act17_5.png" alt="Salida de lsadump con el secreto DefaultPassword" loading="lazy">
+      </a>
+      <figcaption>El secreto DefaultPassword contiene la contraseña en texto plano (UTF-16): MortyIsReallyAnOtter.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 6 · Punto 4 · netscan</h4>
+      <a href="img/act17_6.png" target="_blank" rel="noopener">
+        <img src="img/act17_6.png" alt="Salida de netscan con la dirección local 192.168.202.131" loading="lazy">
+      </a>
+      <figcaption>Conexiones del equipo con la dirección local 192.168.202.131, entre ellas las de BitTorrent.exe.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 7 · Punto 5 · hivelist</h4>
+      <a href="img/act17_7.png" target="_blank" rel="noopener">
+        <img src="img/act17_7.png" alt="Salida de hivelist con los hives del Registro" loading="lazy">
+      </a>
+      <figcaption>Hives cargados en memoria: SYSTEM, SAM, SECURITY, SOFTWARE, DEFAULT y los de usuario de Rick (ntuser.dat y UsrClass.dat).</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 8 · Punto 6 · printkey ComputerName</h4>
+      <a href="img/act17_8.png" target="_blank" rel="noopener">
+        <img src="img/act17_8.png" alt="Salida de printkey con el valor ComputerName" loading="lazy">
+      </a>
+      <figcaption>Llave ComputerName del hive SYSTEM: el equipo se llama WIN-LO6FAF3DTFE.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 9 · Punto 7 · pstree</h4>
+      <a href="img/act17_9.png" target="_blank" rel="noopener">
+        <img src="img/act17_9.png" alt="Árbol de procesos con Rick And Morty, vmware-tray.exe y LunarMS.exe" loading="lazy">
+      </a>
+      <figcaption>Rick And Morty (3820) es el padre de vmware-tray.exe (3720). También aparecen chrome.exe (4076) y LunarMS.exe (708).</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 10 · Punto 8 · Conexión al servidor malicioso</h4>
+      <a href="img/act17_10.png" target="_blank" rel="noopener">
+        <img src="img/act17_10.png" alt="Salida de netscan filtrada por LunarMS" loading="lazy">
+      </a>
+      <figcaption>LunarMS.exe (PID 708): 192.168.202.131:49530 → 77.102.199.102:7575, en estado CLOSED.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 11 · Punto 8 · Geolocalización de la IP</h4>
+      <a href="img/act17_11.jpg" target="_blank" rel="noopener">
+        <img src="img/act17_11.jpg" alt="Resultado de geolocation.com para 77.102.199.102" loading="lazy">
+      </a>
+      <figcaption>77.102.199.102: Londres, Inglaterra, Reino Unido (WC2N). ISP: Virgin Media Limited.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 12 · Punto 9 · Procesos de Chrome y memdump</h4>
+      <a href="img/act17_12.jpg" target="_blank" rel="noopener">
+        <img src="img/act17_12.jpg" alt="Salida de pslist filtrada por chrome y memdump del PID 4076" loading="lazy">
+      </a>
+      <figcaption>Procesos chrome.exe; el principal (PID 4076) se volcó a dump/4076.dmp.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 13 · Punto 9 · Correos en la memoria de Chrome</h4>
+      <a href="img/act17_13.jpg" target="_blank" rel="noopener">
+        <img src="img/act17_13.jpg" alt="Lista de correos extraídos con strings y grep" loading="lazy">
+      </a>
+      <figcaption>Al final de la lista: usernamerickopicko@mail.com y usernamerickypinky@mail.com, capturados del campo de usuario de mail.com.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 14 · Punto 10 · memdump del proceso 3720</h4>
+      <a href="img/act17_14.png" target="_blank" rel="noopener">
+        <img src="img/act17_14.png" alt="Salida de memdump del proceso vmware-tray.exe 3720" loading="lazy">
+      </a>
+      <figcaption>Volcado de la memoria de vmware-tray.exe (PID 3720) en dump/3720.dmp.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 15 · Punto 10 · Mensaje del ransomware</h4>
+      <a href="img/act17_15.jpg" target="_blank" rel="noopener">
+        <img src="img/act17_15.jpg" alt="Mensaje de rescate encontrado con strings -e l" loading="lazy">
+      </a>
+      <figcaption>Mensaje oculto: “This is Ransomware. It locks your files until you pay for them…”, que pide enviar 0.16 a la dirección indicada.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 16 · Punto 10 · Cartera Bitcoin</h4>
+      <a href="img/act17_16.png" target="_blank" rel="noopener">
+        <img src="img/act17_16.png" alt="Dirección Bitcoin extraída con strings y grep" loading="lazy">
+      </a>
+      <figcaption>Dirección Bitcoin extraída de las cadenas UTF-16: 1MmpEmebJkqXG8nQv4cjJSmxZQFVmFo63M.</figcaption>
+    </figure>
+
+    <figure class="capture">
+      <h4>Captura 17 · Punto 10 · Verificación en BTC Black</h4>
+      <a href="img/act17_17.png" target="_blank" rel="noopener">
+        <img src="img/act17_17.png" alt="Resultado de BTC Black: la dirección no está en la lista negra" loading="lazy">
+      </a>
+      <figcaption>BTC Black: “The BTC address 1MmpEmebJkqXG8nQv4cjJSmxZQFVmFo63M is NOT blacklisted”.</figcaption>
+    </figure>
+
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>4_Descarga del documento</h2>
+    <p>Descarga el reporte completo de la actividad, con las respuestas, el análisis y el informe ejecutivo.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-ACT17.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-ACT17.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
