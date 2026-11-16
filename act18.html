@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 18 — La huella digital de un cibercriminal | MDTS Portafolio</title>
+<meta name="description" content="Actividad 18: La investigación forense - la huella digital de un cibercriminal con Autopsy (NIST Hacking Case) - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+
+  .hash {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    padding: 12px 15px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .hash .label { color: #68856b; font-size: 0.85rem; display: block; }
+  .hash code { color: #e0f2e3; font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .match { color: var(--accent-bright); font-weight: bold; }
+  .warn-box {
+    background: rgba(201, 162, 39, 0.08);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warn-box h4 { color: var(--warning); margin-top: 0; }
+  .warn-box ul { margin-bottom: 0; padding-left: 20px; }
+  ul.lines li { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#resultados">/resultados</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+    <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ TERCER PARCIAL — ACTIVIDAD 18 ]</span>
+    <h1>LA HUELLA DIGITAL DE UN CIBERCRIMINAL</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Investigación forense con Autopsy ]</p>
+    <p>
+      Análisis de la imagen forense del <strong>Hacking Case</strong> del NIST (CFReDS): una laptop Dell encontrada abandonada junto con una tarjeta inalámbrica y una antena casera, que se sospecha fue usada para interceptar tráfico en hotspots públicos. Con Autopsy se creó el caso, se verificó la integridad de la imagen y se extrajo del Registro de Windows la información que vincula el equipo con el sospechoso Greg Schardt, alias “Mr. Evil”.
+    </p>
+    <div class="tag-container">
+      <span class="tag">FORENSE DIGITAL</span>
+      <span class="tag">AUTOPSY</span>
+      <span class="tag tag-info">REGISTRO DE WINDOWS</span>
+      <span class="tag tag-info">NIST CFREDS</span>
+      <span class="tag tag-warning">CADENA DE CUSTODIA</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. ¿Qué se hizo?</h2>
+    <p>Autopsy es una plataforma forense de código abierto que procesa una imagen de disco con módulos de ingesta y organiza lo que encuentra: archivos, artefactos del sistema, cuentas, historial y Registro.</p>
+
+    <div class="chain-step"><strong>1 · Evidencia</strong>: se descargaron los 8 segmentos de la imagen (SCHARDT.001 a .008) del archivo CFReDS del NIST.</div>
+    <div class="chain-step"><strong>2 · Caso</strong>: se creó el caso INV01UPSLP, número 01, con los datos del examinador, la nota “Fraude (carding) Greg Schardt” y la organización UPSLP.</div>
+    <div class="chain-step"><strong>3 · Fuente de datos</strong>: “Disk Image or VM File”, seleccionando solo SCHARDT.001 (Autopsy une los demás) y capturando el MD5 de la adquisición.</div>
+    <div class="chain-step"><strong>4 · Ingesta</strong>: se ejecutaron los módulos de análisis; Cyber Triage Malware Scanner se desactivó porque requiere licencia comercial.</div>
+    <div class="chain-step"><strong>5 · Análisis</strong>: Operating System Information y el visor del Registro (colmenas SYSTEM, SECURITY y SAM) para responder las preguntas del caso.</div>
+
+    <h3>Tipos de fuente de datos</h3>
+    <table>
+      <tr><th>Tipo</th><th>Descripción</th></tr>
+      <tr><td><strong>Disk Image or VM File</strong></td><td>Imagen forense (raw/dd, E01) o disco virtual. Es la opción usada: conserva particiones, sistema de archivos y espacio no asignado.</td></tr>
+      <tr><td><strong>Logical Files</strong></td><td>Archivos o carpetas sueltos agregados tal cual. No incluye particiones ni espacio no asignado, así que no permite recuperar archivos borrados.</td></tr>
+      <tr><td><strong>Local Disk</strong></td><td>Disco conectado directamente al equipo del analista, leído en vivo sector por sector.</td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="resultados">
+    <h2>2. Resultados</h2>
+    <table>
+      <tr><th>Pregunta</th><th>Hallazgo</th></tr>
+      <tr><td><strong>Hash de la imagen</strong></td><td>MD5 AEE4FCD9301C03B3B054623CA261959A · adquisición y verificación coinciden</td></tr>
+      <tr><td><strong>Sistema operativo</strong></td><td>Microsoft Windows XP (build 2600) en C:\WINDOWS</td></tr>
+      <tr><td><strong>Fecha de instalación</strong></td><td>19/08/2004 22:48:27 UTC (17:48:27 hora local)</td></tr>
+      <tr><td><strong>Zona horaria</strong></td><td>Central Standard Time (UTC−6) · Bias 360</td></tr>
+      <tr><td><strong>Propietario registrado</strong></td><td><strong>Greg Schardt</strong></td></tr>
+      <tr><td><strong>Nombre del equipo</strong></td><td>N-1A9ODN6ZXK4LQ</td></tr>
+      <tr><td><strong>Dominio principal</strong></td><td><strong>EVIL</strong> (PolPrDmN, colmena SECURITY)</td></tr>
+      <tr><td><strong>Último apagado</strong></td><td>27/08/2004 15:46:33 UTC (10:46:33 hora local)</td></tr>
+      <tr><td><strong>Cuentas registradas</strong></td><td>5: Administrator, Guest, HelpAssistant, SUPPORT_388945a0 y <strong>Mr. Evil</strong></td></tr>
+    </table>
+
+    <div class="hash"><span class="label">MD5 · hash de adquisición = hash de verificación</span><code>AEE4FCD9301C03B3B054623CA261959A</code> <span class="match">✔ Coincide</span></div>
+
+    <div class="info-box">
+      <h4>ℹ️ ¿Cómo se vincula el equipo con el sospechoso?</h4>
+      <p>El propietario registrado de Windows es <strong>Greg Schardt</strong>, la única cuenta creada por el usuario se llama <strong>Mr. Evil</strong> (su apodo en línea) y el dominio principal configurado es <strong>EVIL</strong>. El equipo se usó entre su instalación (19/08/2004) y su último apagado (27/08/2004), antes de ser encontrado el 20/09/2004.</p>
+    </div>
+
+    <div class="warn-box">
+      <h4>⚠️ Observaciones</h4>
+      <ul>
+        <li>Las fechas del Registro se guardan en UTC; la zona horaria Central del equipo es indispensable para convertirlas a hora local.</li>
+        <li>El nodo OS Accounts de Autopsy puede mostrar menos cuentas; la colmena SAM confirma las 5.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>3. Capturas</h2>
+    <p>Configuración del caso en Autopsy y evidencia de cada respuesta. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Captura 1 · Imagen forense en 8 segmentos</h4>
+      <a href="img/act18_1.png" target="_blank" rel="noopener">
+        <img src="img/act18_1.png" alt="Carpeta INV01UPSLP con los archivos SCHARDT.001 a SCHARDT.008" loading="lazy">
+      </a>
+      <figcaption>Los 8 segmentos de la imagen (SCHARDT.001 a SCHARDT.008) descargados del NIST en la carpeta INV01UPSLP.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 2 · New Case</h4>
+      <a href="img/act18_2.png" target="_blank" rel="noopener">
+        <img src="img/act18_2.png" alt="Ventana New Case Information con el nombre INV01UPSLP" loading="lazy">
+      </a>
+      <figcaption>Caso INV01UPSLP, tipo Single-User, con el directorio base en la carpeta del Escritorio</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 3 · Alta de la organización</h4>
+      <a href="img/act18_3.png" target="_blank" rel="noopener">
+        <img src="img/act18_3.png" alt="Ventana Manage Organizations con la UPSLP" loading="lazy">
+      </a>
+      <figcaption>Organización Universidad Politécnica de San Luis Potosí, contacto CNO IV – Seguridad Informática.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 4 · Examiner y notas del caso</h4>
+      <a href="img/act18_4.png" target="_blank" rel="noopener">
+        <img src="img/act18_4.png" alt="Ventana Optional Information con número 01, examinador y notas" loading="lazy">
+      </a>
+      <figcaption>Número 01, datos del examinador, nota “Fraude (carding) Greg Schardt” y organización seleccionada.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 5 · Select Host</h4>
+      <a href="img/act18_5.png" target="_blank" rel="noopener">
+        <img src="img/act18_5.png" alt="Ventana Select Host con Generate new host name seleccionado" loading="lazy">
+      </a>
+      <figcaption>Opción “Generate new host name based on data source name”.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 6 · Select Data Source Type</h4>
+      <a href="img/act18_6.png" target="_blank" rel="noopener">
+        <img src="img/act18_6.png" alt="Ventana Select Data Source Type con Disk Image or VM File" loading="lazy">
+      </a>
+      <figcaption>Se eligió “Disk Image or VM File” porque la evidencia es una imagen raw (dd).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 7 · Select Data Source</h4>
+      <a href="img/act18_7.png" target="_blank" rel="noopener">
+        <img src="img/act18_7.png" alt="Ventana Select Data Source con la ruta de SCHARDT.001 y el MD5" loading="lazy">
+      </a>
+      <figcaption>Ruta de SCHARDT.001, zona horaria America/Chicago y el MD5 de la adquisición.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 8 · Configure Ingest</h4>
+      <a href="img/act18_8.png" target="_blank" rel="noopener">
+        <img src="img/act18_8.png" alt="Ventana Configure Ingest con los módulos marcados" loading="lazy">
+      </a>
+      <figcaption>Módulos de ingesta seleccionados (sin Cyber Triage Malware Scanner, que requiere licencia).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 9 · Hash de la imagen</h4>
+      <a href="img/act18_9.png" target="_blank" rel="noopener">
+        <img src="img/act18_9.png" alt="Data Sources Summary, pestaña Container, con el MD5" loading="lazy">
+      </a>
+      <figcaption>Imagen de 4.87 GB (4,871,301,120 bytes) con MD5 AEE4FCD9301C03B3B054623CA261959A.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 10 · Operating System Information</h4>
+      <a href="img/act18_10.png" target="_blank" rel="noopener">
+        <img src="img/act18_10.png" alt="Tabla Operating System Information de Autopsy" loading="lazy">
+      </a>
+      <figcaption>Windows XP, equipo N-1A9ODN6ZXK4LQ, propietario Greg Schardt y Product ID 55274-640-0147306-23684.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 11 · Zona horaria</h4>
+      <a href="img/act18_11.png" target="_blank" rel="noopener">
+        <img src="img/act18_11.png" alt="Llave TimeZoneInformation en el visor del Registro" loading="lazy">
+      </a>
+      <figcaption>TimeZoneInformation: Bias 360 (UTC−6), Central Standard Time / Central Daylight Time.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 12 · Dominio principal</h4>
+      <a href="img/act18_12.png" target="_blank" rel="noopener">
+        <img src="img/act18_12.png" alt="Valor PolPrDmN de la colmena SECURITY" loading="lazy">
+      </a>
+      <figcaption>El valor PolPrDmN de la colmena SECURITY contiene E.V.I.L.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 13 · Último apagado</h4>
+      <a href="img/act18_13.png" target="_blank" rel="noopener">
+        <img src="img/act18_13.png" alt="Valor ShutdownTime en la colmena SYSTEM" loading="lazy">
+      </a>
+      <figcaption>ShutdownTime = C4 FC 00 07 4D 8C C4 01 (FILETIME): 27/08/2004 15:46:33 UTC.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 14 · Cuentas registradas</h4>
+      <a href="img/act18_14.png" target="_blank" rel="noopener">
+        <img src="img/act18_14.png" alt="Llave Names de la colmena SAM con las 5 cuentas" loading="lazy">
+      </a>
+      <figcaption>SAM\Domains\Account\Users\Names: Administrator, Guest, HelpAssistant, Mr. Evil y SUPPORT_388945a0.</figcaption>
+    </figure>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>4_Descarga del documento</h2>
+    <p>Descarga el reporte completo de la actividad, con las respuestas y las capturas.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-ACT18.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-ACT18.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
