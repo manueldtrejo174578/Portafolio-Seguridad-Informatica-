@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 19 — Los primeros minutos cuentan | MDTS Portafolio</title>
+<meta name="description" content="Actividad 19: Los primeros minutos cuentan - adquisición forense en caliente con CMD y PowerShell - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+
+  .hash {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    padding: 12px 15px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .hash .label { color: #68856b; font-size: 0.85rem; display: block; }
+  .hash code { color: #e0f2e3; font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .match { color: var(--accent-bright); font-weight: bold; }
+  .warn-box {
+    background: rgba(201, 162, 39, 0.08);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warn-box h4 { color: var(--warning); margin-top: 0; }
+  .warn-box ul { margin-bottom: 0; padding-left: 20px; }
+  ul.lines li { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#resultados">/resultados</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+      <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ TERCER PARCIAL — ACTIVIDAD 19 ]</span>
+    <h1>LOS PRIMEROS MINUTOS CUENTAN</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Adquisición forense en caliente con CMD y PowerShell ]</p>
+    <p>
+      Simulación de respuesta a incidentes: como primer respondiente, se recolectó la evidencia volátil de un equipo Windows 11 encendido (PCTREJO) usando únicamente comandos nativos de CMD y PowerShell ejecutados como administrador. Se obtuvieron procesos, servicios, sesiones, conexiones, caché DNS, tabla ARP, historial de comandos, tareas programadas, logs, el fichero hosts y el árbol de directorios.
+    </p>
+    <div class="tag-container">
+      <span class="tag">RESPUESTA A INCIDENTES</span>
+      <span class="tag">LIVE RESPONSE</span>
+      <span class="tag tag-info">CMD</span>
+      <span class="tag tag-info">POWERSHELL</span>
+      <span class="tag tag-warning">ORDEN DE VOLATILIDAD</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. ¿Qué se hizo?</h2>
+    <p>En una adquisición <strong>en caliente</strong> el equipo sigue encendido, así que lo primero es rescatar lo que se pierde al apagarlo. Se siguió el <strong>orden de volatilidad</strong>:</p>
+    <div class="chain-step"><strong>1 · Lo más volátil</strong>: fecha y hora, procesos, servicios y sesiones de usuario.</div>
+    <div class="chain-step"><strong>2 · Red</strong>: configuración, nombres NetBIOS, conexiones establecidas, puertos por aplicación, caché DNS y tabla ARP.</div>
+    <div class="chain-step"><strong>3 · Actividad del usuario</strong>: perfiles Wi-Fi, historial de comandos, unidades mapeadas y recursos compartidos.</div>
+    <div class="chain-step"><strong>4 · Lo más persistente</strong>: información del sistema, tareas programadas, logs de eventos, fichero hosts y árbol de directorios.</div>
+
+    <h3>Comandos utilizados</h3>
+    <table>
+      <tr><th>#</th><th>Evidencia</th><th>Comando</th></tr>
+      <tr><td><strong>1</strong></td><td>Fecha y hora</td><td><code>date /t & time /t</code></td></tr><tr><td><strong>2</strong></td><td>Procesos</td><td><code>tasklist</code></td></tr><tr><td><strong>3</strong></td><td>Servicios</td><td><code>net start / Get-Service</code></td></tr><tr><td><strong>4</strong></td><td>Usuarios logueados</td><td><code>query user</code></td></tr><tr><td><strong>5</strong></td><td>Usuarios que han iniciado sesión</td><td><code>Win32_NetworkLoginProfile + net user</code></td></tr><tr><td><strong>6</strong></td><td>Información de red</td><td><code>ipconfig /all</code></td></tr><tr><td><strong>7</strong></td><td>Nombres NetBIOS</td><td><code>nbtstat -n</code></td></tr><tr><td><strong>8</strong></td><td>Conexiones establecidas</td><td><code>netstat -ano | findstr ESTABLISHED</code></td></tr><tr><td><strong>9</strong></td><td>Aplicación ↔ puerto</td><td><code>netstat -anob</code></td></tr><tr><td><strong>10</strong></td><td>Dominios accedidos</td><td><code>ipconfig /displaydns</code></td></tr><tr><td><strong>11</strong></td><td>IP ↔ MAC</td><td><code>arp -a</code></td></tr><tr><td><strong>12</strong></td><td>Redes Wi-Fi</td><td><code>netsh wlan show profiles</code></td></tr><tr><td><strong>13</strong></td><td>Historial de comandos</td><td><code>Get-History + PSReadLine</code></td></tr><tr><td><strong>14</strong></td><td>Unidades mapeadas</td><td><code>net use</code></td></tr><tr><td><strong>15</strong></td><td>Recursos compartidos</td><td><code>net share</code></td></tr><tr><td><strong>16</strong></td><td>Información del equipo</td><td><code>systeminfo</code></td></tr><tr><td><strong>17</strong></td><td>Tareas programadas</td><td><code>schtasks /query /fo TABLE</code></td></tr><tr><td><strong>18</strong></td><td>Exportar logs</td><td><code>wevtutil epl</code></td></tr><tr><td><strong>19</strong></td><td>Fichero hosts</td><td><code>type …\etc\hosts</code></td></tr><tr><td><strong>20</strong></td><td>Árbol por fecha de creación</td><td><code>dir C:\ /t:c /o:d</code></td></tr>
+    </table>
+  </section>
+
+  <section class="box" id="resultados">
+    <h2>2. Resultados</h2>
+    <table>
+      <tr><th>Elemento</th><th>Hallazgo</th></tr>
+      <tr><td><strong>Equipo</strong></td><td>PCTREJO · Windows 11 Pro 10.0.26300 · ASUS, AMD x64, 32 GB RAM · WORKGROUP</td></tr>
+      <tr><td><strong>Inicio de la adquisición</strong></td><td>15/11/2026 11:58 p. m. (UTC−6)</td></tr>
+      <tr><td><strong>Sesión activa</strong></td><td>manue (console), desde el 15/11/2026 08:01 p. m.</td></tr>
+      <tr><td><strong>Red</strong></td><td>Ethernet 192.168.100.10 · gateway 192.168.100.1 · VMware VMnet1/VMnet8</td></tr>
+      <tr><td><strong>Wi-Fi</strong></td><td>wlansvc detenido: equipo por cable, sin perfiles guardados</td></tr>
+      <tr><td><strong>Recursos compartidos</strong></td><td>Solo C$, D$, IPC$ y ADMIN$ · sin unidades mapeadas</td></tr>
+      <tr><td><strong>Fichero hosts</strong></td><td>Sin entradas activas (limpio)</td></tr>
+      <tr><td><strong>Logs exportados</strong></td><td>System.evtx, Application.evtx y Security.evtx</td></tr>
+    </table>
+
+    <h3>CMD vs PowerShell</h3>
+    <table>
+      <tr><th>Aspecto</th><th>net start (CMD)</th><th>Get-Service (PowerShell)</th></tr>
+      <tr><td><strong>Servicios mostrados</strong></td><td>Solo los iniciados</td><td>Todos (Running y Stopped)</td></tr>
+      <tr><td><strong>Columnas</strong></td><td>Nombre descriptivo</td><td>Status, Name y DisplayName</td></tr>
+      <tr><td><strong>Uso forense</strong></td><td>Vista rápida y parcial</td><td>Inventario completo, filtrable y exportable</td></tr>
+    </table>
+
+    <div class="info-box">
+      <h4>ℹ️ Historial de comandos</h4>
+      <p><strong>Get-History</strong> solo ve la sesión actual de PowerShell; el historial real de sesiones anteriores está en el archivo <strong>ConsoleHost_history.txt</strong> de PSReadLine.</p>
+    </div>
+
+    <div class="warn-box">
+      <h4>⚠️ Posibles indicios a revisar</h4>
+      <ul>
+        <li>Cuentas no estándar: <strong>manue_le6rv7</strong> y <strong>WsiAccount</strong>.</li>
+        <li>Puertos sin dueño identificable (7680, 51233, 54235) y gran cantidad de conexiones internas en 127.0.0.1.</li>
+        <li>Los logs se exportaron a un Escritorio sincronizado con OneDrive; en un caso real deben ir a un medio externo.</li>
+      </ul>
+    </div>
+
+    <h3>Siguientes pasos</h3>
+    <ul class="lines">
+      <li>Calcular el hash SHA-256 de cada archivo recolectado y registrarlo en la cadena de custodia.</li>
+      <li>Volcar la memoria RAM y analizarla con Volatility.</li>
+      <li>Crear una imagen forense del disco con FTK Imager y analizarla con Autopsy.</li>
+      <li>Revisar los .evtx: eventos 4624/4625 (inicios de sesión), 4720 (creación de cuentas) y 7045 (servicios instalados).</li>
+      <li>Verificar el origen de las cuentas y ejecutables poco comunes y revisar sus hashes en VirusTotal.</li>
+    </ul>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>3. Capturas</h2>
+    <p>Salida de cada comando en el equipo analizado. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Punto 1 · Fecha y hora del sistema</h4>
+      <a href="img/act19_1.png" target="_blank" rel="noopener">
+        <img src="img/act19_1.png" alt="Salida de date /t & time /t" loading="lazy">
+      </a>
+      <figcaption><code>date /t & time /t</code> — 15/11/2026 11:58 p. m.: momento de inicio de la adquisición.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 2 · Procesos en ejecución</h4>
+      <a href="img/act19_2.png" target="_blank" rel="noopener">
+        <img src="img/act19_2.png" alt="Salida de tasklist" loading="lazy">
+      </a>
+      <figcaption><code>tasklist</code> — Procesos de Windows (lsass, services, svchost, LsaIso por Credential Guard) y de AMD, NVIDIA y ASUS.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 3a · Servicios desde CMD</h4>
+      <a href="img/act19_3a.png" target="_blank" rel="noopener">
+        <img src="img/act19_3a.png" alt="Salida de net start" loading="lazy">
+      </a>
+      <figcaption><code>net start</code> — Solo servicios iniciados, por nombre descriptivo y en orden alfabético.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 3b · Servicios desde PowerShell</h4>
+      <a href="img/act19_3b.png" target="_blank" rel="noopener">
+        <img src="img/act19_3b.png" alt="Salida de Get-Service" loading="lazy">
+      </a>
+      <figcaption><code>Get-Service</code> — Todos los servicios con Status (Running/Stopped), Name y DisplayName.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 4 · Usuarios con sesión activa</h4>
+      <a href="img/act19_4.png" target="_blank" rel="noopener">
+        <img src="img/act19_4.png" alt="Salida de query user" loading="lazy">
+      </a>
+      <figcaption><code>query user</code> — Una sola sesión: manue, console, ID 1, activa desde el 15/11/2026 08:01 p. m.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 5a · Usuarios que han iniciado sesión</h4>
+      <a href="img/act19_5a.png" target="_blank" rel="noopener">
+        <img src="img/act19_5a.png" alt="Salida de Win32_NetworkLoginProfile" loading="lazy">
+      </a>
+      <figcaption><code>Win32_NetworkLoginProfile</code> — Perfiles de SYSTEM, LOCAL SERVICE, NETWORK SERVICE, manue, WsiAccount y manue_le6rv7.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 5b · Cuentas locales</h4>
+      <a href="img/act19_5b.png" target="_blank" rel="noopener">
+        <img src="img/act19_5b.png" alt="Salida de net user" loading="lazy">
+      </a>
+      <figcaption><code>net user</code> — Administrador, DefaultAccount, Invitado, manue, manue_le6rv7, WDAGUtilityAccount y WsiAccount.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 6 · Configuración de red</h4>
+      <a href="img/act19_6.png" target="_blank" rel="noopener">
+        <img src="img/act19_6.png" alt="Salida de ipconfig /all" loading="lazy">
+      </a>
+      <figcaption><code>ipconfig /all</code> — Host PCTREJO, Ethernet 192.168.100.10 (gateway/DNS 192.168.100.1) y adaptadores VMware.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 7 · Nombres NetBIOS</h4>
+      <a href="img/act19_7.png" target="_blank" rel="noopener">
+        <img src="img/act19_7.png" alt="Salida de nbtstat -n" loading="lazy">
+      </a>
+      <figcaption><code>nbtstat -n</code> — PCTREJO <00> y <20> (Único) y WORKGROUP <00> (Grupo) en cada interfaz.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 8 · Conexiones establecidas</h4>
+      <a href="img/act19_8.png" target="_blank" rel="noopener">
+        <img src="img/act19_8.png" alt="Salida de netstat -ano | findstr ESTABLISHED" loading="lazy">
+      </a>
+      <figcaption><code>netstat -ano | findstr ESTABLISHED</code> — Conexiones locales 127.0.0.1 y salidas HTTPS (443), incluidas varias a 149.154.175.x (PID 6716).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 9 · Aplicación ↔ puerto</h4>
+      <a href="img/act19_9.png" target="_blank" rel="noopener">
+        <img src="img/act19_9.png" alt="Salida de netstat -anob" loading="lazy">
+      </a>
+      <figcaption><code>netstat -anob</code> — Ejecutable dueño de cada puerto: svchost, System, vmware-authd, RGSUpdater, Spotify, ASUS, Razer…</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 10 · Caché DNS</h4>
+      <a href="img/act19_10.png" target="_blank" rel="noopener">
+        <img src="img/act19_10.png" alt="Salida de ipconfig /displaydns" loading="lazy">
+      </a>
+      <figcaption><code>ipconfig /displaydns</code> — Dominios resueltos recientemente: Spotify, Sentry y Windows Update (Delivery Optimization).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 11 · Tabla ARP</h4>
+      <a href="img/act19_11.png" target="_blank" rel="noopener">
+        <img src="img/act19_11.png" alt="Salida de arp -a" loading="lazy">
+      </a>
+      <figcaption><code>arp -a</code> — IP ↔ MAC de los equipos vecinos; gateway 192.168.100.1 → 90-f9-70-c9-53-37.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 12 · Redes Wi-Fi</h4>
+      <a href="img/act19_12.png" target="_blank" rel="noopener">
+        <img src="img/act19_12.png" alt="Salida de netsh wlan show profiles" loading="lazy">
+      </a>
+      <figcaption><code>netsh wlan show profiles</code> — wlansvc no se está ejecutando: equipo conectado por cable, sin perfiles Wi-Fi.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 13a · Historial de la sesión</h4>
+      <a href="img/act19_13a.png" target="_blank" rel="noopener">
+        <img src="img/act19_13a.png" alt="Salida de Get-History" loading="lazy">
+      </a>
+      <figcaption><code>Get-History</code> — Solo los comandos de la sesión actual de PowerShell.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 13b · Historial persistente (PSReadLine)</h4>
+      <a href="img/act19_13b.png" target="_blank" rel="noopener">
+        <img src="img/act19_13b.png" alt="Salida de ConsoleHost_history.txt" loading="lazy">
+      </a>
+      <figcaption><code>ConsoleHost_history.txt</code> — Comandos de sesiones anteriores: Python, WSL, Docker y scripts del laboratorio.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 14 · Unidades mapeadas</h4>
+      <a href="img/act19_14.png" target="_blank" rel="noopener">
+        <img src="img/act19_14.png" alt="Salida de net use" loading="lazy">
+      </a>
+      <figcaption><code>net use</code> — No hay unidades de red mapeadas.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 15 · Recursos compartidos</h4>
+      <a href="img/act19_15.png" target="_blank" rel="noopener">
+        <img src="img/act19_15.png" alt="Salida de net share" loading="lazy">
+      </a>
+      <figcaption><code>net share</code> — Solo los administrativos por defecto: C$, D$, IPC$ y ADMIN$.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 16 · Información del equipo</h4>
+      <a href="img/act19_16.png" target="_blank" rel="noopener">
+        <img src="img/act19_16.png" alt="Salida de systeminfo" loading="lazy">
+      </a>
+      <figcaption><code>systeminfo</code> — Windows 11 Pro 10.0.26300, ASUS, AMD x64, 32 GB RAM, instalado el 11/09/2026 (correo del propietario oculto).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 17 · Tareas programadas</h4>
+      <a href="img/act19_17.png" target="_blank" rel="noopener">
+        <img src="img/act19_17.png" alt="Salida de schtasks /query /fo TABLE" loading="lazy">
+      </a>
+      <figcaption><code>schtasks /query /fo TABLE</code> — Tareas de Brave, Edge, NVIDIA, OneDrive, ASUS, Google y Office.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 18 · Exportación de logs</h4>
+      <a href="img/act19_18.png" target="_blank" rel="noopener">
+        <img src="img/act19_18.png" alt="Salida de wevtutil epl" loading="lazy">
+      </a>
+      <figcaption><code>wevtutil epl</code> — System.evtx, Application.evtx y Security.evtx exportados al Escritorio.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 19 · Fichero hosts</h4>
+      <a href="img/act19_19.png" target="_blank" rel="noopener">
+        <img src="img/act19_19.png" alt="Salida de type …\drivers\etc\hosts" loading="lazy">
+      </a>
+      <figcaption><code>type …\drivers\etc\hosts</code> — Solo el contenido de ejemplo de Microsoft, todo comentado: sin redirecciones.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Punto 20 · Directorios por fecha de creación</h4>
+      <a href="img/act19_20.png" target="_blank" rel="noopener">
+        <img src="img/act19_20.png" alt="Salida de dir C:\ /t:c /o:d" loading="lazy">
+      </a>
+      <figcaption><code>dir C:\ /t:c /o:d</code> — Carpetas base del 01/04/2024; la más reciente es Gowin (05/11/2026).</figcaption>
+    </figure>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>4_Descarga del documento</h2>
+    <p>Descarga el informe completo de la actividad, con cada comando, su resultado y el informe ejecutivo.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-ACT19.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-ACT19.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
