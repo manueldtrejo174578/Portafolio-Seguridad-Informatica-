@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto P3 — Operación Narcos: expediente Kowhai | MDTS Portafolio</title>
+<meta name="description" content="Proyecto P3: Operación Narcos, expediente Kowhai - análisis forense de la imagen Narcos-1 con FTK Imager y Autopsy - MDTS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #111411;
+    --box-bg: #1a1f1a;
+    --text-color: #a3cfa8;
+    --accent: #107C10;
+    --accent-bright: #5DC21E;
+    --border-color: #2b402c;
+    --shadow-color: #080a08;
+    --code-bg: #0d100d;
+    --warning: #c9a227;
+    --info: #4a90c9;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.05rem;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1, h2, h3, .tech-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #e0f2e3;
+    margin-top: 0;
+    letter-spacing: 1px;
+  }
+
+  h1 { font-size: 2.2rem; margin-bottom: 5px; line-height: 1.2; }
+  h2 { font-size: 1.6rem; border-bottom: 3px solid var(--border-color); display: inline-block; padding-bottom: 5px; text-transform: uppercase; margin-top: 0; }
+  h3 { font-size: 1.2rem; color: var(--accent-bright); margin: 25px 0 10px 0; }
+  h4 { font-family: 'Orbitron', sans-serif; color: #e0f2e3; font-size: 1rem; margin: 20px 0 8px 0; }
+
+  a {
+    color: var(--accent-bright);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .box {
+    background-color: var(--box-bg);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 2px;
+  }
+
+  header { margin-bottom: 40px; }
+  .id-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    border: 2px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  nav a:hover {
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+    border-color: var(--accent);
+  }
+
+  .tag-container { margin-top: 15px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--accent-bright);
+    background-color: var(--bg-color);
+    color: var(--accent-bright);
+    padding: 3px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .tag-warning { border-color: var(--warning); color: var(--warning); }
+  .tag-info { border-color: var(--info); color: var(--info); }
+
+  .info-box {
+    background: rgba(74, 144, 201, 0.1);
+    border: 2px solid var(--info);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .info-box h4 { color: var(--info); margin-top: 0; }
+  .info-box p { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--accent-bright);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+
+  .chain-step {
+    background: var(--code-bg);
+    border-left: 4px solid var(--accent-bright);
+    padding: 12px 18px;
+    margin: 12px 0;
+  }
+  .chain-step strong { color: var(--accent-bright); }
+
+  .capture {
+    margin: 25px 0 0 0;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    padding: 15px;
+    transition: all 0.2s;
+  }
+  .capture:hover {
+    border-color: var(--accent-bright);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .capture h4 { color: var(--accent-bright); margin: 0 0 12px 0; }
+  .capture a:hover { background: none; }
+  .capture img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid var(--border-color);
+    background: var(--code-bg);
+  }
+  .capture figcaption {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--bg-color);
+    color: var(--accent-bright);
+    border: 3px solid var(--border-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    text-decoration: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+  }
+
+  .sys-log { color: #68856b; font-size: 0.85rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #68856b;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    .btn { padding: 12px 15px; font-size: 0.8rem; }
+  }
+
+  .hash {
+    background: var(--code-bg);
+    border: 2px solid var(--border-color);
+    padding: 12px 15px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .hash .label { color: #68856b; font-size: 0.85rem; display: block; }
+  .hash code { color: #e0f2e3; font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .match { color: var(--accent-bright); font-weight: bold; }
+  .warn-box {
+    background: rgba(201, 162, 39, 0.08);
+    border: 2px solid var(--warning);
+    border-radius: 2px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  .warn-box h4 { color: var(--warning); margin-top: 0; }
+  .warn-box ul { margin-bottom: 0; padding-left: 20px; }
+  ul.lines li { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="box">
+    <div class="id-card">
+      <div>
+        <strong style="color: #e0f2e3; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Manuel Darío Trejo Salazar (MDTS)</strong><br>
+        <span class="sys-log">Univ. Politécnica de San Luis Potosí (UPSLP) | CNO IV Seguridad Informática | 7.º Semestre</span>
+      </div>
+      <div style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: bold; color: var(--accent-bright);">MT</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">/inicio</a></li>
+        <li><a href="parcial3.html">/tercer_parcial</a></li>
+        <li><a href="#explicacion">/explicacion</a></li>
+        <li><a href="#resultados">/resultados</a></li>
+        <li><a href="#capturas">/capturas</a></li>
+        <li><a href="#bibliografia">/bibliografia</a></li>
+        <li><a href="#descarga">/descargar_pdf</a></li>
+        <li><a href="road-to-hall-of-fame.html">/road-to-hall-of-fame</a></li>
+      </ul>
+    </nav>
+  </header>
+
+      <section class="box" id="inicio">
+    <span class="tech-title" style="font-size: 1rem; color: var(--accent-bright);">[ PROYECTO INTEGRADOR — TERCER PARCIAL ]</span>
+    <h1>OPERACIÓN NARCOS: EXPEDIENTE KOWHAI</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-bright);">[ Análisis forense de la imagen Narcos-1 con FTK Imager y Autopsy ]</p>
+    <p>
+      Dos pasajeros procedentes de Australia fueron interceptados en Wellington, Nueva Zelanda, con un kilogramo de metanfetamina. La investigación llevó a un inmueble en Petone relacionado con Steve Kowhai, donde se aseguró una computadora de escritorio. Como parte de la unidad forense, se examinó la imagen de ese equipo (Narcos-1) para identificar evidencia, reconstruir acontecimientos y distinguir lo que se puede demostrar de lo que no.
+    </p>
+    <div class="tag-container">
+      <span class="tag">FORENSE DIGITAL</span>
+      <span class="tag">AUTOPSY</span>
+      <span class="tag">FTK IMAGER</span>
+      <span class="tag tag-info">DIGITAL CORPORA · 2019 NARCOS</span>
+      <span class="tag tag-warning">CADENA DE CUSTODIA</span>
+    </div>
+  </section>
+
+  <section class="box" id="explicacion">
+    <h2>1. Metodología</h2>
+    <div class="chain-step"><strong>1 · Preservación</strong>: los 15 volúmenes Narcos1.zip se conservaron sin modificar y se calculó el MD5 de cada uno antes de extraerlos.</div>
+    <div class="chain-step"><strong>2 · Verificación</strong>: FTK Imager recalculó los hashes de la imagen raw de 21 segmentos y los comparó con el reporte de adquisición.</div>
+    <div class="chain-step"><strong>3 · Procesamiento</strong>: caso PR03 en Autopsy con la imagen Narcos-1.001, zona horaria Pacific/Auckland y módulos de ingesta.</div>
+    <div class="chain-step"><strong>4 · Análisis</strong>: Operating System Information, Web History, Recent Documents, Installed Programs, Run Programs (Prefetch), visor del Registro y metadatos NTFS.</div>
+    <div class="chain-step"><strong>5 · Interpretación</strong>: para cada hallazgo se separa lo observado, lo interpretado y lo que no puede confirmarse.</div>
+    <div class="hash"><span class="label">Imagen Narcos-1 · MD5 calculado = MD5 del reporte</span><code>c63a3d19e9c9495b573f45be544e50f9</code> <span class="match">✔ Match</span></div>
+    <div class="hash"><span class="label">SHA1 calculado = SHA1 del reporte</span><code>4d8e5041f47e0b0fc0eacc85d300661946537418</code> <span class="match">✔ Match</span></div>
+    <div class="info-box">
+      <h4>ℹ️ Zona horaria</h4>
+      <p>Autopsy mostró las marcas de tiempo en CST (UTC−6). Todas las fechas del informe se convirtieron a <strong>NZDT (UTC+13)</strong>, sumando 19 horas.</p>
+    </div>
+  </section>
+
+  <section class="box" id="resultados">
+    <h2>2. Parte I · Evidencia identificada</h2>
+    <table>
+      <tr><th>#</th><th>Pregunta</th><th>Resultado</th></tr>
+      <tr><td><strong>1</strong></td><td>Edición de Windows</td><td>Windows 10 Pro (AMD64) · equipo SK-DESKTOP · colmena SOFTWARE</td></tr><tr><td><strong>2</strong></td><td>Perfil principal</td><td>Steve · C:\Users\Steve</td></tr><tr><td><strong>3</strong></td><td>Clave UserAssist</td><td>NTUSER.DAT → Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist</td></tr><tr><td><strong>4</strong></td><td>Navegadores</td><td>Chrome (…\Chrome\User Data\Default\History) y Edge heredado / IE (…\WebCache\WebCacheV01.dat)</td></tr><tr><td><strong>5</strong></td><td>MD5 History de Chrome</td><td>f3f979c6dee9fbb7cbdf5818aaa4b723</td></tr><tr><td><strong>6</strong></td><td>Ruta de airport crystals.jpg</td><td>C:\Users\Steve\Documents\Misc\airport crystals.jpg</td></tr><tr><td><strong>7</strong></td><td>Creación de airport crystals.jpg</td><td>31/01/2019 10:25:18 NZDT</td></tr><tr><td><strong>8</strong></td><td>MD5 de dropoff.jpg</td><td>7feb763bebe42c3a3464c9ee3bb1d3e8</td></tr><tr><td><strong>9</strong></td><td>Modificación de dropoff.jpg</td><td>02/02/2019 14:06:06 NZDT</td></tr><tr><td><strong>10</strong></td><td>Reservación de vuelo</td><td>flightbookings.PNG · C:\Users\Steve\Documents\Misc</td></tr><tr><td><strong>11</strong></td><td>MD5 de Method run.jpg</td><td>69b225bc0ef5a0c003f1e2a6646aaf92</td></tr><tr><td><strong>12</strong></td><td>MD5 de BNE.png</td><td>dffa98bdd7371d1806adb09db27ba283</td></tr><tr><td><strong>13</strong></td><td>Esteganografía</td><td>Image Steganography 1.5.2 Setup.exe · Downloads · MD5 c9b7c382dea6d7f45ae1bf437860cb69</td></tr><tr><td><strong>14</strong></td><td>Cifrado</td><td>TrueCrypt Setup 7.1a.exe · C:\Users\Steve\Downloads</td></tr><tr><td><strong>15</strong></td><td>Discord / Timeline</td><td>AppData\Roaming\Discord\Cache · AppData\Local\ConnectedDevicesPlatform\2418c0082017486a\ActivitiesCache.db</td></tr>
+    </table>
+
+    <h2 style="margin-top:30px;">3. Parte II · Análisis del caso</h2>
+    <h3>Línea de tiempo (NZDT)</h3>
+    <table>
+      <tr><th>Fecha y hora</th><th>Evento</th></tr>
+      <tr><td>29/01/2019 09:56</td><td>Se instala Discord (Update.exe en AppData\Local\Discord)</td></tr>
+      <tr><td>30/01/2019 12:27</td><td>Descarga de TrueCrypt Setup 7.1a.exe</td></tr>
+      <tr><td>30/01/2019 12:41</td><td>Descarga de CCleaner (ccsetup552.exe)</td></tr>
+      <tr><td>30/01/2019 18:28</td><td>TrueCrypt v.7.1a queda registrado como programa instalado</td></tr>
+      <tr><td>31/01/2019 10:21–10:25</td><td>Se abren Method run.jpg y airport crystals.jpg (.lnk)</td></tr>
+      <tr><td>01/02/2019 13:13</td><td>Descarga de BNE.png</td></tr>
+      <tr><td>01/02/2019 13:16</td><td>Descarga de Image Steganography 1.5.2 Setup.exe</td></tr>
+      <tr><td>02/02/2019 14:06</td><td>dropoff.jpg (Biblioteca de Eastbourne)</td></tr>
+      <tr><td>02/02/2019 15:28</td><td>flightbookings.PNG (vuelo BNE → WLG del 16/02/2019)</td></tr>
+      <tr><td>02/02/2019 15:39</td><td>Última actividad en la caché de Discord</td></tr>
+    </table>
+
+    <h3>Coincidencias logísticas (P16–P17)</h3>
+    <ul class="lines">
+      <li><strong>flightbookings.PNG</strong>: Brisbane → Wellington el 16/02/2019 para 2 adultos (Virgin Australia), regreso el 23/02/2019; coincide con los dos pasajeros interceptados en Wellington.</li>
+      <li><strong>BNE.png</strong>: Brisbane, origen del vuelo. <strong>dropoff.jpg</strong>: Biblioteca de Eastbourne, uno de los puntos de entrega señalados.</li>
+      <li><strong>airport crystals.jpg</strong> (aeropuerto → Eastbourne) y <strong>Method run.jpg</strong> (recorrido desde “Home”) se abrieron el 31/01/2019, según sus accesos directos .lnk.</li>
+    </ul>
+
+    <h3>Herramientas: de la descarga al uso (P18–P19)</h3>
+    <table>
+      <tr><th>Herramienta</th><th>Descarga</th><th>Instalación</th><th>Ejecución</th><th>Uso efectivo</th></tr>
+      <tr><td><strong>Discord</strong></td><td>—</td><td>✔ AppData\Local\Discord</td><td>✔ Prefetch DISCORD.EXE</td><td>Caché y adjuntos; mensajes no recuperados</td></tr>
+      <tr><td><strong>TrueCrypt 7.1a</strong></td><td>✔ Downloads</td><td>✔ Installed Programs</td><td>Instalador sí; programa no verificado</td><td>✘ Sin contenedor localizado</td></tr>
+      <tr><td><strong>Image Steganography 1.5.2</strong></td><td>✔ Downloads</td><td>✘ Sin registro</td><td>✘ Sin registro</td><td>✘ No demostrado</td></tr>
+    </table>
+
+    <div class="info-box">
+      <h4>ℹ️ Hipótesis principal</h4>
+      <p>El equipo SK-DESKTOP (perfil Steve) se usó para coordinar la recepción y distribución de la droga traída desde Brisbane: reservación del vuelo, rutas desde el aeropuerto, punto de entrega en Eastbourne, comunicación por Discord y preparación de herramientas para proteger información.</p>
+    </div>
+    <div class="warn-box">
+      <h4>⚠️ Explicación alternativa y límites</h4>
+      <ul>
+        <li>Todos los archivos tienen Zone.Identifier y hay adjuntos de Discord: Steve pudo haberlos recibido de otra persona y no ser el organizador.</li>
+        <li>No se leen los nombres de los pasajeros en la reservación ni se recuperaron mensajes; no hay prueba de uso efectivo del cifrado ni de la esteganografía.</li>
+        <li>Evidencias adicionales necesarias: el contenido de Discord (volcado de memoria Narcos-Mem-1 o requerimiento legal) y la correlación con los equipos de John y Jane y con los registros de la aerolínea.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="box" id="capturas">
+    <h2>4. Capturas</h2>
+    <p>Evidencia de cada respuesta. Haz clic en una imagen para verla en tamaño completo.</p>
+
+    <figure class="capture">
+      <h4>Captura 1 · Evidencia original</h4>
+      <a href="img/p3_1.png" target="_blank" rel="noopener"><img src="img/p3_1.png" alt="Evidencia original" loading="lazy"></a>
+      <figcaption>Los 15 volúmenes Narcos1.zip.001 a .015 conservados sin modificar.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 2 · Hash de los volúmenes originales</h4>
+      <a href="img/p3_2.png" target="_blank" rel="noopener"><img src="img/p3_2.png" alt="Hash de los volúmenes originales" loading="lazy"></a>
+      <figcaption>MD5 de cada volumen calculado con Get-FileHash antes de extraer.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 3 · Imagen raw extraída</h4>
+      <a href="img/p3_3.png" target="_blank" rel="noopener"><img src="img/p3_3.png" alt="Imagen raw extraída" loading="lazy"></a>
+      <figcaption>Narcos-1.001 a Narcos-1.021 (30,720 MB) y el reporte de adquisición Narcos-1.001.txt.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 4 · Verificación con FTK Imager</h4>
+      <a href="img/p3_4.png" target="_blank" rel="noopener"><img src="img/p3_4.png" alt="Verificación con FTK Imager" loading="lazy"></a>
+      <figcaption>MD5 c63a3d19…50f9 y SHA1 4d8e5041…7418: Match, sin sectores dañados.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 5 · Caso en Autopsy</h4>
+      <a href="img/p3_5.png" target="_blank" rel="noopener"><img src="img/p3_5.png" alt="Caso en Autopsy" loading="lazy"></a>
+      <figcaption>Caso PR03, examinador y organización UPSLP.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 6 · Fuente de datos</h4>
+      <a href="img/p3_6.png" target="_blank" rel="noopener"><img src="img/p3_6.png" alt="Fuente de datos" loading="lazy"></a>
+      <figcaption>Narcos-1.001 con zona horaria Pacific/Auckland.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 7 · P1 · Sistema operativo</h4>
+      <a href="img/p3_7.png" target="_blank" rel="noopener"><img src="img/p3_7.png" alt="P1 · Sistema operativo" loading="lazy"></a>
+      <figcaption>Windows 10 Pro (AMD64), equipo SK-DESKTOP.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 8 · P2 · Perfil principal</h4>
+      <a href="img/p3_8.png" target="_blank" rel="noopener"><img src="img/p3_8.png" alt="P2 · Perfil principal" loading="lazy"></a>
+      <figcaption>Perfil Steve en C:\Users\Steve.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 9 · P4 · Web History</h4>
+      <a href="img/p3_9.png" target="_blank" rel="noopener"><img src="img/p3_9.png" alt="P4 · Web History" loading="lazy"></a>
+      <figcaption>994 registros de navegación.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 10 · P4 · Historial de Edge / IE</h4>
+      <a href="img/p3_10.png" target="_blank" rel="noopener"><img src="img/p3_10.png" alt="P4 · Historial de Edge / IE" loading="lazy"></a>
+      <figcaption>WebCacheV01.dat en AppData\Local\Microsoft\Windows\WebCache.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 11 · P5 · History de Chrome</h4>
+      <a href="img/p3_11.png" target="_blank" rel="noopener"><img src="img/p3_11.png" alt="P5 · History de Chrome" loading="lazy"></a>
+      <figcaption>MD5 f3f979c6dee9fbb7cbdf5818aaa4b723.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 12 · P6–P7 · airport crystals.jpg</h4>
+      <a href="img/p3_12.png" target="_blank" rel="noopener"><img src="img/p3_12.png" alt="P6–P7 · airport crystals.jpg" loading="lazy"></a>
+      <figcaption>Documents\Misc · creado el 31/01/2019 10:25:18 NZDT.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 13 · P8–P9 · dropoff.jpg</h4>
+      <a href="img/p3_13.png" target="_blank" rel="noopener"><img src="img/p3_13.png" alt="P8–P9 · dropoff.jpg" loading="lazy"></a>
+      <figcaption>MD5 7feb763b…d3e8 · modificado el 02/02/2019 14:06:06 NZDT.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 14 · P10 · flightbookings.PNG</h4>
+      <a href="img/p3_14.png" target="_blank" rel="noopener"><img src="img/p3_14.png" alt="P10 · flightbookings.PNG" loading="lazy"></a>
+      <figcaption>Documents\Misc\flightbookings.PNG.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 15 · P11 · Method run.jpg</h4>
+      <a href="img/p3_15.png" target="_blank" rel="noopener"><img src="img/p3_15.png" alt="P11 · Method run.jpg" loading="lazy"></a>
+      <figcaption>MD5 69b225bc0ef5a0c003f1e2a6646aaf92.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 16 · P12 · BNE.png</h4>
+      <a href="img/p3_16.png" target="_blank" rel="noopener"><img src="img/p3_16.png" alt="P12 · BNE.png" loading="lazy"></a>
+      <figcaption>Downloads\Misc · MD5 dffa98bdd7371d1806adb09db27ba283.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 17 · P13 · Instalador de esteganografía</h4>
+      <a href="img/p3_17.png" target="_blank" rel="noopener"><img src="img/p3_17.png" alt="P13 · Instalador de esteganografía" loading="lazy"></a>
+      <figcaption>Image Steganography 1.5.2 Setup.exe · MD5 c9b7c382dea6d7f45ae1bf437860cb69.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 18 · P14 · Instalador de cifrado</h4>
+      <a href="img/p3_18.png" target="_blank" rel="noopener"><img src="img/p3_18.png" alt="P14 · Instalador de cifrado" loading="lazy"></a>
+      <figcaption>TrueCrypt Setup 7.1a.exe en Downloads.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 19 · P15 · Caché de Discord</h4>
+      <a href="img/p3_19.png" target="_blank" rel="noopener"><img src="img/p3_19.png" alt="P15 · Caché de Discord" loading="lazy"></a>
+      <figcaption>AppData\Roaming\Discord\Cache.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 20 · P15 · ConnectedDevicesPlatform</h4>
+      <a href="img/p3_20.png" target="_blank" rel="noopener"><img src="img/p3_20.png" alt="P15 · ConnectedDevicesPlatform" loading="lazy"></a>
+      <figcaption>Carpeta de Windows Timeline (ActivitiesCache.db).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 21 · P16 · Reservación de vuelo</h4>
+      <a href="img/p3_21.png" target="_blank" rel="noopener"><img src="img/p3_21.png" alt="P16 · Reservación de vuelo" loading="lazy"></a>
+      <figcaption>BNE → WLG el 16/02/2019 para 2 adultos; regreso el 23/02/2019.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 22 · P16 · BNE.png</h4>
+      <a href="img/p3_22.png" target="_blank" rel="noopener"><img src="img/p3_22.png" alt="P16 · BNE.png" loading="lazy"></a>
+      <figcaption>Fotografía de Brisbane (Story Bridge).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 23 · P16 · dropoff.jpg</h4>
+      <a href="img/p3_23.png" target="_blank" rel="noopener"><img src="img/p3_23.png" alt="P16 · dropoff.jpg" loading="lazy"></a>
+      <figcaption>Google Maps: Biblioteca de Eastbourne.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 24 · P17 · airport crystals.jpg</h4>
+      <a href="img/p3_24.png" target="_blank" rel="noopener"><img src="img/p3_24.png" alt="P17 · airport crystals.jpg" loading="lazy"></a>
+      <figcaption>Ruta del aeropuerto de Wellington hacia Eastbourne.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 25 · P17 · Method run.jpg</h4>
+      <a href="img/p3_25.png" target="_blank" rel="noopener"><img src="img/p3_25.png" alt="P17 · Method run.jpg" loading="lazy"></a>
+      <figcaption>Recorrido en la región de Wellington con “Home” marcado.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 26 · P17 · Recent Documents</h4>
+      <a href="img/p3_26.png" target="_blank" rel="noopener"><img src="img/p3_26.png" alt="P17 · Recent Documents" loading="lazy"></a>
+      <figcaption>Accesos directos a enlaces y adjuntos de Discord.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 27 · P18 · Instalación de Discord</h4>
+      <a href="img/p3_27.png" target="_blank" rel="noopener"><img src="img/p3_27.png" alt="P18 · Instalación de Discord" loading="lazy"></a>
+      <figcaption>AppData\Local\Discord: Update.exe, app-0.0.304, SquirrelSetup.log.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 28 · P18 · Prefetch de Discord</h4>
+      <a href="img/p3_28.png" target="_blank" rel="noopener"><img src="img/p3_28.png" alt="P18 · Prefetch de Discord" loading="lazy"></a>
+      <figcaption>Varias entradas de DISCORD.EXE-794770A9.pf: el programa se ejecutó.</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 29 · P19 · Carpeta Downloads</h4>
+      <a href="img/p3_29.png" target="_blank" rel="noopener"><img src="img/p3_29.png" alt="P19 · Carpeta Downloads" loading="lazy"></a>
+      <figcaption>TrueCrypt, Image Steganography y CCleaner (ccsetup552.exe).</figcaption>
+    </figure>
+    <figure class="capture">
+      <h4>Captura 30 · P19 · TrueCrypt instalado</h4>
+      <a href="img/p3_30.png" target="_blank" rel="noopener"><img src="img/p3_30.png" alt="P19 · TrueCrypt instalado" loading="lazy"></a>
+      <figcaption>Installed Programs: TrueCrypt v.7.1a (colmena SOFTWARE).</figcaption>
+    </figure>
+  </section>
+
+  <section class="box" id="bibliografia">
+    <h2>5. Bibliografía</h2>
+    <ul class="lines">
+      <li>Garfinkel, S., Farrell, P., Roussev, V. y Dinolt, G. (2009). <em>Bringing Science to Digital Forensics with Standardized Forensic Corpora</em>. Digital Forensic Research Workshop (DFRWS), Montreal, Canadá. <a href="https://simson.net/clips/academic/2009.DFRWS.Corpora.pdf" target="_blank" rel="noopener">https://simson.net/clips/academic/2009.DFRWS.Corpora.pdf</a></li>
+      <li>Digital Corpora. (2019). <em>2019 Narcos</em> [Escenario forense de práctica]. <a href="https://digitalcorpora.org/corpora/scenarios/2019-narcos/" target="_blank" rel="noopener">https://digitalcorpora.org/corpora/scenarios/2019-narcos/</a></li>
+    </ul>
+  </section>
+
+  <section class="box" id="descarga">
+    <h2>6_Descarga del documento</h2>
+    <p>Descarga el informe completo del proyecto, con la Parte I, la Parte II y la bibliografía.</p>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="TrejoSalazarManuelDarío-P3-Narcos.pdf" class="btn" download>📥 Descargar TrejoSalazarManuelDarío-P3-Narcos.pdf</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Manuel Darío Trejo Salazar (MDTS) — Portafolio CNO IV</p>
+    <p>Hecho con HTML y CSS</p>
+  </footer>
+
+</div>
+</body>
+</html>
